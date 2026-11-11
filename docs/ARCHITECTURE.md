@@ -6,123 +6,124 @@ How the code is organised and how to change it safely. For what the site does, s
 
 ```
 Editor (Pages CMS forms)
-   |  saves = a commit
+   |  a save = a commit to main
    v
 GitHub repository:  src/content/**  and  public/uploads/**
-   |  push triggers a build on the host
+   |  the push starts .github/workflows/deploy.yml
    v
 npm run build
    1. scripts/optimize-images.mjs   public/uploads/*  ->  public/_img/*.webp + manifest.json
    2. astro build
-        src/content.config.ts   loads and validates the content files (forgiving)
-        src/lib/content.ts      normalises: defaults, sorting, links, dates, images
-        src/pages, layouts, components   render HTML
+        src/content.config.ts   loads the people and pages collections (forgiving)
+        src/lib/content.ts      settings, people, pages, links, images, text rendering
+        src/lib/i18n.ts         languages, fixed wording, the tr() fallback helper
+        src/pages, layouts, components   render HTML for every language
    v
-dist/   plain static files, served by the host
+dist/   plain static files, published to GitHub Pages
 ```
 
-There is no runtime code on the server. The only browser JavaScript is one small inline script in `src/layouts/Base.astro` that hides past program items.
+Nothing runs on a server. Browser JavaScript is two small inline scripts: the menu button (`Base.astro`) and the language redirect on `/` (`pages/index.astro`). The site works without either.
 
 ## File map
 
 | Path | Responsibility |
 |---|---|
-| `src/content/settings/site.json`, `home.json` | Site-wide settings and home page texts (read directly by `lib/content.ts`) |
-| `src/content/events`, `people`, `links` | One JSON file per item (collections) |
-| `src/content/pages/*.md` | Free-form text pages (collection, Markdown) |
+| `src/content/settings/site.json` | Community name, main language, contact, "hide from Google" |
+| `src/content/settings/community.json` | Community home page (nearly empty on purpose) |
+| `src/content/settings/festival.json` | Festival home, ticket link, program images, page headings |
+| `src/content/people/*.json` | One file per teacher or artist |
+| `src/content/pages/*.json` | One file per festival text page; the file name is the address |
 | `public/uploads/` | Uploaded photos (committed). `public/_img/` is generated and ignored by Git |
-| `.pages.yml` | The editing forms (Pages CMS). Must mirror the content model |
-| `src/content.config.ts` | Declares the four collections and their (forgiving) shape |
+| `.pages.yml` | The editing forms. Must mirror the content model |
+| `src/content.config.ts` | Declares the two collections and their forgiving shape |
 | `src/lib/schema.ts` | Forgiving field types: `text`, `flag`, `num`, `textList` |
-| `src/lib/content.ts` | The only place pages get content from: settings, events, people, links, pages, dates, safe links, images |
-| `src/layouts/Base.astro` | Head, menu, footer, the past-event script |
-| `src/pages/index.astro`, `program.astro`, `people.astro`, `[slug].astro`, `404.astro` | The routes |
-| `src/components/EventRow.astro`, `PersonCard.astro`, `Picture.astro` | Reusable pieces |
+| `src/lib/i18n.ts` | `LANGS`, the fixed wording in each language (`UI`), and `tr(obj, 'field', lang)` |
+| `src/lib/content.ts` | The only place pages get content from: settings, people, pages, `href`, `withBase`, `safeUrl`, `getImage`, `paragraphs`, `renderBody` |
+| `src/layouts/Base.astro` | Head tags, header (brand, date, language switch, menu), footer. Takes `lang`, `section`, `pagePath` and optionally `tone` (page background: `red`, `dark` or `cream`) |
+| `src/pages/index.astro` | `/`: redirect to a language |
+| `src/pages/[lang]/index.astro` | Community home |
+| `src/pages/[lang]/festival/index.astro`, `program.astro`, `teachers.astro`, `artists.astro`, `[slug].astro` | The festival |
+| `src/pages/404.astro` | Not found, both languages |
+| `src/components/Hero.astro`, `PageTitle.astro`, `PersonList.astro`, `Picture.astro` | Banner, red title band, people list, responsive photo |
 | `src/styles/global.css` | All styling; colours and fonts as variables at the top |
 | `scripts/optimize-images.mjs` | Photo resizing before each build |
-| `scripts/check.mjs` | `npm run check`: reproducible tests |
-| `astro.config.mjs` | Reads `SITE_URL` and `SITE_BASE` from the environment (defaults `https://example.com` and `/`); trailing slash setting |
-| `.github/workflows/deploy.yml` | GitHub Pages: check job, build job (works out URL/base, builds, uploads), deploy job |
-| `scripts/ci-build.mjs` | Runs the build in CI and copies `[content-warning]` lines to the run summary |
-| `.node-version`, `package.json`, `package-lock.json` | Pinned Node (22.23.4), scripts, two exactly pinned dependencies (`astro`, `sharp`) |
-| `.gitattributes`, `.editorconfig`, `public/.nojekyll` | Line endings, editor settings, tells GitHub Pages not to post-process files |
-| `README.md`, `EDITING-GUIDE.md`, `CLAUDE.md`, `docs/*` | Documentation (see "Documentation" in `README.md`) |
+| `scripts/check.mjs` | `npm run check`: four test builds with assertions |
+| `scripts/ci-build.mjs` | The build as run on GitHub; copies warnings to the run summary |
+| `.github/workflows/deploy.yml` | Build once and deploy, on every push to `main` |
+| `.github/workflows/check.yml` | `npm run check`, only when code changes and on pull requests |
+| `astro.config.mjs` | Reads `SITE_URL` and `SITE_BASE`; trailing slashes |
+| `.node-version`, `package.json`, `package-lock.json` | Pinned Node and six exactly pinned dependencies: `astro`, `sharp`, `marked`, three `@fontsource-variable/*` fonts |
 
 ## Rules the code follows
 
-1. **Pages never read raw files.** They call helpers in `src/lib/content.ts`, which tolerate missing fields and skip broken entries with a `[content-warning]` line.
-2. **Every field is optional in the code.** "Required" lives only in `.pages.yml`.
-3. **Links go through `safeUrl`** before being rendered. **Photos go through `getImage`**, which returns web-sized copies, the original, or nothing.
-4. **Dates are calendar days** parsed at noon UTC and formatted in UTC, so no time zone can shift a day.
-5. **No third-party requests** from the pages (no fonts, scripts, trackers).
-6. **Never write a root-relative address (`/program/`, `/uploads/x.jpg`) by hand in pages or components.** Use `withBase()` for internal addresses; `safeUrl()` and `getImage()` already apply it. Markdown text pages are fixed by `rebaseHtml()` in `[slug].astro` (Astro 7's default Markdown processor has no simple plugin hook, so the rendered HTML is rewritten instead). `npm run check` section 4 fails if a link ignores the base.
+1. **Pages never read raw files.** They call helpers in `src/lib/content.ts`.
+2. **Every field is optional in the code.** "Required" lives only in `.pages.yml`. Problems become `[content-warning]` lines, never failures.
+3. **Two-language fields are always read with `tr()`**, which falls back to the other language. Never read `x_en` or `x_hu` directly in a page.
+4. **Every page takes its language from the address** (`Astro.params.lang`) and passes `lang`, `section` and `pagePath` to `Base`. `pagePath` is the address without the language (`/festival/program/`); the language switch, the menu marker and `hreflang` all depend on it being right.
+5. **Never write an address by hand.** Use `href(lang, '/festival/...')` for pages and `withBase()` for anything else; `safeUrl()` and `getImage()` already apply the base path. HTML from text bodies goes through `renderBody()`, which also rewrites root-relative links. `npm run check` section 4 fails if an address ignores the base.
+6. **Links go through `safeUrl`; photos go through `getImage`** (or the `Picture` component).
+7. **No third-party requests.** Fonts come from the `@fontsource-variable` packages, imported in `Base.astro`.
 
 ## Astro 7 specifics (this repo uses Astro 7.4)
 
-These differ from older tutorials:
-
-- `defineCollection` comes from `astro/content/config`, the `glob` loader from `astro/loaders`, and `z` from `astro/zod`. The collections file is `src/content.config.ts`.
-- Rendering Markdown: `import { render } from 'astro:content'` and `await render(entry)`.
-- Entry ids are generated from file names with `generateId` (see `content.config.ts`), so a stored reference like `src/content/people/teacher-anna.json` matches the id `teacher-anna`.
-- The `create-astro` templates cannot be downloaded in restricted environments; the project was created by hand (`npm install astro sharp`).
+- `defineCollection` comes from `astro/content/config`, the `glob` loader from `astro/loaders`, `z` from `astro/zod`. The collections file is `src/content.config.ts`.
+- Entry ids are generated from file names (`generateId` in `content.config.ts`).
+- `getStaticPaths` is hoisted; it cannot use variables declared outside it. Imports are fine.
 - Astro 7 needs Node 22.23.4 or newer.
+- `create-astro` templates could not be downloaded in the sandbox this was built in; the project was set up by hand.
 
 ## Gotchas
 
-- `getStaticPaths` in `[slug].astro` is hoisted by Astro; it cannot use variables declared outside it. Imports are fine.
 - `lib/content.ts` finds `public/_img/manifest.json` through `process.cwd()`, so builds must run from the project root (npm scripts do).
-- In `.pages.yml` reference labels, `{name}` means the entry's file name, not the `name` field. Use `{primary}` to show the primary field.
-- Hidden elements need the `[hidden] { display: none !important }` rule in `global.css`; component styles that set `display` would otherwise override the `hidden` attribute.
-- Renaming a person's file silently unlinks them from program items (references are file paths).
-- `public/_img` is regenerated on every build; never commit it or edit it.
+- `public/_img` is regenerated on every build; never commit or edit it.
+- The phone menu depends on the `js` and `menu-open` classes the inline script puts on `<html>`. Without the script the menu is visible by default; keep it that way.
+- The header is sticky and the open phone menu is positioned below it using `--header-h` in `global.css`. If the header height changes, change that variable.
+- The one-row desktop header starts at 1180 px because the menu does not fit below that. Adding a menu entry or a longer word means re-testing 1180 px in both languages and raising the breakpoint if it overflows.
+- A text page's file name is its address in both languages. Renaming the file changes the address and breaks links to it.
+- In `.pages.yml`, `{primary}` in a file name pattern is the primary field's value; how it treats accented letters is unverified.
 - Pages CMS's stored value formats were assumed from its docs, not observed. See the assumptions table in `DECISIONS.md`.
 
 ## How to change things
 
-### Add a field to something that exists (for example a "video link" on people)
+### Add a field to something that exists
 
-1. `src/content.config.ts`: add the field with the matching helper from `lib/schema.ts` (`text`, `flag`, `num`, `textList`).
-2. `.pages.yml`: add the form field to the same collection.
-3. The page or component that shows it (use `safeUrl` for links).
-4. Add a sample value to one or two placeholder files, and a line in `SPEC.md` section 5.
-5. `npm run check`.
+1. `src/content.config.ts` (people, pages) or the schema in `src/lib/content.ts` (settings files): add the field with a helper from `lib/schema.ts`. For a two-language field add both `x_en` and `x_hu`.
+2. `.pages.yml`: add the form field or fields in the same place.
+3. The page or component that shows it: read it with `tr()` if it has two languages, `safeUrl` if it is a link.
+4. Add a value to a content file, a line in `SPEC.md` section 5, and run `npm run check`.
 
-### Add a new kind of content (a new collection)
+### Add a new kind of content (for example classes on the community level)
 
-1. Create the folder under `src/content/` and a sample file.
-2. `content.config.ts`: new `defineCollection` with the `glob` loader and `generateId: idFromFile`; add it to `collections`.
-3. `lib/content.ts`: a `getX()` helper that normalises and sorts; use `console.warn('[content-warning] ...')` for anything skipped.
-4. A page or section that uses it.
-5. `.pages.yml`: a new `content` entry (collection, `format: json`, `view.primary`).
-6. `scripts/check.mjs`: add an assertion; `SPEC.md`: document it; `DECISIONS.md` if it is a real decision.
+1. Create the folder under `src/content/` with a sample file.
+2. `content.config.ts`: a new `defineCollection` with `generateId: idFromFile`; add it to `collections`.
+3. `lib/content.ts`: a `getX()` helper that sorts and warns about anything it skips.
+4. A page under `src/pages/[lang]/...` with `getStaticPaths` returning every language.
+5. `.pages.yml`: a new `content` entry.
+6. `scripts/check.mjs`: add an assertion. `SPEC.md` and, if it is a real decision, `DECISIONS.md`.
 
 ### Add a page (route)
 
-Add a file in `src/pages/`, wrap it in `Base`, and read content only through `lib/content.ts`. Add its address to the reserved list in `lib/content.ts` (`RESERVED_SLUGS`) so a text page cannot clash with it, and to the menu in `Base.astro` if it should appear there.
+Add a file under `src/pages/[lang]/`, export `getStaticPaths` that returns `LANGS`, wrap it in `Base` with the right `section` and `pagePath`. Add it to the menu in `Base.astro`, its menu word to both languages in `i18n.ts`, and, if it sits under `/festival/`, its name to `RESERVED_SLUGS` in `lib/content.ts`.
 
 ### Add a text page without code
 
-Add a Markdown file in `src/content/pages/` (or use the editor). It gets the address `/<file-name>/` and appears in the menu when `showInMenu` is true.
+Use the editor (Festival > Text pages), or add a JSON file in `src/content/pages/`.
 
-### Add a second language (not designed yet)
+### Change fixed wording or add a language
 
-Two realistic shapes, to decide with the admin:
-- **Separate content per language** (`src/content/en/...`, pages under `/en/`): simple for editors to understand, doubles what they maintain, and needs a language switcher.
-- **Translated fields in the same files** (`title_en`, `bio_en`): fewer files, but forms become long.
-Either way the labels in `site.json` need a per-language set. Record the choice in `DECISIONS.md`.
+Wording: edit `UI` in `src/lib/i18n.ts`, same key in every language.
+A third language: add it to `LANGS`, `LANG_LABEL`, `LANG_NAME` and `UI`; add `_xx` fields to the schemas and to `.pages.yml`; add the `og:locale` case in `Base.astro`. The forms get long with three languages; reconsider decision 5 first.
 
-### Replace the design with the admin's
+### Change the design
 
-Keep `lib/`, `content.config.ts`, `.pages.yml`, the content and the scripts. Replace `src/styles/global.css` and the markup in `src/pages`, `src/components` and `src/layouts`. Keep calling the same helpers. Keep the safe-link, photo and past-event behaviours (SPEC R9, R18, R19). Run `npm run check` and the manual checks in `HANDOFF.md`.
+Colours and fonts: the variables at the top of `src/styles/global.css`. Layout: that file and the markup in `src/components` and `src/pages`. Keep calling the same helpers and keep rules 3 to 6. Then run `npm run check` and the browser checks in `HANDOFF.md`.
+To change a font: install the `@fontsource-variable/<name>` package with an exact version, import it in `Base.astro`, and set the variable in `global.css`.
 
-### Swap the editing tool
+### Swap the editing tool or the host
 
-The content files do not change. Replace `.pages.yml` with the new tool's configuration, keep `content.config.ts` as the source of truth for the content shape, and re-check the stored value formats (photo paths, references, dates).
+Editor: the content files do not change. Replace `.pages.yml` with the new tool's configuration and re-check the stored value formats.
+Host: any static host. Build command `npm run build`, output folder `dist`, Node 22.23.4 or newer, `SITE_URL` set to the real address (`SITE_BASE` only under a sub-path).
 
-### Swap the host
+### Upgrade Astro, Node or another dependency
 
-Any static host: build command `npm run build`, output folder `dist`, Node 22.23.4 or newer. Set `SITE_URL` (and `SITE_BASE` if served under a sub-path) in the host's environment. On a custom domain `SITE_BASE` stays `/`.
-
-### Upgrade Astro or Node
-
-Change the exact versions in `package.json` and `.node-version` (also `node-version` in `.github/workflows/deploy.yml`), run `npm install`, then `npm run check` and the manual browser checks. Re-read the "Astro 7 specifics" above if imports break.
+Change the exact versions in `package.json` and `.node-version` (and `node-version` in `deploy.yml`), run `npm install`, then `npm run check` and the browser checks.

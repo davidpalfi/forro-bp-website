@@ -1,0 +1,58 @@
+---
+// The festival home page: banner, intro, the counts line, buttons.
+import Base from '../../../layouts/Base.astro';
+import Hero from '../../../components/Hero.astro';
+import { getFestival, getPages, paragraphs, safeUrl, href } from '../../../lib/content';
+import { LANGS, UI, tr, type Lang } from '../../../lib/i18n';
+
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const festival = getFestival();
+const intro = paragraphs(tr(festival, 'intro', lang));
+const stats = tr(festival, 'stats', lang);
+const ticketUrl = safeUrl(festival.ticketUrl);
+const ticketLabel = tr(festival, 'ticketLabel', lang) || UI[lang].tickets;
+const buttons = (await getPages()).filter((p) => p.showOnHome);
+---
+
+<Base lang={lang} section="festival" pagePath="/festival/">
+  <Hero
+    image={festival.heroImage}
+    imagePhone={festival.heroImagePhone}
+    logo={festival.logo}
+    title={festival.name}
+    dateLine={tr(festival, 'dateLine', lang)}
+    buttonUrl={ticketUrl}
+    buttonLabel={ticketLabel}
+    buttonNewTab
+  />
+  {
+    intro.length > 0 && (
+      <section class="band band--red intro">
+        {intro.map((p) => (
+          <p>{p}</p>
+        ))}
+      </section>
+    )
+  }
+  <section class="band band--red band--center">
+    {stats && <p class="stats">{stats}</p>}
+    {
+      buttons.map((p) => (
+        <a class="button" href={href(lang, `/festival/${p.slug}/`)}>
+          {tr(p, 'title', lang)}
+        </a>
+      ))
+    }
+    {
+      ticketUrl && (
+        <a class="ticket-text" href={ticketUrl} target="_blank" rel="noopener">
+          {ticketLabel}
+        </a>
+      )
+    }
+  </section>
+</Base>

@@ -1,0 +1,23 @@
+---
+import Base from '../../../layouts/Base.astro';
+import PageTitle from '../../../components/PageTitle.astro';
+import PersonList from '../../../components/PersonList.astro';
+import { getFestival, getPeople } from '../../../lib/content';
+import { LANGS, UI, tr, type Lang } from '../../../lib/i18n';
+
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const festival = getFestival();
+const people = await getPeople('teacher');
+const heading = tr(festival, 'teachersHeading', lang) || UI[lang].teachers;
+---
+
+<Base lang={lang} section="festival" pagePath="/festival/teachers/" title={UI[lang].teachers}>
+  <PageTitle title={heading} />
+  <section class="page page--wide">
+    <PersonList people={people} lang={lang} />
+  </section>
+</Base>

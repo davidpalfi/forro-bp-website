@@ -1,117 +1,113 @@
 # Handoff: start here
 
-If you are picking this project up with no other context, read this file first, then `USER-NEEDS.md` (who it is for, and how little is verified), then `SPEC.md` (what the site does), `DECISIONS.md` (why), and `ARCHITECTURE.md` (how the code is organised). `CLAUDE.md` has the rules for editing content; `EDITING-GUIDE.md` is for the person who edits the site.
+If you are picking this project up with no other context, read this file first, then `USER-NEEDS.md` (who it is for and how little is verified), `DECISIONS.md` (why), `SPEC.md` (what the site does) and `ARCHITECTURE.md` (how the code is organised). `CLAUDE.md` has the rules for a Claude session working in the repo; `EDITING-GUIDE.md` is for the person who edits the site.
 
 ## In 60 seconds
 
-- **What:** a static website for a dance festival (Astro). It replaces a Wix site. Content is plain files in this repo; a free editor (Pages CMS) gives the non-technical admin forms to change them; Cloudflare Pages builds and hosts it.
-- **What the owner wants, in priority order:** the admin can update it herself; it is robust and hard for her to break; as little dependence on outside providers as possible (leaving Wix is the point). The real content and layout are not decided yet, so this is a base to prototype on. The admin is a designer and will provide her own design later.
-- **State:** the prototype is built and its build-level checks pass. It has placeholder content. It is ready to push to GitHub and publish with GitHub Pages (workflow included, not yet run on a real repository). The live editor (Pages CMS) has never been connected to it.
-- **First thing to do:** the "first test" below, because the whole plan rests on it.
+- **What:** one static website (Astro) for the Forró Budapest community. The community level is an empty shell; the Budapest Forró Festival sits below it at `/<lang>/festival/`. English and Hungarian. The look is copied from the festival's current Wix site (forrobudapest.com), which this is meant to replace.
+- **How it is edited:** content is JSON files in this repo. A free editor (Pages CMS) gives the non-technical admin forms that save those files. GitHub Pages builds and hosts it.
+- **What the owner wants, in order:** the admin updates it herself; no subscription or paid accounts; hard to break.
+- **State:** a proof of concept to show the admin. It builds, the automated checks pass, and it was looked at in a browser at phone and desktop size. It has **never been on GitHub**, and **Pages CMS has never been connected**. Photos, the logo and most longer texts are placeholders.
+- **First thing to do:** publish it and run the editor trial with the admin (steps 1 to 3 below). The whole plan rests on that.
 
-## Status
+## Status (2026-11-11)
 
 Done:
-- Pages: home, program, people, text pages, 404 (`SPEC.md` section 3).
-- Content model, forgiving schema, safe links, photo resizing, past-event hiding (`SPEC.md` sections 5 and 6).
-- Editing forms config (`.pages.yml`), written from the Pages CMS docs.
-- Documentation, and `npm run check` (builds the real content and a deliberately broken copy, plus an expected-failure case).
-- Checked by hand once: mobile and desktop layout, past-event hiding with and without JavaScript, a rotated oversized phone photo, Hungarian date formatting.
+- Pages in both languages: community home, festival home, program, teachers, artists, text pages (location, code of conduct), 404, and the language redirect on `/`.
+- Content model with both languages side by side, falling back to the other language when one is empty.
+- The Wix look on phones and desktop, built from screenshots of both: red pages, dark people cards (two side by side on desktop), cream text pages, grey footer, sticky header with the one-row desktop menu and cream ticket button, full-screen phone menu, torn-paper buttons, banner block to the left on desktop.
+- Editing forms (`.pages.yml`), written from the Pages CMS docs.
+- Lenient content handling, photo resizing, safe links, sharing image and language tags.
+- Two workflows: deploy (one build per push) and check (only when code changes).
+- `npm run check`: 35 assertions over four builds, all passing.
+- Looked at in Chromium at eleven widths from 320 to 1920 px in both languages: no horizontal scrolling, no console errors, no third-party requests; the menu button works; `/` redirects by browser language and without JavaScript.
+
+Real content already in place (taken from the Wix site):
+- Festival name, dates, ticket link, Instagram link, contact email.
+- The home page intro and the line of numbers, in both languages.
+- The names, roles and Instagram links of the six teachers and six artists (Hungarian role only where it was seen: "Tánctanár").
+- Page headings seen on the Wix site.
+- The English code of conduct, **without** the care team's names and phone numbers (left out of a public repository on purpose; the admin can add them).
+
+Placeholders, to be replaced:
+- **All images**: logo (the name is shown as text), banner photo, program graphic, every person's photo, location photos.
+- **All bios**, in both languages. The tool used to read the Wix site would not copy long texts word for word, and the Hungarian pages could not be opened from the sandbox. Pasting them in is a natural part of the editor trial.
+- **The location text**: a short summary in both languages, marked as placeholder wording.
+- Hungarian: the code of conduct, the artists page heading, the roles "Consent Facilitator" and "Music Teacher", the ticket button label. These show the English text until filled in.
+- The fixed Hungarian wording in `src/lib/i18n.ts` was written by Claude; a native speaker should read it once.
 
 Not done:
-- Git repository, GitHub, hosting, domain.
-- Connecting Pages CMS and inviting the admin (acceptance criteria AC12 and AC13 in `SPEC.md`).
-- Confirming that a failed build leaves the previous version live (AC14).
-- The real content, languages and design (`SPEC.md` section 10).
-- Accessibility beyond basics; testing in browsers other than Chromium; any analytics, sitemap or forms.
+- Anything on GitHub: repository, Pages, the workflows' first run.
+- Connecting Pages CMS and the admin's trial (AC13 to AC15 in `SPEC.md`).
+- The admin's sign-off on the look (AC16). The fonts are a match by eye. The Wix site uses a different banner photo on desktop (people dancing) than on phones (the aerial view); both slots exist in the form (banner photo, banner photo for phones) and both hold a placeholder until her files arrive.
+- The community level's content.
+- Domain move and redirects.
+- Browsers other than Chromium; a real accessibility review.
+- The changes of 2026-11-11 are in the working folder but **not committed** to Git.
 
 ## Next steps, in order
 
-1. **Push to GitHub and publish with GitHub Pages.** The folder is already a Git repo with one commit. Create an empty repository on GitHub (public for the test), add it as `origin`, push `main`, then in the repository open Settings > Pages > Build and deployment > Source and choose **GitHub Actions**. The workflow runs on every push to `main` (watch it under the Actions tab) and the address appears in the deploy job: `https://<user>.github.io/<repo>/`. If it fails, read the run log; the workflow was written from documentation and not yet run. For a real domain: put it in `public/CNAME`, set it under Settings > Pages, and the base becomes `/` automatically.
-2. **Optional, for production: Cloudflare Pages** from the same repo: build command `npm run build`, output folder `dist`, environment variable `NODE_VERSION` = `22.23.4`, `SITE_URL` = the real address. Either host works. Check AC14 on a non-production branch by pushing a file with broken JSON and confirming the live site is unchanged. Decide who gets build-failure emails.
-3. **Connect Pages CMS** to the repo and walk through `.pages.yml` against reality. Fill in every row of the assumptions table in `DECISIONS.md` (what exactly does it store for photos, references, dates, selects?). Fix the code or config where it differs, and update the table.
-4. **Invite the admin by email** and have her sign in on her own phone and add a program item with a teacher and a photo (AC13). If the sign-in is a struggle, stop: the content files stay the same, so another editor can replace Pages CMS (`ARCHITECTURE.md`, "Swap the editing tool").
-5. **Ask her the open questions** below, then replace the placeholder content and decide on languages.
-6. **Apply her design** (`ARCHITECTURE.md`, "Replace the design with the admin's").
-7. **Domain.** Find out where it is registered. Do not cancel the Wix plan until the new site is live and the domain points to it; a free Wix plan cannot keep a custom domain. Keep old page addresses or add redirects. Set `SITE_URL` (or `public/CNAME` on GitHub Pages) and turn `noindex` off in Site settings.
+1. **Publish on GitHub Pages.** Commit the working folder. Create an empty public repository, add it as `origin`, push `main`. In the repository: Settings > Pages > Build and deployment > Source: **GitHub Actions**. Watch the Actions tab; the address is `https://<user>.github.io/<repo>/`. If a workflow fails, read its log: the workflows were written from documentation and have not run yet.
+2. **Connect Pages CMS** (pagescms.org, sign in with GitHub, install its app on the repository). Walk through every form and fill in the assumptions table in `DECISIONS.md`: what exactly is saved for photos, photo lists, rich text and selects? Fix code or config where it differs.
+3. **Editor trial with the admin.** Invite her by email. On her own phone: sign in, add a teacher with a photo and both bios, replace the program image, change the intro. Watch, do not help. If signing in is a struggle, stop and reconsider the editor (decision 3); the content files stay the same.
+4. **Show her the result and collect design corrections**: fonts, desktop layout, anything that differs from her design. Get the real logo, banner and program graphics as files.
+5. **Fill in the real content** through the editor (bios, location text, Hungarian gaps).
+6. **Decide the community level** with her, then design its content types (`ARCHITECTURE.md`, "Add a new kind of content").
+7. **Launch.** Decide public or private repository (decision 13). Find out where the domain is registered; do not cancel Wix until the new site is live and the domain points to it. Add redirects for the old addresses (below). Put the domain in `public/CNAME`, set it under Settings > Pages, and turn off "Hide the site from Google".
 
-## Questions for the admin
+### Old addresses to redirect at launch
 
-- What kinds of content will the site have: people, program, text pages, galleries, anything else?
-- One language or two (Hungarian and English)?
-- How often will she update it, and which parts?
-- Which Wix features does the current site use (forms, members area, anything else)? The home page showed none, but only the home page was inspected.
-- Where is the domain registered, and when does the Wix plan renew?
-- Is the festival site separate from, or part of, a wider community site?
+| Old (Wix) | New |
+|---|---|
+| `/` | `/en/festival/` (or the community home, to be decided) |
+| `/program` | `/en/festival/program/` |
+| `/teachers` | `/en/festival/teachers/` |
+| `/music` | `/en/festival/artists/` |
+| `/location` | `/en/festival/location/` |
+| `/code-of-conduct` | `/en/festival/code-of-conduct/` |
+| `/hu`, `/hu/...` | `/hu/festival/...` (the exact Hungarian addresses on Wix were not read; check them) |
+
+GitHub Pages has no server-side redirects; each old address needs a small page that forwards, or a host that supports redirect rules (Cloudflare Pages does).
 
 ## Commands
 
 ```
-npm install        # once
+npm ci             # once (exact versions from the lockfile)
 npm run dev        # preview at http://localhost:4321 (resizes photos first)
 npm run build      # builds dist/ ; read any [content-warning] lines
-npm run check      # reproducible tests, about 10-40 seconds
+npm run check      # the test suite, about 20-40 seconds
 ```
 
-Needs Node 22.23.4 or newer (`.node-version` pins 22.23.4). Build for a sub-path locally: `SITE_URL=https://x.github.io SITE_BASE=/repo npm run build`.
+Needs Node 22.23.4 or newer. Build for a sub-path locally: `SITE_URL=https://x.github.io SITE_BASE=/repo npm run build`.
 
 ## How to check things
 
-**Automated:** `npm run check` covers the build, routes, content on the pages, link and image integrity, safe links, broken-content tolerance and the known failure on broken JSON. A change is not done until it passes.
+**Automated:** `npm run check`. A code change is not done until it passes.
 
-**In a browser (manual):** `npm run check` cannot test the past-event script or the layout. Recipe, using Playwright (preinstalled in Claude's cloud sandbox for Python; elsewhere install it first):
+**In a browser (manual):** build, serve `dist/` (`python3 -m http.server 8777 --directory dist`), and look at these at 390 and 1280 px wide: `/en/`, `/hu/festival/`, `/en/festival/program/`, `/hu/festival/teachers/`, `/en/festival/artists/`, `/en/festival/location/`, `/en/festival/code-of-conduct/`, `/404.html`. Check:
+- no horizontal scrolling (`document.documentElement.scrollWidth > window.innerWidth` is false) and no console errors;
+- no request leaves the site (network tab);
+- at 390 px the menu button opens the full-screen menu and Escape closes it;
+- `/` lands on `/hu/` in a browser set to Hungarian, on the default language otherwise, and still redirects with JavaScript off;
+- the language switch on an inner page leads to the same page in the other language.
 
-1. To test hiding, temporarily add a past event, for example `src/content/events/2020-01-01-old.json` with `{ "title": "Old", "date": "2020-01-01" }`. Remove it afterwards.
-2. `npm run build`, then `cd dist && python3 -m http.server 8777`.
-3. Run:
-
-```python
-from playwright.sync_api import sync_playwright
-with sync_playwright() as p:
-    b = p.chromium.launch()
-    for w, h in [(390, 844), (1280, 900)]:
-        pg = b.new_page(viewport={"width": w, "height": h})
-        errors = []
-        pg.on("pageerror", lambda e: errors.append(str(e)))
-        pg.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
-        for path in ["/", "/program/", "/people/", "/location/"]:
-            pg.goto(f"http://localhost:8777{path}")
-            print(w, path,
-                  "visible/total events:", pg.locator("[data-day]:visible").count(), "/", pg.locator("[data-day]").count(),
-                  "overflow:", pg.evaluate("document.documentElement.scrollWidth > window.innerWidth"))
-        print(w, "errors:", errors)
-    # AC9, JavaScript off: nothing hidden
-    ctx = b.new_context(java_script_enabled=False)
-    pg = ctx.new_page(); pg.goto("http://localhost:8777/program/")
-    print("no-JS visible events:", pg.locator("[data-day]:visible").count())
-```
-
-With the old event added, the visible count on `/program/` should be one less than the total, and equal to the total without JavaScript; overflow must be `False` and `errors` empty. Take screenshots and look at them too.
-
-## Environment notes (cloud sandbox this was built in)
-
-- npm works; `npm create astro@latest` templates do not (their download is blocked), which is why the project was created by hand. Many websites are unreachable from the shell, and the web-fetch tool only opens addresses it has been given or found by search.
-- A Python Playwright and Chromium are preinstalled. The Node project does not depend on them.
-- Photos used as placeholders are generated gradients, not real people.
-- The working copy was at `/home/claude/festival-site`; a packaged zip of it was sent to the owner.
+Playwright with Chromium does all of this in a script; it was used for the 2026-11-11 check.
 
 ## Known issues and limits
 
-- Editors cannot supply alt text for photos (all photos are treated as decorative). A fix needs new fields in the forms and the schema.
-- One language only (labels are configurable). A second language is not designed.
-- References between content are file paths; renaming a person's file unlinks them from program items.
-- Two program items with the same title and date would get the same file name (how Pages CMS handles that is unknown).
-- Photos in formats other than JPG, PNG or WebP (for example HEIC) are rejected by the editor on purpose.
-- The home page's "Coming up" list uses the build date (UTC); the browser removes anything past by the visitor's date. Between a build and midnight, a day-old item can briefly remain in the list.
-- No sitemap, analytics, forms, or search.
-- Colours, spacing and look are placeholders, not a design.
+- The program is images: not readable by screen readers or search engines unless the optional text is filled in.
+- People photos have empty alt text; there is no alt-text field in the forms.
+- A code push to `main` deploys without waiting for the checks (decision 14). Use a branch and a pull request for code.
+- Free GitHub Pages needs a public repository (decision 13).
+- Original photos are stored in Git and re-encoded on every build; fine for tens, slow for hundreds.
+- The header's language switch is two plain links, not the flag drop-down of the Wix site.
+- No sitemap, analytics or forms.
 - The `.pages.yml` forms are untested against the live tool.
 
 ## Glossary
 
-- **CMS (content management system):** the editing layer; here, forms that save the content files.
-- **Collection:** a folder of similar files (events, people, links, text pages).
-- **Build:** turning the content files and code into the finished static pages in `dist/`.
-- **Static site:** the finished pages are ready-made files; nothing runs on the server when someone visits.
-- **Reference:** a stored link from one content item to another (an event pointing to its teachers).
-- **Preview deployment:** a temporary copy of the site built from a branch, for checking a change before it goes live (a hosting feature).
+- **CMS:** the editing layer; here, forms that save the content files.
+- **Collection:** a folder of similar files (people, text pages).
+- **Build:** turning the content files and code into the finished pages in `dist/`.
+- **Static site:** the finished pages are ready-made files; nothing runs on a server when someone visits.
+- **Workflow:** a script GitHub runs for you on each push (here: build and publish).

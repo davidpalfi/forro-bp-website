@@ -1,55 +1,68 @@
 # How to update the website
 
-This is a short guide for the person who edits the site. You do not need any technical knowledge.
+A short guide for the person who edits the site. You do not need any technical knowledge.
 
-**The basics:** you fill in forms and press save. About two minutes later the change is on the website. You cannot break the design, because the forms only change texts, photos and links.
+**The basics:** you fill in forms and press save. A few minutes later the change is on the website. You cannot break the design, because the forms only change texts, photos and links.
+
+**Two languages:** most texts have two boxes, one English and one Hungarian. Fill in both. If you leave one empty, the site shows the other language there, so nothing is ever blank.
 
 ## Sign in
 
 Open the editor link you received by email and sign in. (Ask whoever set it up if you cannot find it.)
 
-## Add a program item (workshop, concert, party)
+## The festival home page
 
-1. Open **Program** and press **Add an entry**.
-2. Fill in the **Title** and the **Date**. These two are required.
-3. Add start and end time (24-hour, for example `20:00`), the place, and the type.
-4. Under **Teachers and performers**, pick the people from the list. They must already exist under **People**.
-5. Add a **Link for tickets or details** if there is one. It must start with `https://`.
-6. Save.
+Open **Festival**, then **Home page, program and headings**. Here you can change:
 
-To change an item, open it from the list, edit, and save. To remove one, delete it. Items whose date has passed disappear from the site by themselves.
+- the logo and the banner photo (and, if you like, a taller banner photo just for phones),
+- the dates and the ticket link and button text,
+- the intro text (a blank line starts a new paragraph),
+- the line of numbers ("14 Workshops | 4 Bands | ..."),
+- the headings of the Program, Teachers and Artists pages.
 
-## Add a teacher or performer
+## The program
 
-1. Open **People** and press **Add an entry**.
-2. Fill in the **Name** and the **Role**.
-3. Upload a **Photo**. Any size is fine, straight from your phone. Photos in JPG, PNG or WebP work.
-4. Add a short bio and, if you like, a website or social link.
-5. Tick **Show on the home page** only for the people who should appear on the front page.
-6. Save.
+In the same form, find **Program images**. Upload the program graphics and put them in the order they should appear. The same images are shown in both languages. To replace the program, remove the old images and add the new ones.
 
-**Order** decides who comes first. Lower numbers come first. Leave it empty to sort by name.
+If you want to add a note or a plain-text version, use **Text under the program**.
 
-## Change the home page
+## Add a teacher or an artist
 
-Open **Pages**, then **Home page**. You can change the big title, dates, intro text, main photo, and the button.
+1. Open **Festival**, then **Teachers and artists**, and press **Add an entry**.
+2. Fill in the **Name**.
+3. Choose **Shown on**: *Teacher* puts the person on the Teachers page, *Artist* on the Artists page.
+4. Add the **Role** if there is one (for example "Dance Teacher" / "Tánctanár").
+5. Upload a **Photo**. Any size is fine, straight from your phone. JPG, PNG and WebP work.
+6. Write the **Bio** in both languages. A blank line starts a new paragraph.
+7. Add the **Instagram link**. It must start with `https://`.
+8. Save.
 
-## Add a page with text (location, rules, ...)
+**Order** decides who comes first. Lower numbers come first.
 
-Open **Pages**, then **Text pages**, and add an entry. Write the text in the **Text** box. If you want it in the top menu, leave **Show in the menu** ticked.
+To change a person, open them from the list, edit, and save. To remove one, delete the entry.
 
-## Videos, photos and social links
+## Text pages (location, code of conduct, ...)
 
-Open **Videos, photos and social links** and add an entry with a title and the link.
+Open **Festival**, then **Text pages**.
+
+- To change a page, open it, edit the text in either language, and save.
+- To add a page, press **Add an entry**, give it a title and write the text.
+- **Show in the menu** puts it in the top menu. **Menu word** lets the menu say something shorter than the title.
+- **Show as a button on the festival home page** adds a button for it at the bottom of the festival home page (as with the Code of Conduct).
+- You can add a photo at the top and a small photo gallery at the bottom.
+
+## The community home page
+
+Open **Community home page** to change its title, banner photo and intro text. It is almost empty for now on purpose.
+
+## Site settings
+
+Contact email, Instagram and Facebook links, and the switch **Hide the site from Google**. Keep that switch on while the site is being tested.
 
 ## Good to know
 
-- **Check the result.** After saving, wait a couple of minutes and look at the real site on your phone. Check dates and names carefully.
-- **Dates:** pick them from the calendar. Do not type them by hand.
+- **Check the result.** After saving, wait a few minutes and look at the real site on your phone, in both languages.
 - **Links** must start with `https://`.
-- **Undo:** every change is saved in a history, so a mistake can always be reversed. Ask whoever set the site up.
+- **Undo:** every change is kept in a history, so a mistake can always be reversed. Ask whoever set the site up.
 - **If something does not appear** after ten minutes, do not keep trying. Tell the person who set up the site.
-
-## If you use Claude to make changes
-
-You can ask Claude to edit the site, for example "add a workshop on Saturday at 14:00 with Teacher Anna". Claude follows the rules in `CLAUDE.md`. Always look at the result before you trust it, especially dates, times and names.
+- **The menu words** (Program, Teachers, ...) and the look of the site cannot be changed in the forms. Ask the person who set up the site.

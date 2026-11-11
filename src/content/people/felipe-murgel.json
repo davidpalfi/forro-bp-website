@@ -1,0 +1,11 @@
+{
+  "name": "Felipe Murgel",
+  "group": "Teacher",
+  "role_en": "Dance Teacher",
+  "role_hu": "Tánctanár",
+  "photo": "/uploads/placeholder-person-3.jpg",
+  "bio_en": "[Placeholder] The bio from the current site goes here.\n\nA blank line starts a new paragraph.",
+  "bio_hu": "[Helykitöltő] Ide kerül a jelenlegi oldalon szereplő bemutatkozás.\n\nEgy üres sor új bekezdést kezd.",
+  "instagram": "https://www.instagram.com/felipemurgel/",
+  "order": 3
+}

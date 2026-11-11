@@ -1,6 +1,9 @@
 # Publishes the site to GitHub Pages on every push to main (including saves from Pages CMS).
 # One-time setup: repository Settings > Pages > Build and deployment > Source: "GitHub Actions".
-# If checks or the build fail, nothing is deployed and the previous version stays online.
+#
+# One build, then deploy. If the build fails, nothing is deployed and the previous version
+# stays online. Content warnings do NOT stop the deployment; they are listed on the run's
+# summary page. The longer test suite lives in check.yml and runs only when code changes.
 name: Deploy to GitHub Pages
 
 on:
@@ -11,22 +14,13 @@ on:
 permissions:
   contents: read
 
-jobs:
-  check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version-file: .node-version
-      - run: npm ci
-      - run: npm run check
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
+jobs:
   build:
-    needs: check
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@v7
       - name: Work out the site address
@@ -56,9 +50,6 @@ jobs:
     permissions:
       pages: write
       id-token: write
-    concurrency:
-      group: pages
-      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

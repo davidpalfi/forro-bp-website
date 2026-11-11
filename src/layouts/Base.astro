@@ -1,79 +1,142 @@
 ---
+// The frame around every page: head tags, header with menu and language switch, footer.
+// `section` decides which menu is shown: the community level or the festival below it.
+import '@fontsource-variable/fraunces/index.css';
+import '@fontsource-variable/libre-franklin/index.css';
+import '@fontsource-variable/open-sans/index.css';
 import '../styles/global.css';
-import { getSite, getPages, safeUrl, withBase } from '../lib/content';
+import { getSite, getFestival, getCommunity, getPages, getImage, safeUrl, href } from '../lib/content';
+import { LANGS, LANG_LABEL, LANG_NAME, UI, tr, type Lang } from '../lib/i18n';
 
 interface Props {
+  lang: Lang;
+  section: 'community' | 'festival';
+  /** Address without the language, e.g. "/festival/program/". Used for the menu and the language switch. */
+  pagePath: string;
   title?: string;
   description?: string;
+  /** Photo for link previews on social media (a path like /uploads/x.jpg). */
+  shareImage?: string;
+  /** Background of the page body: red (default), dark or cream. */
+  tone?: 'red' | 'dark' | 'cream';
 }
 
-const { title, description } = Astro.props;
+const { lang, section, pagePath, title, description, shareImage, tone = 'red' } = Astro.props;
 const site = getSite();
-const L = site.labels;
-const menuPages = (await getPages()).filter((p) => p.showInMenu);
+const festival = getFestival();
+const community = getCommunity();
+const t = UI[lang];
+const inFestival = section === 'festival';
 
-const nav = [
-  { href: withBase('/'), label: L.home },
-  { href: withBase('/program/'), label: L.program },
-  { href: withBase('/people/'), label: L.people },
-  ...menuPages.map((p) => ({ href: withBase(`/${p.slug}/`), label: p.menuLabel })),
-];
+const sectionName = inFestival ? festival.name : site.name;
+const fullTitle = title ? `${title} | ${sectionName}` : sectionName;
+const desc = description || tr(inFestival ? festival : site, 'tagline', lang);
+const canonical = new URL(href(lang, pagePath), Astro.site).href;
+const share = getImage(shareImage || (inFestival ? festival.heroImage : community.heroImage) || festival.heroImage);
+const shareUrl = share ? new URL(share.src, Astro.site).href : '';
 
-const path = Astro.url.pathname;
-const fullTitle = title ? `${title} | ${site.name}` : site.name;
-const desc = description || site.tagline;
-const canonical = new URL(path, Astro.site).href;
-const ticketUrl = safeUrl(site.ticketUrl);
-const social = [
-  { label: 'Instagram', url: safeUrl(site.instagram) },
-  { label: 'Facebook', url: safeUrl(site.facebook) },
-].filter((s) => s.url);
+const menuPages = inFestival ? (await getPages()).filter((p) => p.showInMenu) : [];
+const nav = inFestival
+  ? [
+      { path: '/festival/', label: t.home },
+      { path: '/festival/program/', label: t.program },
+      { path: '/festival/teachers/', label: t.teachers },
+      { path: '/festival/artists/', label: t.artists },
+      ...menuPages.map((p) => ({ path: `/festival/${p.slug}/`, label: tr(p, 'menuLabel', lang) || tr(p, 'title', lang) })),
+      { path: '/', label: site.name },
+    ]
+  : [{ path: '/festival/', label: festival.name }];
+
+const brandPath = inFestival ? '/festival/' : '/';
+const logo = inFestival ? getImage(festival.logo) : undefined;
+const ticketUrl = inFestival ? safeUrl(festival.ticketUrl) : '';
+const headerDate = inFestival ? tr(festival, 'dateLine', lang) : '';
+const instagram = safeUrl((inFestival && festival.instagram) || site.instagram || festival.instagram);
+const facebook = safeUrl(site.facebook);
+const footerNote = tr(site, 'footerNote', lang);
+const year = new Date().getFullYear();
 ---
 
 <!doctype html>
-<html lang={site.locale.split('-')[0]}>
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     {desc && <meta name="description" content={desc} />}
     <link rel="canonical" href={canonical} />
+    {LANGS.map((l) => <link rel="alternate" hreflang={l} href={new URL(href(l, pagePath), Astro.site).href} />)}
+    <link rel="alternate" hreflang="x-default" href={new URL(href(site.defaultLang, pagePath), Astro.site).href} />
     <meta property="og:title" content={fullTitle} />
     {desc && <meta property="og:description" content={desc} />}
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonical} />
-    <meta name="theme-color" content="#1c1838" />
+    <meta property="og:locale" content={lang === 'hu' ? 'hu_HU' : 'en_GB'} />
+    {shareUrl && <meta property="og:image" content={shareUrl} />}
+    {shareUrl && <meta name="twitter:card" content="summary_large_image" />}
+    <meta name="theme-color" content="#b92734" />
     {site.noindex && <meta name="robots" content="noindex, nofollow" />}
   </head>
-  <body>
-    <a class="skip" href="#main">Skip to content</a>
+  <body class={inFestival ? 'in-festival' : 'in-community'}>
+    <a class="skip" href="#main">{t.skip}</a>
 
     <header class="top">
-      <a class="brand" href={withBase('/')}>{site.name}</a>
-      <nav aria-label="Main">
+      <a class="brand" href={href(lang, brandPath)}>
+        {
+          logo ? (
+            <img src={logo.src} srcset={logo.srcset} sizes="140px" alt={sectionName} class="brand-logo" />
+          ) : (
+            <span class="brand-text">{sectionName}</span>
+          )
+        }
+      </a>
+      {headerDate && <p class="top-date">{headerDate}</p>}
+
+      <p class="lang" aria-label={t.language}>
+        {
+          LANGS.map((l) => (
+            <a
+              href={href(l, pagePath)}
+              lang={l}
+              hreflang={l}
+              aria-current={l === lang ? 'true' : undefined}
+              title={LANG_NAME[l]}
+            >
+              {LANG_LABEL[l]}
+            </a>
+          ))
+        }
+      </p>
+
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" hidden>
+        <span class="menu-btn-bars" aria-hidden="true"></span>
+        <span class="sr-only">{t.menu}</span>
+      </button>
+
+      <nav id="menu" class="menu" aria-label={t.menu}>
         {
           nav.map((item) => (
-            <a href={item.href} aria-current={path === item.href ? 'page' : undefined}>
+            <a href={href(lang, item.path)} aria-current={item.path === pagePath ? 'page' : undefined}>
               {item.label}
             </a>
           ))
         }
         {
-          ticketUrl && site.ticketLabel && (
-            <a class="nav-cta" href={ticketUrl} target="_blank" rel="noopener">
-              {site.ticketLabel}
+          ticketUrl && (
+            <a class="ticket ticket--small" href={ticketUrl} target="_blank" rel="noopener">
+              {t.tickets}
             </a>
           )
         }
       </nav>
     </header>
 
-    <main id="main">
+    <main id="main" class={`tone-${tone}`}>
       <slot />
     </main>
 
-    <footer>
-      <p class="footer-name">{site.name}</p>
+    <footer class="foot">
+      <p class="small foot-copy">© {year} {site.name}.</p>
       {
         site.email && (
           <p>
@@ -82,41 +145,47 @@ const social = [
         )
       }
       {
-        social.length > 0 && (
-          <p class="footer-social">
-            {social.map((s) => (
-              <a href={s.url} target="_blank" rel="noopener">
-                {s.label}
+        (instagram || facebook) && (
+          <p class="foot-social">
+            {instagram && (
+              <a href={instagram} target="_blank" rel="noopener">
+                {t.instagram}
               </a>
-            ))}
+            )}
+            {facebook && (
+              <a href={facebook} target="_blank" rel="noopener">
+                Facebook
+              </a>
+            )}
           </p>
         )
       }
-      {site.footerNote && <p class="small">{site.footerNote}</p>}
+      {footerNote && <p class="small">{footerNote}</p>}
     </footer>
 
     <!--
-      Hides program items whose date has passed, so the site never shows old
-      events even if it has not been rebuilt. Without JavaScript, everything stays visible.
+      The menu button. Without JavaScript the button stays hidden and the menu is simply
+      always visible, so the site works either way.
     -->
     <script is:inline>
       (function () {
-        var d = new Date();
-        var today =
-          d.getFullYear() +
-          '-' +
-          String(d.getMonth() + 1).padStart(2, '0') +
-          '-' +
-          String(d.getDate()).padStart(2, '0');
-        document.querySelectorAll('[data-day]').forEach(function (el) {
-          if (el.getAttribute('data-day') < today) el.hidden = true;
+        var btn = document.querySelector('.menu-btn');
+        var menu = document.getElementById('menu');
+        if (!btn || !menu) return;
+        document.documentElement.classList.add('js');
+        btn.hidden = false;
+        function set(open) {
+          btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+          document.documentElement.classList.toggle('menu-open', open);
+        }
+        btn.addEventListener('click', function () {
+          set(btn.getAttribute('aria-expanded') !== 'true');
         });
-        document.querySelectorAll('[data-day-group]').forEach(function (g) {
-          g.hidden = !g.querySelector('[data-day]:not([hidden])');
-        });
-        document.querySelectorAll('[data-events]').forEach(function (box) {
-          var empty = box.querySelector('[data-events-empty]');
-          if (empty) empty.hidden = !!box.querySelector('[data-day]:not([hidden])');
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') {
+            set(false);
+            btn.focus();
+          }
         });
       })();
     </script>

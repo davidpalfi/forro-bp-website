@@ -1,0 +1,40 @@
+---
+// Text pages of the festival (Location, Code of Conduct, ...), written in the editor
+// under "Festival > Text pages". Each one gets the address /<language>/festival/<file-name>/
+import Base from '../../../layouts/Base.astro';
+import Picture from '../../../components/Picture.astro';
+import { getPages, renderBody } from '../../../lib/content';
+import { LANGS, tr, type Lang } from '../../../lib/i18n';
+
+export async function getStaticPaths() {
+  // getPages() already leaves out pages whose name clashes with a built-in address.
+  const pages = await getPages();
+  return LANGS.flatMap((lang) => pages.map((p) => ({ params: { lang, slug: p.slug }, props: { page: p } })));
+}
+
+const lang = Astro.params.lang as Lang;
+const { page } = Astro.props;
+const title = tr(page, 'title', lang);
+const body = renderBody(tr(page, 'body', lang));
+---
+
+<Base lang={lang} section="festival" pagePath={`/festival/${page.slug}/`} title={title} shareImage={page.image} tone="cream">
+  {page.image && <Picture src={page.image} class="page-banner" sizes="100vw" eager />}
+  <article class="page prose">
+    <h1 class="page-title">{title}</h1>
+    <Fragment set:html={body} />
+  </article>
+  {
+    page.gallery.length > 0 && (
+      <section class="page page--wide">
+        <ul class="gallery">
+          {page.gallery.map((src) => (
+            <li>
+              <Picture src={src} sizes="(min-width: 720px) 33vw, 50vw" />
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</Base>

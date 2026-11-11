@@ -1,0 +1,29 @@
+{
+  "name": "Budapest Forró Festival",
+  "logo": "",
+  "heroImage": "/uploads/placeholder-hero.jpg",
+  "heroImagePhone": "",
+  "tagline_en": "Three days of forró on Margaret Island: workshops, concerts and parties.",
+  "tagline_hu": "Három nap forró a Margitszigeten: workshopok, koncertek és bulik.",
+  "dateLine_en": "19-21 June 2026",
+  "dateLine_hu": "2026. június 19–21.",
+  "ticketUrl": "https://app.tickettailor.com/events/forrbudapest/2141833",
+  "ticketLabel_en": "Get your tickets!",
+  "ticketLabel_hu": "",
+  "intro_en": "The Budapest Forró Festival is a three-day international gathering that celebrates forró, a cultural expression from the northeast of Brazil that combines music and couple dance.\n\nPresent in Hungary since 2018, the Forró Budapest community has been growing and evolving ever since, building an open and welcoming community connected through dance. Together with this community, the idea of creating a dedicated festival was born - and this year that dream finally becomes reality.\n\nThe festival brings together live music performances, DJ parties, workshops with Brazilian dance teachers, and plenty of dancing. It takes place on Margit-sziget, a green island in the middle of the Danube River, as well as in the spacious indoor halls of Kristály Színtér and the outdoor café area, creating a varied and open setting throughout the day and night.\n\nThe festival is built as a space for cultural exchange, diversity, and freedom of expression.",
+  "intro_hu": "A forró, Brazília északkeleti régiójából származó páros tánc és zenei kultúra 2018 óta van jelen Magyarországon. A Forró Budapest közösségével együtt megszületett bennünk a vágy egy saját fesztivál létrehozására is - idén pedig ez az álom végre valóra válik.\n\nA Budapest Forró Festival egy háromnapos esemény, ahova igazi brazil életigenlő energiákat hozunk el nektek. Workshopok brazil tánctanárokkal, élőzenés táncestek külföldi előadókkal és sok-sok közös tánc a Margitsziget zöld környezetében, a Kristály Színtér hangulatos belső tereiben és a szabadtéri kávézóban.\n\nA forró világszerte nyitott és befogadó közösségeket hoz létre. Ezt a szellemiséget viszi tovább a Budapest Forró Festival is: egy tér a kapcsolódásra, a sokszínűségre és a szabad önkifejezésre.",
+  "stats_en": "14 Workshops | 4 Bands | 5 Concerts | 3 Afternoon Parties | Warm-up Party",
+  "stats_hu": "14 workshop | 4 zenekar | 5 koncert | 3 délutáni buli | warm-up buli",
+  "instagram": "https://www.instagram.com/budapestforrofestival/",
+  "programHeading_en": "Your daily rhythm...",
+  "programHeading_hu": "Napi bontás",
+  "programImages": [
+    "/uploads/placeholder-program.png"
+  ],
+  "programText_en": "",
+  "programText_hu": "",
+  "teachersHeading_en": "Meet the teachers!",
+  "teachersHeading_hu": "Bemutatjuk a tanárokat!",
+  "artistsHeading_en": "Who's playing?",
+  "artistsHeading_hu": ""
+}

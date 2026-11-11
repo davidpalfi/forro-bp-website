@@ -6,93 +6,83 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { getCollection } from 'astro:content';
 import { z } from 'astro/zod';
-import { text, flag } from './schema';
+import { marked } from 'marked';
+import { text, flag, textList } from './schema';
+import { isLang, type Lang } from './i18n';
 import siteRaw from '../content/settings/site.json';
-import homeRaw from '../content/settings/home.json';
+import communityRaw from '../content/settings/community.json';
+import festivalRaw from '../content/settings/festival.json';
 
 /* ---------- Settings ---------- */
 
-const LabelsSchema = z
-  .object({
-    home: text,
-    program: text,
-    people: text,
-    details: text,
-    noEvents: text,
-    teachers: text,
-    performers: text,
-    organizers: text,
-    others: text,
-  })
-  .partial()
-  .nullish();
-
 const SiteSchema = z.object({
   name: text,
-  tagline: text,
-  locale: text,
+  defaultLang: text,
+  tagline_en: text,
+  tagline_hu: text,
   email: text,
   instagram: text,
   facebook: text,
-  ticketLabel: text,
-  ticketUrl: text,
-  footerNote: text,
+  footerNote_en: text,
+  footerNote_hu: text,
   noindex: flag(true),
-  labels: LabelsSchema,
 });
 
-const HomeSchema = z.object({
-  heroTitle: text,
-  heroSubtitle: text,
-  dateLine: text,
+const CommunitySchema = z.object({
+  title_en: text,
+  title_hu: text,
   heroImage: text,
-  ctaLabel: text,
-  ctaUrl: text,
-  intro: text,
-  eventsHeading: text,
-  peopleHeading: text,
-  linksHeading: text,
+  intro_en: text,
+  intro_hu: text,
 });
 
-const DEFAULT_LABELS = {
-  home: 'Home',
-  program: 'Program',
-  people: 'People',
-  details: 'Details',
-  noEvents: 'The program will be announced soon.',
-  teachers: 'Teachers',
-  performers: 'Performers',
-  organizers: 'Organizers',
-  others: 'More people',
-};
+const FestivalSchema = z.object({
+  name: text,
+  logo: text,
+  heroImage: text,
+  heroImagePhone: text,
+  tagline_en: text,
+  tagline_hu: text,
+  dateLine_en: text,
+  dateLine_hu: text,
+  ticketUrl: text,
+  ticketLabel_en: text,
+  ticketLabel_hu: text,
+  intro_en: text,
+  intro_hu: text,
+  stats_en: text,
+  stats_hu: text,
+  instagram: text,
+  programHeading_en: text,
+  programHeading_hu: text,
+  programImages: textList,
+  programText_en: text,
+  programText_hu: text,
+  teachersHeading_en: text,
+  teachersHeading_hu: text,
+  artistsHeading_en: text,
+  artistsHeading_hu: text,
+});
 
 export function getSite() {
   const s = SiteSchema.parse(siteRaw);
-  const given = Object.fromEntries(
-    Object.entries(s.labels ?? {}).filter(([, v]) => typeof v === 'string' && v !== ''),
-  );
-  return {
-    ...s,
-    name: s.name || 'Festival',
-    locale: s.locale || 'en-GB',
-    labels: { ...DEFAULT_LABELS, ...given },
-  };
+  const defaultLang: Lang = isLang(s.defaultLang) ? s.defaultLang : 'en';
+  return { ...s, name: s.name || 'Community', defaultLang };
 }
 
-export function getHome() {
-  const h = HomeSchema.parse(homeRaw);
-  return {
-    ...h,
-    eventsHeading: h.eventsHeading || 'Coming up',
-    peopleHeading: h.peopleHeading || 'Meet the people',
-    linksHeading: h.linksHeading || 'Watch and look',
-  };
+export function getCommunity() {
+  return CommunitySchema.parse(communityRaw);
 }
 
-/* ---------- Links ---------- */
+export function getFestival() {
+  const f = FestivalSchema.parse(festivalRaw);
+  return { ...f, name: f.name || 'Festival' };
+}
+
+/* ---------- Addresses and links ---------- */
 
 /**
- * Puts the site's base path in front of a site-relative address ("/program/").
+ * Puts the site's base path in front of a site-relative address ("/en/festival/").
  * The base is "/" on a custom domain and "/repo-name" on github.io/repo-name.
  * Never write a root-relative address by hand; always go through this.
  */
@@ -101,9 +91,14 @@ export function withBase(p: string) {
   return base + '/' + (p ?? '').replace(/^\/+/, '');
 }
 
+/** The address of a page in a language: href('hu', '/festival/program/') -> /hu/festival/program/ */
+export function href(lang: Lang, pagePath = '/') {
+  return withBase(`/${lang}/${pagePath.replace(/^\/+/, '')}`);
+}
+
 /**
- * Text pages: editors write Markdown links like [Program](/program/) and photos at /uploads/x.jpg.
- * This puts the base path in front of those in the finished HTML. No-op when the base is "/".
+ * Text written by editors may contain links like [Program](/en/festival/program/) and photos at
+ * /uploads/x.jpg. This puts the base path in front of those in the finished HTML.
  */
 export function rebaseHtml(html: string) {
   const base = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '');
@@ -118,124 +113,84 @@ export function safeUrl(u: string) {
   return v.startsWith('/') ? withBase(v) : v;
 }
 
-export function hostOf(u: string) {
+/* ---------- Text ---------- */
+
+/** Plain multi-line text: each blank-line-separated block is a paragraph. */
+export function paragraphs(s: string) {
+  return (s ?? '')
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+}
+
+/** A text page body (Markdown or HTML, whichever the editor saved) as finished HTML. */
+export function renderBody(body: string) {
+  if (!body || !body.trim()) return '';
+  let html = '';
   try {
-    return new URL(u).hostname.replace(/^www\./, '');
+    html = marked.parse(body, { async: false }) as string;
   } catch {
-    return u;
+    html = paragraphs(body)
+      .map((p) => `<p>${p.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</p>`)
+      .join('\n');
   }
+  // Editors are trusted, but a pasted "javascript:" link should still never reach visitors.
+  html = html.replace(/\s(href|src)="\s*(?:javascript|data|vbscript):[^"]*"/gi, '');
+  return rebaseHtml(html);
 }
-
-/* ---------- Dates ---------- */
-
-/** "2026-06-19" -> a Date at noon UTC (so time zones can never shift the day). */
-export function parseDay(iso: string): Date | null {
-  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
-  if (!m) return null;
-  const [y, mo, day] = [Number(m[1]), Number(m[2]), Number(m[3])];
-  const d = new Date(Date.UTC(y, mo - 1, day, 12));
-  // Reject impossible dates like 2027-13-45, which JavaScript would silently roll over.
-  if (Number.isNaN(d.getTime()) || d.getUTCMonth() !== mo - 1 || d.getUTCDate() !== day) return null;
-  return d;
-}
-
-export function formatDay(date: Date, locale: string, options: Intl.DateTimeFormatOptions) {
-  try {
-    return new Intl.DateTimeFormat(locale, { ...options, timeZone: 'UTC' }).format(date);
-  } catch {
-    return new Intl.DateTimeFormat('en-GB', { ...options, timeZone: 'UTC' }).format(date);
-  }
-}
-
-export const todayIso = () => new Date().toISOString().slice(0, 10);
 
 /* ---------- Collections ---------- */
 
-const baseId = (ref: string) => ref.split('/').pop()!.replace(/\.[^.]+$/, '');
+const GROUPS = { teacher: 'teacher', artist: 'artist' } as const;
+export type Group = keyof typeof GROUPS;
+const warned = new Set<string>();
+const warnOnce = (msg: string) => {
+  if (warned.has(msg)) return;
+  warned.add(msg);
+  console.warn(`[content-warning] ${msg}`);
+};
 
-export async function getPeople() {
+export async function getPeople(group?: Group) {
   const entries = await getCollection('people');
-  return entries
-    .map((e) => ({
-      id: e.id,
-      ...e.data,
-      name: e.data.name || e.id,
-      order: e.data.order ?? 100,
-    }))
+  const all = entries
+    .map((e) => {
+      const g = e.data.group.toLowerCase();
+      if (!(g in GROUPS)) {
+        warnOnce(`person "${e.id}" has no group (Teacher or Artist) and is shown with the teachers`);
+      }
+      return {
+        id: e.id,
+        ...e.data,
+        name: e.data.name || e.id,
+        group: (g in GROUPS ? g : 'teacher') as Group,
+        order: e.data.order ?? 100,
+      };
+    })
     .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+  return group ? all.filter((p) => p.group === group) : all;
 }
 export type Person = Awaited<ReturnType<typeof getPeople>>[number];
 
-export async function getEvents() {
-  const entries = await getCollection('events');
-  const out = [];
-  for (const e of entries) {
-    const dateObj = parseDay(e.data.date);
-    if (!dateObj) {
-      console.warn(`[content-warning] event "${e.id}" has no valid date (needs yyyy-mm-dd) and was skipped`);
-      continue;
-    }
-    out.push({
-      id: e.id,
-      ...e.data,
-      title: e.data.title || e.id,
-      day: e.data.date.slice(0, 10),
-      dateObj,
-    });
-  }
-  return out.sort(
-    (a, b) =>
-      a.day.localeCompare(b.day) ||
-      a.startTime.localeCompare(b.startTime) ||
-      a.title.localeCompare(b.title),
-  );
-}
-export type FestivalEvent = Awaited<ReturnType<typeof getEvents>>[number];
-
-/** Turn stored references (file paths or ids) into people. Missing people are ignored. */
-export function resolvePeople(refs: string[], people: Person[]) {
-  const byId = new Map(people.map((p) => [p.id, p]));
-  return refs.map((r) => byId.get(baseId(r))).filter((p): p is Person => Boolean(p));
-}
-
-export async function getLinks() {
-  const entries = await getCollection('links');
-  return entries
-    .map((e) => ({
-      id: e.id,
-      ...e.data,
-      url: safeUrl(e.data.url), // unsafe or empty links become '' and are dropped below
-      label: e.data.label || e.data.url,
-      order: e.data.order ?? 100,
-    }))
-    .filter((l) => l.url)
-    .sort((a, b) => a.order - b.order || a.label.localeCompare(b.label));
-}
-
-/** Addresses that belong to built-in pages; a text page with one of these names is skipped. */
-const RESERVED_SLUGS = new Set(['program', 'people', '404', 'uploads']);
-const warnedSlugs = new Set<string>();
+/** Addresses under /festival/ that belong to built-in pages; a text page with one of these names is skipped. */
+export const RESERVED_SLUGS = new Set(['program', 'teachers', 'artists']);
 
 export async function getPages() {
   const entries = (await getCollection('pages')).filter((e) => {
     if (!RESERVED_SLUGS.has(e.id)) return true;
-    if (!warnedSlugs.has(e.id)) {
-      warnedSlugs.add(e.id);
-      console.warn(`[content-warning] text page "${e.id}" uses a reserved address and was skipped`);
-    }
+    warnOnce(`text page "${e.id}" uses a reserved address and was skipped`);
     return false;
   });
   return entries
     .map((e) => ({
-      entry: e,
       slug: e.id,
-      title: e.data.title || e.id,
-      menuLabel: e.data.menuLabel || e.data.title || e.id,
-      showInMenu: e.data.showInMenu,
+      ...e.data,
+      title_en: e.data.title_en || e.data.title_hu || e.id,
+      title_hu: e.data.title_hu || e.data.title_en || e.id,
       order: e.data.order ?? 100,
     }))
-    .sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
+    .sort((a, b) => a.order - b.order || a.title_en.localeCompare(b.title_en));
 }
+export type TextPage = Awaited<ReturnType<typeof getPages>>[number];
 
 /* ---------- Images ---------- */
 
@@ -258,7 +213,7 @@ function loadManifest(): Manifest {
 
 export type ResolvedImage = { src: string; srcset?: string; width?: number; height?: number };
 
-/** Returns web-sized variants when we made them; otherwise the original path. */
+/** Returns web-sized variants when we made them; otherwise the original path; nothing if the file is gone. */
 export function getImage(src?: string): ResolvedImage | undefined {
   if (!src) return undefined;
   let clean = src;
@@ -274,7 +229,7 @@ export function getImage(src?: string): ResolvedImage | undefined {
     // A path to a photo that no longer exists would show a broken image, so show nothing instead.
     const onDisk = path.join(process.cwd(), 'public', local);
     if (!fs.existsSync(onDisk)) {
-      console.warn(`[content-warning] photo "${src}" was not found in public/uploads and was left out`);
+      warnOnce(`photo "${src}" was not found in public/uploads and was left out`);
       return undefined;
     }
     return { src: withBase(local) };

@@ -1,224 +1,207 @@
 # Specification
 
-What the site does and how it must behave. This describes the prototype as built. Where the real site's content or design is still undecided, the spec says so. Requirement IDs (R1, R2, ...) are referred to in the acceptance criteria at the end.
+What the site does and how it must behave, as built on 2026-11-11. Requirement IDs (R1, R2, ...) are referred to in the acceptance criteria at the end. For why, see `DECISIONS.md`.
 
 ## 1. Purpose and users
 
-A public website for a dance festival, replacing an existing Wix site, with content the festival's admin edits herself.
+One website for the Forró Budapest community. The community level is an empty shell for now; the Budapest Forró Festival is a section below it. It replaces the festival's Wix site and copies its look. The festival's admin edits the content herself.
 
 | User | Main tasks |
 |---|---|
-| Visitor (mostly on a phone, arriving from a social media link) | See when and where the festival is; see the program; see who teaches and performs; buy tickets; find the location and rules; open promo videos and photos |
-| Admin (non-technical, also a designer) | Add or change program items, people, links and text pages; replace photos; change home page texts. Without a developer, in a few minutes |
-| Maintainer (developer, or an AI agent working for one) | Change the structure, fix problems, deploy |
-
-The evidence behind this table is thin; see `USER-NEEDS.md` for what is stated, observed or assumed.
+| Visitor (mostly on a phone) | See what the festival is and when; see the program; see teachers and artists; buy tickets; find the venue and the code of conduct; switch between English and Hungarian |
+| Admin (non-technical, a designer) | Change texts in both languages, replace photos and program images, add or remove people and text pages. Without a developer, without a GitHub account |
+| Maintainer (developer, or Claude working for one) | Change the structure and design, fix problems, deploy |
 
 ## 2. Scope
 
-In scope: public pages listed in section 3, the content model in section 5, editing through forms, building and hosting as a static site.
+In scope: the pages in section 3, the content model in section 5, editing through forms, building and hosting as a static site.
 
-Out of scope for the prototype (see section 10): a second language, ticket sales (tickets are sold on an external platform and linked), accounts or logins for visitors, payments, search, calendar export, analytics, contact forms.
+Out of scope: content for the community level (not designed), a structured (text) program, ticket sales (linked to an external platform), visitor accounts, payments, search, analytics, contact forms, embedded video or maps.
 
 ## 3. Pages and addresses
 
+`<lang>` is `en` or `hu`. Every page exists in both.
+
 | Address | Page | Source |
 |---|---|---|
-| `/` | Home | `settings/home.json`, `site.json`, events, people, links |
-| `/program/` | Program | events, people |
-| `/people/` | People | people |
-| `/<name>/` | Text page, one per file in `src/content/pages/` | the Markdown file |
-| `/404.html` | Page not found | fixed text |
+| `/` | Sends the visitor to `/<lang>/` (R3) | `site.json` |
+| `/<lang>/` | Community home | `settings/community.json`, `festival.json` |
+| `/<lang>/festival/` | Festival home | `settings/festival.json`, text pages |
+| `/<lang>/festival/program/` | Program | `festival.json` |
+| `/<lang>/festival/teachers/` | Teachers | people with group Teacher |
+| `/<lang>/festival/artists/` | Artists | people with group Artist |
+| `/<lang>/festival/<name>/` | Text page, one per file in `src/content/pages/` | that file |
+| `/404.html` | Page not found, in both languages | fixed wording |
 
-**R1.** The addresses `program`, `people`, `404` and `uploads` are reserved. A text page with one of these file names is skipped with a `[content-warning]` in the build log.
-**R2.** All addresses end with a slash (`trailingSlash: 'always'`).
-**R3.** The whole site is plain files; there is no server-side code at runtime.
+- **R1.** Under `/festival/`, the names `program`, `teachers` and `artists` are reserved. A text page with one of these file names is skipped with a `[content-warning]`.
+- **R2.** All addresses end with a slash. The whole site is plain files; nothing runs on a server.
+- **R3. Root.** `/` goes to `/hu/` or `/en/` according to the first matching language in the browser's preferences, otherwise to `defaultLang`. Without JavaScript it goes to `defaultLang`. The page also lists both languages as links.
 
-## 4. Page behavior
+## 4. Page behaviour
 
-### 4.1 Every page (layout)
+### 4.1 Every page
 
-- **R4. Head.** `<title>` is "Page title | Site name" (just the site name on the home page). Meta description is the page's own, else the site tagline (omitted when empty). Canonical URL, Open Graph title, description, type and URL. Theme colour. `lang` is the first part of `locale`.
+- **R4. Head.** `<title>` is "Page title | Section name" (section name alone on the two home pages; the section is the festival name or the community name). Meta description: the page's own, else the section's tagline in that language. Canonical URL. `hreflang` links to both languages and `x-default`. Open Graph title, description, URL, locale and image (the page's own photo, else the section's banner photo). `lang` attribute is the page's language.
 - **R5. Indexing.** When `noindex` in `site.json` is true (the default), every page carries `robots: noindex, nofollow`.
-- **R6. Skip link** to the main content is the first focusable element.
-- **R7. Header.** Site name (link to `/`), then the menu: Home, Program, People, then text pages with `showInMenu` true, ordered by `order` then title. The current page has `aria-current="page"`. A ticket button (opens in a new tab) is shown last, only when `ticketUrl` is a safe link and `ticketLabel` is not empty.
-- **R8. Footer.** Site name, email (as a `mailto:` link), Instagram and Facebook links (only those with a safe link), and the footer note. Each part is left out when empty.
-- **R9. Past items hide.** A small inline script hides every element carrying `data-day` earlier than the visitor's local date, hides day groups that become empty, and shows the "no events" message when nothing is left. Without JavaScript, nothing is hidden.
+- **R6. Skip link** to the main content is the first focusable element, in the page's language.
+- **R7. Header** (stays at the top while scrolling): the brand, the language switch, the menu.
+  - Brand: in the festival, the festival logo (or its name as text when no logo is uploaded), linking to the festival home. On the community level, the community name, linking to the community home.
+  - Language switch: `EN` and `HU`; each links to the same page in that language; the current one is marked.
+  - Festival menu, in order: Home (the festival home), Program, Teachers, Artists, text pages with `showInMenu` (by `order`, then title; shown with their `menuLabel` when set), the community name (link up to the community home), and a cream "Tickets" button (new tab) when `ticketUrl` is a safe link. Community menu: one link to the festival.
+  - From 1400 px the festival's date line is also shown next to the brand.
+  - The current page has `aria-current="page"`.
+  - Below 1180 px the menu is behind a button and opens as a full-screen panel; Escape closes it. From 1180 px everything sits in one row, in capitals. Without JavaScript the menu is always visible instead.
+- **R8. Footer.** "© year community name", contact email (`mailto:`), Instagram link (the festival's inside the festival, else the community's) and Facebook link when set, and the footer note. Each part is left out when empty. Stacked and centred on phones; in one row from 860 px (copyright left, the rest right).
+- **R8a. Page background.** Red on the home pages, program, teachers, artists and 404; cream with dark text on text pages.
 
-### 4.2 Home (`/`)
+### 4.2 Community home (`/<lang>/`)
 
-In this order; a section with no content is left out entirely unless stated.
+Banner with the community title over the banner photo; the intro paragraphs when written; then the festival name, its date line and a button to the festival. Nothing else yet.
 
-1. **Hero.** Big title (`heroTitle`, else the site name); `dateLine`; `heroSubtitle`; a button (`ctaLabel` + safe `ctaUrl`, both needed; opens in a new tab); the main photo (`heroImage`; loads eagerly; decorative, so empty alt text).
-2. **Intro.** `intro` text; each blank-line-separated block is a paragraph.
-3. **Coming up** (heading `eventsHeading`, default "Coming up"). The first 6 events whose date is today or later, by the date at build time, each as a program row with a date block (4.4). When none exist at build time the "no events" message is shown. A link to the program page is shown when any event exists at build time.
-4. **People** (heading `peopleHeading`, default "Meet the people"). People with `featured` true, at most 8, in people order, plus a link to the people page. Left out when nobody is featured.
-5. **Links** (heading `linksHeading`, default "Watch and look"). Each link as a card; left out when there are no usable links.
+### 4.3 Festival home
 
-### 4.3 Program (`/program/`)
+1. **Banner.** Banner photo (on phones the phone banner photo, when one is uploaded); the logo (or festival name as text); the ticket button (needs a safe `ticketUrl`; label falls back to "Tickets"/"Jegyek"; new tab); the date line. Centred on phones; from 900 px the block sits to the left over the photo.
+2. **Intro.** Each blank-line-separated block is a paragraph. Left out when empty.
+3. **Closing block.** The line of numbers (`stats`); one button per text page with `showOnHome`; the ticket link again.
 
-- **R10.** Heading is the "Program" label. Events are grouped by date; each group has a heading with the long weekday, day and month in the site's locale (capitalised by CSS).
-- **R11.** Within a day: ordered by start time (text comparison, so use 24-hour times), then title. Rows show the start time on the left (see 4.4).
-- **R12.** Past events are in the HTML but hidden by R9. When the program is empty (or everything is hidden) the "no events" message is shown.
+### 4.4 Program
 
-### 4.4 Program row
+Heading (`programHeading`, else "Program"). The `programImages` in order, one under the other at up to about 1150 px wide, the same in both languages. Then `programText` when written. Image alt text is "Program – festival name (n)".
 
-- Title, with the type as a small badge when set.
-- Meta line. On the home page (date block variant): weekday, time range ("20:00 – 22:30", or only the start time), place. On the program page (time variant): place only; the start time is shown on the left.
-- People names, joined with ", ", for each referenced person that still exists.
-- Description, with line breaks kept.
-- A link (opens in a new tab) with the "details" label when `url` is a safe link.
+### 4.5 Teachers and Artists
 
-### 4.5 People (`/people/`)
+Heading (`teachersHeading` / `artistsHeading`, else the menu word). Then each person of that group, by `order` (default 100) then name, as a dark card on the red page: photo (cropped to 4:3 on phones, square from 860 px), role (when set), name, bio paragraphs, and an "Instagram" link (new tab) at the bottom of the card when the link is safe. One card per row on phones, two side by side from 860 px. A person whose group is missing or unknown is shown with the teachers, with a warning.
 
-- **R13.** Groups in this order: Teachers, Performers, Organizers (people whose role matches `teacher`, `performer` or `organizer`, ignoring case), then "More people" for any other or empty role. Empty groups are left out.
-- **R14.** Within a group: ordered by `order` (default 100), then name.
-- **R15.** Card: photo cropped to 4:5 (a plain placeholder box when there is no photo), name, country, bio, and the link shown as its host name (opens in a new tab).
+### 4.6 Text pages
 
-### 4.6 Text pages (`/<name>/`)
-
-Title as heading, optional photo, then the Markdown body (headings, lists, links, bold and italic as standard Markdown).
-
-### 4.7 Page not found
-
-A short message and a link to the home page.
+The optional top photo across the full width, then on a cream background: the title, the body, and the optional photo gallery (two columns on phones, three from 720 px).
 
 ## 5. Content model
 
-All content is plain files under `src/content/`. In the tables: **Form** = what the editing form enforces (`.pages.yml`). **Code** = what the site does when the value is missing or odd. The code never fails on a missing or wrong-typed value (R20).
+All content is plain JSON files under `src/content/`. **Form** = what the editing form enforces (`.pages.yml`). The code never fails on a missing or wrong-typed value (R12).
 
-### 5.1 `settings/site.json` (one file)
+**Two-language fields** are written `name_en` / `name_hu` below as `name_*`. **R9.** When one language is empty the other is shown.
 
-| Field | Type | Form | Code and use |
-|---|---|---|---|
-| `name` | text | required | Default "Festival". Header, footer, title |
-| `tagline` | text | | Fallback meta description |
-| `locale` | select `en-GB` or `hu-HU` | | Language for dates and the `lang` attribute. Default `en-GB`. Code accepts any valid language tag |
-| `email` | text | | Footer `mailto:` link |
-| `instagram`, `facebook` | link | https only | Footer links |
-| `ticketLabel`, `ticketUrl` | text, link | https only | Header button; needs both |
-| `footerNote` | text | | Small text in the footer |
-| `noindex` | yes/no | default yes | See R5 |
-| `labels.home`, `.program`, `.people` | text | | Menu and page headings. Defaults: Home, Program, People |
-| `labels.details` | text | | Link text on program rows. Default "Details" |
-| `labels.noEvents` | text | | Default "The program will be announced soon." |
-| `labels.teachers`, `.performers`, `.organizers`, `.others` | text | | People page headings. Defaults: Teachers, Performers, Organizers, More people |
+### 5.1 `settings/site.json`
 
-### 5.2 `settings/home.json` (one file)
+| Field | Form | Use |
+|---|---|---|
+| `name` | required | Community name: brand, footer, titles. Default "Community" |
+| `defaultLang` | `en` or `hu` | R3. Anything else counts as `en` |
+| `tagline_*` | | Meta description on the community level |
+| `email` | | Footer |
+| `instagram`, `facebook` | https only | Footer |
+| `footerNote_*` | | Footer |
+| `noindex` | default yes | R5 |
 
-`heroTitle`, `dateLine`, `heroSubtitle`, `heroImage` (photo), `ctaLabel`, `ctaUrl` (https only), `intro` (multi-line text), `eventsHeading`, `peopleHeading`, `linksHeading`. All optional; headings default as in 4.2. See 4.2 for how each is used.
+### 5.2 `settings/community.json`
 
-### 5.3 `events/*.json` (one file per program item)
+`title_*` (banner title; falls back to the community name), `heroImage`, `intro_*` (multi-line).
 
-| Field | Type | Form | Code and use |
-|---|---|---|---|
-| `title` | text | required | Falls back to the file name |
-| `date` | `yyyy-MM-dd` | required | An empty, malformed or impossible date (for example `2027-13-45`) skips the event with a warning |
-| `startTime`, `endTime` | text, 24-hour | | Shown as written; start time is also used for ordering |
-| `place` | text | | |
-| `type` | select Workshop, Concert, Party, Social, Other | | Shown as written, any text accepted |
-| `people` | list of references to people | | Resolved by file name; missing people ignored; a single string counts as a one-item list |
-| `description` | multi-line text | | Line breaks kept |
-| `url` | link | https only | Unsafe or empty: no link |
+### 5.3 `settings/festival.json`
 
-File name convention: `yyyy-MM-dd-title-in-lowercase.json` (the editor generates it from the date and title).
+| Field | Form | Use |
+|---|---|---|
+| `name` | required | Brand text, titles. Default "Festival" |
+| `logo` | image | Banner and header; text is used when empty |
+| `heroImage` | image | Festival banner; default sharing image |
+| `heroImagePhone` | image | Optional taller banner used below 720 px |
+| `dateLine_*` | | Banner; also on the community home |
+| `ticketUrl`, `ticketLabel_*` | https only | Ticket buttons |
+| `intro_*` | multi-line | Festival home |
+| `stats_*` | | The line of numbers |
+| `instagram` | https only | Footer inside the festival |
+| `tagline_*` | | Meta description inside the festival |
+| `programHeading_*`, `programImages` (list of images), `programText_*` (rich text) | | Program page |
+| `teachersHeading_*`, `artistsHeading_*` | | Page headings |
 
 ### 5.4 `people/*.json`
 
-| Field | Type | Form | Code and use |
-|---|---|---|---|
-| `name` | text | required | Falls back to the file name |
-| `role` | select Teacher, Performer, Organizer | required | Groups the people page (R13) |
-| `photo` | photo path | JPG, PNG or WebP | Missing file: no photo shown, with a warning |
-| `country`, `bio`, `link` | text, text, link | link: https only | |
-| `featured` | yes/no | default no | Shows on the home page |
-| `order` | number | | Default 100; lower first |
+| Field | Form | Use |
+|---|---|---|
+| `name` | required | Falls back to the file name |
+| `group` | required: Teacher or Artist | Which page (case ignored) |
+| `role_*` | | Small label above the name |
+| `photo` | JPG, PNG or WebP | Missing file: no photo, with a warning |
+| `bio_*` | multi-line | Paragraphs |
+| `instagram` | https only | Link |
+| `order` | number | Default 100; lower first |
 
-### 5.5 `links/*.json`
+### 5.5 `pages/*.json` (text pages of the festival)
 
-| Field | Type | Form | Code and use |
-|---|---|---|---|
-| `label` | text | required | Falls back to the URL |
-| `url` | link | required, https only | Unsafe or empty: the link is dropped |
-| `kind` | select Video, Photos, Social, Tickets, Other | | `video` and `photos` give the card a different accent colour |
-| `description` | text | | Shown under the label; falls back to the kind |
-| `order` | number | | Default 100; lower first |
+| Field | Form | Use |
+|---|---|---|
+| `title_*` | English required | Falls back to the other language, then the file name |
+| `menuLabel_*` | | Menu word when it should differ from the title ("Location" for a page titled "Venue") |
+| `body_*` | rich text | Markdown or HTML; both are rendered |
+| `image` | image | Shown under the title; sharing image |
+| `gallery` | list of images | Grid at the bottom |
+| `showInMenu` | default yes | Festival menu |
+| `showOnHome` | default no | Button on the festival home |
+| `order` | number | Default 100 |
 
-### 5.6 `pages/*.md` (Markdown with front matter)
+The file name is the address in both languages (`location.json` gives `/en/festival/location/` and `/hu/festival/location/`).
 
-| Field | Type | Form | Code and use |
-|---|---|---|---|
-| `title` | text | required | Falls back to the file name |
-| `menuLabel` | text | | Menu text; falls back to the title |
-| `showInMenu` | yes/no | default yes | |
-| `order` | number | | Default 100; lower first |
-| `image` | photo path | | Shown above the text |
-| body | rich text | | Markdown |
-
-### 5.7 Photos
+### 5.6 Photos
 
 Stored in `public/uploads/`; content refers to them as `/uploads/<file>`.
 
-## 6. Rules and calculations
+### 5.7 Fixed wording
 
-- **R16. Dates** are treated as plain calendar days, with no time zone, so a day can never shift. They are formatted in the site's `locale`.
-- **R17. "Today"** is the date at build time (UTC) for the home page's list, and the visitor's local date for hiding (R9). Around midnight these can differ by a day; the home list may keep a just-past event until the next build, and the browser removes it.
-- **R18. Links** are rendered only when they start with `https://`, `http://`, `mailto:` or a single `/`. Anything else (for example `javascript:`) is dropped.
-- **R19. Photos.** At build time each JPG, PNG or WebP in `public/uploads/` gets WebP copies 480, 960 and 1600 px wide (never enlarged; the largest is the original width, capped at 1600). Pages use them with `srcset` and the original's width and height, so the layout does not jump. Phone rotation tags are respected. A photo that cannot be processed is served as it is. A referenced photo that does not exist is left out. Photos are lazy-loaded except the home page's main photo.
-- **R20. Tolerance.** Wrong types are converted (a number in a text field becomes text; "yes" or "true" counts as true; a text where a number belongs is ignored). Only unreadable file syntax (for example broken JSON) fails a build.
-- **R21. Ordering** by `order` (default 100) then name, title or label, using locale-aware comparison. Events are the exception (R11).
+Menu words, "Skip to content", the ticket-button fallback, "Instagram" and the 404 texts live in `src/lib/i18n.ts` in both languages. They are not editable in the forms.
 
-## 7. Editing experience
+## 6. Rules
 
-- **R22.** Everything the admin can change is available as a form with plain labels and short hints (`.pages.yml`): Home page, Text pages, Program, People, Videos/photos/social links, Site settings.
-- **R23.** Required fields (title, date, name, role, link) cannot be left empty in the form. Link fields must start with `https://`. Dates are picked from a calendar.
-- **R24.** Photos can be uploaded in any size, in JPG, PNG or WebP.
-- **R25.** Teachers and performers are picked from a list when editing a program item.
-- **R26.** A saved change is live within a couple of minutes (target, not yet measured).
-- **R27.** The admin cannot change layout, colours or code through the forms.
-- **R28.** The site works at any address: a custom domain (base `/`) or a sub-path such as `name.github.io/repo-name/`. The address comes from the environment variables `SITE_URL` and `SITE_BASE`; every internal link, photo and Markdown link/image carries the base path.
-- **R29.** Every push to `main` runs `npm run check` and the build; the site is published only if both pass, otherwise the previous version stays online. Content warnings from the build are shown on the run's summary page.
-- **R30.** Dependency and Node versions are pinned (exact versions in `package.json`, lockfile, `.node-version`), so the same input gives the same site.
+- **R10. Links** are rendered only when they start with `https://`, `http://`, `mailto:` or a single `/`. Anything else (for example `javascript:`) is dropped, also inside text-page bodies.
+- **R11. Photos.** At build time each JPG, PNG or WebP in `public/uploads/` gets WebP copies 480, 960 and 1600 px wide (never enlarged). Pages use them with `srcset` and the original's width and height. Phone rotation is respected. A photo that cannot be processed is served as it is, with a warning. A referenced photo that does not exist is left out, with a warning. A photo over 8 MB works but gets a warning. Photos load lazily except banners and the first program image.
+- **R12. Tolerance.** Wrong types are converted (a number in a text field becomes text; "yes" or "true" counts as true; a single text where a list belongs becomes a one-item list). Only unreadable file syntax (broken JSON) fails a build.
+- **R13. Warnings never block publishing.** They are printed as `[content-warning]` lines and listed on the GitHub run summary.
+- **R14. Ordering** is by `order` (default 100), then name or title.
+
+## 7. Editing and publishing
+
+- **R15.** Everything the admin can change is a form with plain labels and hints: Festival (home page, program and headings; teachers and artists; text pages), Community home page, Site settings.
+- **R16.** Required fields cannot be left empty in the form. Link fields must start with `https://`.
+- **R17.** Photos can be uploaded in any size, as JPG, PNG or WebP.
+- **R18.** A push to `main` (which is what a save in the editor is) runs one build and deploys. If the build fails, the previous version stays online.
+- **R19.** `npm run check` runs automatically only for changes outside `src/content` and `public/uploads`, and on pull requests.
+- **R20.** The site works at any address: a custom domain or a sub-path such as `name.github.io/repo-name/`, set by `SITE_URL` and `SITE_BASE`.
+- **R21.** Dependency and Node versions are pinned.
 
 ## 8. Non-functional requirements
 
-- **Performance.** No requests to third parties (no external fonts, scripts, trackers or embeds). Responsive photos (R19). The pages are static files.
-- **Privacy.** No cookies and no third-party requests, so no consent banner is needed for the prototype. Adding analytics or embeds changes this.
-- **Accessibility.** Semantic headings, a skip link, visible keyboard focus, a current-page marker in the menu, reduced-motion respected (the site has no animation), buttons and links sized for touch (not formally measured). Photos are decorative (empty alt text). Known gap: editors cannot supply alt text.
-- **Responsive.** Mobile first; one breakpoint at 720 px. No horizontal scrolling at 390 px wide.
-- **Browsers.** Current browsers. The site works without JavaScript (all program items stay visible).
-- **Robustness.** Bad content must not take the site down (R20, section 6). If a build fails, the host keeps serving the previous version (to be confirmed on the host).
-- **Independence.** Content and code are plain files in a Git repository; hosting and editing tools can be replaced without changing the site.
-- **Build.** `npm run build`, output folder `dist/`, needs Node 22.23.4 (pinned in `.node-version`; `engines` allows newer).
+- **Performance and privacy.** No requests to third parties: fonts are served from the site, no trackers, no embeds, no cookies, so no consent banner.
+- **Accessibility.** Semantic headings, skip link, visible keyboard focus, current-page and current-language markers, a labelled menu button with `aria-expanded`, link texts that name the person on Instagram links, reduced motion respected. Known gaps: people photos have empty alt text (the name is next to them); the program is images, so its content is not available to screen readers unless the optional text is filled in; no formal audit.
+- **Responsive.** Phone first; breakpoints at 720, 860, 900, 1180 and 1400 px. No horizontal scrolling from 320 px up.
+- **Without JavaScript.** Everything works; the menu is shown open, and `/` goes to the default language.
+- **Design.** Colours, shapes and layout follow the Wix festival site (red, cream, dark inner pages, grey footer, torn-paper ticket button). Deliberate differences: body text is left-aligned, not justified; the language switch is two links, not a flag drop-down; Instagram is a text link, not an icon; the menu has one extra entry, the link up to the community home.
 
 ## 9. Acceptance criteria
 
-Automated by `npm run check` (A) or checked by hand (M). See `docs/HANDOFF.md` for how to do the manual ones.
+A = automated by `npm run check`. M = by hand (see `HANDOFF.md`).
 
-| # | Criterion | How |
-|---|---|---|
-| AC1 | The build passes on a clean install | A |
-| AC2 | Home, program, people, 404 and every text page exist in the output | A |
-| AC3 | Every dated event is on the program page; every person is on the people page | A |
-| AC4 | No `javascript:` link and no broken local link, image or srcset URL in the output | A |
-| AC5 | The `noindex` tag matches the setting | A |
-| AC6 | Broken content (no date, impossible date, wrong types, deleted references, missing photos, unsafe links, reserved page name, empty settings) still builds, is skipped or falls back, and logs a `[content-warning]` where something was skipped | A |
-| AC7 | A text page named like a built-in address does not replace the built-in page | A |
-| AC8 | A malformed JSON file fails the build (known limit) | A |
-| AC9 | Past events are hidden with JavaScript on and visible with it off | M |
-| AC10 | No horizontal scrolling and no console errors at 390 px and 1280 px wide | M |
-| AC11 | An oversized phone photo is resized and shown with the right orientation | M (done once, 2026-11-11) |
-| AC12 | All five editing sections appear in Pages CMS with the described fields | M, not yet done |
-| AC13 | An invited editor without a GitHub account can sign in, add a program item with a teacher and a photo, and see it live | M, not yet done |
-| AC14 | A failed build leaves the previous site live | M, not yet done (on GitHub Pages: the deploy job only runs if check and build pass; confirm on the first failed run) |
-| AC15 | With `SITE_BASE=/repo-name`, no link, photo or srcset URL ignores the base path, and Markdown links/images are rewritten | A (`npm run check`, section 4); also clicked through in a browser once |
-| AC16 | An oversized or unreadable photo produces a `[content-warning]` line | A |
-| AC17 | The GitHub workflow publishes the site on push to `main` | M, not yet done (needs a real repository) |
+| # | Criterion | How | State |
+|---|---|---|---|
+| AC1 | The build passes on a clean install | A | passes |
+| AC2 | Every page in section 3 exists in both languages | A | passes |
+| AC3 | Every person is on the page of their group, in both languages | A | passes |
+| AC4 | Language versions declare their language, link to each other, and the switch leads to the same page | A | passes |
+| AC5 | No `javascript:` link and no broken local link, image or srcset URL | A | passes |
+| AC6 | The `noindex` tag matches the setting | A | passes |
+| AC7 | No third-party font, script or tracker addresses in the output | A | passes |
+| AC8 | Broken content (null and wrong-typed fields, missing photos, unsafe links, a reserved page name, an invalid main language, an oversized file) still builds, falls back, and logs warnings | A | passes |
+| AC9 | A missing translation falls back to the other language, both ways | A | passes |
+| AC10 | A malformed JSON file fails the build (known limit) | A | passes |
+| AC11 | With `SITE_BASE=/repo-name`, every link, photo, the root redirect and the sharing image carry the base path | A | passes |
+| AC12 | No horizontal scrolling at eleven widths from 320 to 1920 px in both languages; no console errors; the menu button opens the menu; `/` redirects by browser language and without JavaScript | M | done once in a sandbox, 2026-11-11 |
+| AC13 | All forms appear in Pages CMS with the described fields | M | not done |
+| AC14 | An invited editor without a GitHub account signs in on a phone, adds a person with a photo and both bios, and sees it live | M | not done |
+| AC15 | The workflows run on GitHub; a save in Pages CMS triggers a deployment; a failed build leaves the previous site live | M | not done |
+| AC16 | The admin confirms the look matches her design on phone and desktop | M | not done (built from phone and desktop screenshots of the Wix site; fonts matched by eye) |
 
-## 10. Not specified yet (needs a decision)
+## 10. Not specified yet
 
-- Content: the real page list, the real content types, and any pages beyond those above.
-- Languages: whether the site needs a second language (this roughly doubles the content to edit).
-- Design: the admin's own design replaces the styles and markup, not the content model.
-- Analytics, a sitemap, contact or sign-up forms, calendar export, search, photo alt text fields.
-- Hosting details: custom domain, build-failure notifications, preview deployments for edits.
+- The community level: content types, pages and menu.
+- Whether the program should also exist as text.
+- Launch details: domain, redirects from old Wix addresses, private or public repository, failure notifications.
+- A sitemap, analytics, alt-text fields for photos.

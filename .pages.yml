@@ -1,8 +1,12 @@
 # Pages CMS: the editing forms. Each entry below maps to files in src/content.
-# Written from the Pages CMS docs (pagescms.org/docs/configuration); not yet tested
+# Written from the Pages CMS docs (pagescms.org/docs/configuration); NOT yet tested
 # in the live tool. Test it first (see README, "First test").
 #
-# Keep this file in step with src/content.config.ts: a new field needs adding in both places.
+# Keep this file in step with src/content.config.ts and src/lib/content.ts:
+# a new field needs adding in the form here and in the shape there.
+#
+# Two-language fields come in pairs: name_en and name_hu. If one is left empty,
+# the site shows the other language in its place.
 
 media:
   - name: images
@@ -13,285 +17,175 @@ media:
     extensions: [jpg, jpeg, png, webp]
 
 content:
-  - name: pages-group
-    label: Pages
+  - name: festival-group
+    label: Festival
     type: group
     items:
-      - name: home
-        label: Home page
+      - name: festival
+        label: Home page, program and headings
         type: file
-        path: src/content/settings/home.json
+        path: src/content/settings/festival.json
         format: json
         fields:
-          - name: heroTitle
-            label: Big title
-            type: string
-          - name: dateLine
-            label: Dates and place
-            type: string
-            description: "Shown under the title, for example: 18-20 June 2027, Budapest"
-          - name: heroSubtitle
-            label: Short intro under the title
-            type: text
-          - name: heroImage
-            label: Main photo
+          - { name: name, label: Festival name, type: string, required: true }
+          - name: logo
+            label: Logo (optional)
             type: image
-            options:
-              media: images
-          - name: ctaLabel
-            label: Button text
-            type: string
-          - name: ctaUrl
-            label: Button link
+            description: "Shown on the banner and in the top bar. A PNG with a transparent background works best. Without a logo the name is shown as text."
+            options: { media: images }
+          - name: heroImage
+            label: Banner photo
+            type: image
+            description: "The big photo on the festival home page. Also used when the site is shared on social media."
+            options: { media: images }
+          - name: heroImagePhone
+            label: Banner photo for phones (optional)
+            type: image
+            description: "A taller photo shown on phones only. Leave empty to use the same banner photo everywhere."
+            options: { media: images }
+          - { name: dateLine_en, label: Dates (English), type: string, description: "For example: 19-21 June 2026" }
+          - { name: dateLine_hu, label: Dates (Hungarian), type: string }
+          - name: ticketUrl
+            label: Ticket link
             type: string
             pattern: "^$|^https?://.+"
-            description: "Must start with https://"
-          - name: intro
-            label: Welcome text
-            type: text
-            description: "A blank line starts a new paragraph."
-          - name: eventsHeading
-            label: Heading above the program
+            description: "Must start with https://. Leave empty to hide the ticket buttons."
+          - { name: ticketLabel_en, label: Ticket button text (English), type: string }
+          - { name: ticketLabel_hu, label: Ticket button text (Hungarian), type: string }
+          - { name: intro_en, label: Intro text (English), type: text, description: "A blank line starts a new paragraph." }
+          - { name: intro_hu, label: Intro text (Hungarian), type: text }
+          - { name: stats_en, label: Line of numbers (English), type: string, description: "For example: 14 Workshops | 4 Bands | 5 Concerts" }
+          - { name: stats_hu, label: Line of numbers (Hungarian), type: string }
+          - name: instagram
+            label: Festival Instagram link
             type: string
-          - name: peopleHeading
-            label: Heading above the people
-            type: string
-          - name: linksHeading
-            label: Heading above the links
-            type: string
+            pattern: "^$|^https?://.+"
+          - { name: tagline_en, label: One-line description (English), type: string, description: "Shown in search results and when the site is shared." }
+          - { name: tagline_hu, label: One-line description (Hungarian), type: string }
+          - { name: programHeading_en, label: Program page heading (English), type: string }
+          - { name: programHeading_hu, label: Program page heading (Hungarian), type: string }
+          - name: programImages
+            label: Program images
+            type: image
+            list: true
+            description: "The program graphics, in the order they should appear. The same images are shown in both languages."
+            options: { media: images }
+          - { name: programText_en, label: Text under the program (English, optional), type: rich-text }
+          - { name: programText_hu, label: Text under the program (Hungarian, optional), type: rich-text }
+          - { name: teachersHeading_en, label: Teachers page heading (English), type: string }
+          - { name: teachersHeading_hu, label: Teachers page heading (Hungarian), type: string }
+          - { name: artistsHeading_en, label: Artists page heading (English), type: string }
+          - { name: artistsHeading_hu, label: Artists page heading (Hungarian), type: string }
 
-      - name: text-pages
-        label: Text pages (location, rules, ...)
+      - name: people
+        label: Teachers and artists
         type: collection
-        path: src/content/pages
-        format: yaml-frontmatter
-        filename: "{primary}.md"
+        path: src/content/people
+        format: json
+        filename: "{primary}.json"
         view:
-          primary: title
+          primary: name
+          fields: [name, group, order]
           sort: order
           order: asc
         fields:
-          - name: title
-            label: Title
-            type: string
-            required: true
-          - name: menuLabel
-            label: Name in the menu
-            type: string
-            description: "Leave empty to use the title."
-          - name: showInMenu
-            label: Show in the menu
-            type: boolean
-            default: true
-          - name: order
-            label: Menu order
-            type: number
-            description: "Lower numbers come first."
-          - name: image
-            label: Photo (optional)
-            type: image
-            options:
-              media: images
-          - name: body
-            label: Text
-            type: rich-text
-
-  - name: events
-    label: Program
-    type: collection
-    path: src/content/events
-    format: json
-    filename: "{fields.date}-{primary}.json"
-    view:
-      primary: title
-      sort: date
-      order: asc
-    fields:
-      - name: title
-        label: Title
-        type: string
-        required: true
-      - name: date
-        label: Date
-        type: date
-        required: true
-        default: ""
-        options:
-          format: yyyy-MM-dd
-      - name: startTime
-        label: Start time
-        type: string
-        description: "24-hour time, for example 20:00"
-      - name: endTime
-        label: End time
-        type: string
-        description: "24-hour time, for example 22:30"
-      - name: place
-        label: Place
-        type: string
-      - name: type
-        label: Type
-        type: select
-        options:
-          values: [Workshop, Concert, Party, Social, Other]
-      - name: people
-        label: Teachers and performers
-        type: reference
-        options:
-          collection: people
-          multiple: true
-          search: name
-          value: "{path}"
-          label: "{primary}"
-      - name: description
-        label: Description
-        type: text
-      - name: url
-        label: Link for tickets or details
-        type: string
-        pattern: "^$|^https?://.+"
-        description: "Must start with https://"
-
-  - name: people
-    label: People
-    type: collection
-    path: src/content/people
-    format: json
-    filename: "{primary}.json"
-    view:
-      primary: name
-      sort: name
-      order: asc
-    fields:
-      - name: name
-        label: Name
-        type: string
-        required: true
-      - name: role
-        label: Role
-        type: select
-        required: true
-        options:
-          values: [Teacher, Performer, Organizer]
-      - name: photo
-        label: Photo
-        type: image
-        description: "Any size is fine. The site makes web-sized copies."
-        options:
-          media: images
-      - name: country
-        label: Country
-        type: string
-      - name: bio
-        label: Short bio
-        type: text
-      - name: link
-        label: Website or social link
-        type: string
-        pattern: "^$|^https?://.+"
-        description: "Must start with https://"
-      - name: featured
-        label: Show on the home page
-        type: boolean
-        default: false
-      - name: order
-        label: Order
-        type: number
-        description: "Lower numbers come first. Leave empty to sort by name."
-
-  - name: links
-    label: Videos, photos and social links
-    type: collection
-    path: src/content/links
-    format: json
-    filename: "{primary}.json"
-    view:
-      primary: label
-      sort: order
-      order: asc
-    fields:
-      - name: label
-        label: Title
-        type: string
-        required: true
-      - name: url
-        label: Link
-        type: string
-        required: true
-        pattern: "^https?://.+"
-        description: "Must start with https://"
-      - name: kind
-        label: Type
-        type: select
-        options:
-          values: [Video, Photos, Social, Tickets, Other]
-      - name: description
-        label: Short description
-        type: string
-      - name: order
-        label: Order
-        type: number
-        description: "Lower numbers come first."
-
-  - name: settings-group
-    label: Site settings
-    type: group
-    items:
-      - name: site
-        label: Name, contact and wording
-        type: file
-        path: src/content/settings/site.json
-        format: json
-        fields:
-          - name: name
-            label: Site name
-            type: string
-            required: true
-          - name: tagline
-            label: One-line description
-            type: string
-            description: "Shown in search results and when the site is shared."
-          - name: locale
-            label: Language for dates
+          - { name: name, label: Name, type: string, required: true }
+          - name: group
+            label: Shown on
             type: select
+            required: true
+            description: "Teacher: the Teachers page. Artist: the Artists page."
             options:
-              values: [en-GB, hu-HU]
-          - name: email
-            label: Contact email
-            type: string
+              values: [Teacher, Artist]
+          - { name: role_en, label: Role (English), type: string, description: "For example: Dance Teacher. Can be left empty." }
+          - { name: role_hu, label: Role (Hungarian), type: string }
+          - name: photo
+            label: Photo
+            type: image
+            description: "Any size is fine, straight from a phone. The site makes web-sized copies."
+            options: { media: images }
+          - { name: bio_en, label: Bio (English), type: text, description: "A blank line starts a new paragraph." }
+          - { name: bio_hu, label: Bio (Hungarian), type: text }
           - name: instagram
             label: Instagram link
             type: string
             pattern: "^$|^https?://.+"
-          - name: facebook
-            label: Facebook link
-            type: string
-            pattern: "^$|^https?://.+"
-          - name: ticketLabel
-            label: Ticket button text (top right)
-            type: string
-          - name: ticketUrl
-            label: Ticket button link
-            type: string
-            pattern: "^$|^https?://.+"
-          - name: footerNote
-            label: Small text at the bottom
-            type: text
-          - name: noindex
-            label: Hide the site from Google
-            type: boolean
-            default: true
-            description: "Keep this ON while testing. Turn it OFF when the site goes live."
-          - name: labels
-            label: Wording (change these to translate the site)
-            type: object
-            fields:
-              - { name: home, label: Menu - Home, type: string }
-              - { name: program, label: Menu - Program, type: string }
-              - { name: people, label: Menu - People, type: string }
-              - { name: details, label: Link text on program items, type: string }
-              - { name: noEvents, label: Message when there is no program, type: string }
-              - { name: teachers, label: Heading - Teachers, type: string }
-              - { name: performers, label: Heading - Performers, type: string }
-              - { name: organizers, label: Heading - Organizers, type: string }
-              - { name: others, label: Heading - Other people, type: string }
+            description: "Must start with https://"
+          - { name: order, label: Order, type: number, description: "Lower numbers come first. Leave empty to sort by name." }
+
+      - name: pages
+        label: Text pages (location, rules, ...)
+        type: collection
+        path: src/content/pages
+        format: json
+        filename: "{primary}.json"
+        view:
+          primary: title_en
+          sort: order
+          order: asc
+        fields:
+          - { name: title_en, label: Title (English), type: string, required: true }
+          - { name: title_hu, label: Title (Hungarian), type: string }
+          - { name: menuLabel_en, label: Menu word (English), type: string, description: "Only if the menu should say something shorter than the title, for example Location for a page titled Venue." }
+          - { name: menuLabel_hu, label: Menu word (Hungarian), type: string }
+          - { name: body_en, label: Text (English), type: rich-text }
+          - { name: body_hu, label: Text (Hungarian), type: rich-text }
+          - name: image
+            label: Photo at the top (optional)
+            type: image
+            options: { media: images }
+          - name: gallery
+            label: Photo gallery at the bottom (optional)
+            type: image
+            list: true
+            options: { media: images }
+          - { name: showInMenu, label: Show in the menu, type: boolean, default: true }
+          - { name: showOnHome, label: Show as a button on the festival home page, type: boolean, default: false }
+          - { name: order, label: Order, type: number, description: "Lower numbers come first." }
+
+  - name: community
+    label: Community home page
+    type: file
+    path: src/content/settings/community.json
+    format: json
+    fields:
+      - { name: title_en, label: Big title (English), type: string }
+      - { name: title_hu, label: Big title (Hungarian), type: string }
+      - name: heroImage
+        label: Banner photo
+        type: image
+        options: { media: images }
+      - { name: intro_en, label: Intro text (English), type: text, description: "A blank line starts a new paragraph. Leave empty to show no text." }
+      - { name: intro_hu, label: Intro text (Hungarian), type: text }
+
+  - name: site
+    label: Site settings
+    type: file
+    path: src/content/settings/site.json
+    format: json
+    fields:
+      - { name: name, label: Community name, type: string, required: true }
+      - name: defaultLang
+        label: Main language
+        type: select
+        description: "Used when a visitor's browser prefers neither Hungarian nor English."
+        options:
+          values: [en, hu]
+      - { name: tagline_en, label: One-line description (English), type: string }
+      - { name: tagline_hu, label: One-line description (Hungarian), type: string }
+      - { name: email, label: Contact email, type: string }
+      - name: instagram
+        label: Community Instagram link
+        type: string
+        pattern: "^$|^https?://.+"
+      - name: facebook
+        label: Facebook link
+        type: string
+        pattern: "^$|^https?://.+"
+      - { name: footerNote_en, label: Small text at the bottom (English), type: text }
+      - { name: footerNote_hu, label: Small text at the bottom (Hungarian), type: text }
+      - name: noindex
+        label: Hide the site from Google
+        type: boolean
+        default: true
+        description: "Keep this ON while testing. Turn it OFF when the site goes live."

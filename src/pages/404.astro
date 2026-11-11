@@ -1,13 +1,22 @@
 ---
+// One "not found" page for the whole site, so it shows both languages.
 import Base from '../layouts/Base.astro';
-import { getSite, withBase } from '../lib/content';
+import PageTitle from '../components/PageTitle.astro';
+import { getSite, href } from '../lib/content';
+import { LANGS, UI } from '../lib/i18n';
 
 const site = getSite();
 ---
 
-<Base title="Page not found">
-  <section class="page">
-    <h1>Page not found</h1>
-    <p>This address does not exist. <a href={withBase('/')}>Go to the {site.labels.home.toLowerCase()} page.</a></p>
+<Base lang={site.defaultLang} section="community" pagePath="/" title={UI[site.defaultLang].notFoundTitle}>
+  <PageTitle title={LANGS.map((l) => UI[l].notFoundTitle).join(' / ')} />
+  <section class="page prose page--onred">
+    {
+      LANGS.map((l) => (
+        <p lang={l}>
+          {UI[l].notFoundText} <a href={href(l, '/')}>{UI[l].notFoundLink}</a>
+        </p>
+      ))
+    }
   </section>
 </Base>

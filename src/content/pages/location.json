@@ -1,0 +1,17 @@
+{
+  "title_en": "Venue",
+  "title_hu": "Helyszín",
+  "menuLabel_en": "Location",
+  "menuLabel_hu": "Helyszín",
+  "body_en": "*Placeholder wording: a short summary of the current page, to be replaced with the original text.*\n\n## Margitsziget (Margaret Island)\n\nA green island in the Danube, in the centre of Budapest. Trams 4 and 6 stop at the entrance. The festival area is closer to the southern entrance, reached from Margaret Bridge.\n\n## Kristály Színtér\n\nThe main festival venue: evening concerts in the indoor hall, dance workshops during the day and afternoon parties outdoors.\n\n**Address:** Budapest, Margitsziget 23800/7, 1138  \n**Tram:** 4, 6  \n**Bus:** 26",
+  "body_hu": "*Helykitöltő szöveg: a jelenlegi oldal rövid összefoglalója, az eredeti szövegre cserélendő.*\n\n## Margitsziget\n\nZöld sziget a Dunán, Budapest közepén. A 4-es és 6-os villamos a bejáratnál áll meg. A fesztivál területe a déli bejárathoz, a Margit hídhoz van közelebb.\n\n## Kristály Színtér\n\nA fesztivál fő helyszíne: esti koncertek a nagyteremben, napközben táncworkshopok, délután szabadtéri bulik.\n\n**Cím:** 1138 Budapest, Margitsziget 23800/7  \n**Villamos:** 4, 6  \n**Busz:** 26",
+  "image": "/uploads/placeholder-hero.jpg",
+  "gallery": [
+    "/uploads/placeholder-person-1.jpg",
+    "/uploads/placeholder-person-2.jpg",
+    "/uploads/placeholder-person-3.jpg"
+  ],
+  "showInMenu": true,
+  "showOnHome": false,
+  "order": 1
+}

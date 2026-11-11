@@ -1,0 +1,31 @@
+---
+// The program: the graphics the admin uploads, shown one under the other.
+// The same images serve both languages. An optional text can follow them.
+import Base from '../../../layouts/Base.astro';
+import PageTitle from '../../../components/PageTitle.astro';
+import Picture from '../../../components/Picture.astro';
+import { getFestival, renderBody } from '../../../lib/content';
+import { LANGS, UI, tr, type Lang } from '../../../lib/i18n';
+
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const festival = getFestival();
+const heading = tr(festival, 'programHeading', lang) || UI[lang].program;
+const body = renderBody(tr(festival, 'programText', lang));
+const alt = `${UI[lang].program} – ${festival.name}`;
+---
+
+<Base lang={lang} section="festival" pagePath="/festival/program/" title={UI[lang].program}>
+  <PageTitle title={heading} />
+  <section class="page program">
+    {
+      festival.programImages.map((src, i) => (
+        <Picture src={src} class="program-image" sizes="(min-width: 1200px) 1150px, 100vw" alt={`${alt} (${i + 1})`} eager={i === 0} />
+      ))
+    }
+    {body && <div class="prose" set:html={body} />}
+  </section>
+</Base>

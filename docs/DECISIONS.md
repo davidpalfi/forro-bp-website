@@ -2,116 +2,149 @@
 
 Read this before changing the structure of the site. When you change or add a decision, update this file in the same commit. Keep entries short: what was decided, why, what else was considered, and what would make us revisit it.
 
+Last full revision: 2026-11-11, after a design review and a look at every page of the current Wix site. What changed in that revision is listed under "History" at the end.
+
 ## Context and priorities
 
-The site replaces a Wix festival site (Budapest Forró Festival). The owner wants to stop paying the Wix subscription. Priorities, in order:
+The Forró Budapest community wants one website. Today it has only a festival site on Wix (forrobudapest.com, Budapest Forró Festival). The plan:
 
-1. **The admin can update content herself.** She is not technical, so the setup must be robust and hard to break. She is also a designer, and her own design is still to come.
-2. **Independence from outside providers.** Leaving Wix is the point. Every outside piece must be replaceable without rebuilding the site.
-3. **Content is not final.** The real content types, page list and layout are undecided. This repo is a base to prototype on, not the finished site.
-4. A developer maintains it, with a few technical people in the community as backup. Day-to-day content edits should never need them.
+- Build a **community site**. Its main level is empty for now.
+- The **festival** becomes a section one level below (`/festival/`).
+- The whole site uses the **look of the current Wix festival site**. The admin agreed to this.
+- **English and Hungarian** from the start (the Wix site already has both).
 
-The site is mainly Hungarian. The prototype's wording is English and is configurable (see decision 12).
+Priorities, in order:
 
-The needs behind these priorities, and how well each is known, are in `USER-NEEDS.md`. Only the three priorities above are firmly stated; page-level needs are assumptions.
+1. **The admin can update content herself.** She is not technical. She is a designer and made the Wix design.
+2. **No running costs and no dependence on a paid provider.** Leaving Wix is about cutting the subscription. This rules out anything that needs a paid plan or account for her, including a paid Claude plan.
+3. **Robust and hard to break.**
+4. A developer maintains it, with a few technical people in the community as backup.
+
+The needs behind these, and how well each is known, are in `USER-NEEDS.md`.
 
 ## Decisions
 
 ### 1. Static site, no server and no database
-Why: nothing to patch or hack, free hosting, fast, and it fits an idle site that peaks around the festival. Rejected: WordPress (needs paid hosting and regular security updates, which suits an idle site badly). Revisit if the site needs logins, payments or bookings; those are a different project.
+Why: nothing to patch or hack, free hosting, fast. Rejected: WordPress (paid hosting, regular security updates). Revisit if the site needs logins, payments or bookings.
 
-### 2. Astro, not plain HTML
-Why: pre-rendered HTML (good for search and link previews), typed content collections, and a widely supported tool. Cost: a build step, and Astro 7 needs Node 22.23.4 or newer. `.node-version` pins 22.23.4.
+### 2. Astro
+Why: pre-rendered HTML, typed content collections, widely supported. Cost: a build step. Astro 7 needs Node 22.23.4 or newer; `.node-version` pins it.
 
-### 3. Pages CMS for editing, hosted on Cloudflare Pages, files in GitHub
-Why: free, open source (can be self-hosted), form-based, and the content stays as plain files. Rejected: Sanity (content lives at a third party, more setup; the owner wants fewer dependencies), Decap (login setup is the usual sticking point), Keystatic and TinaCMS (more setup and friction). Revisit if the invited-editor sign-in is a struggle, if drafts and validation turn out to matter, or if content becomes heavily linked. Because the content is files, switching editors does not change the site.
+### 3. Editing through Pages CMS forms; content stays as files in GitHub
+Why: free, open source, form-based, and invited editors sign in by email without a GitHub account. Rejected: Sanity (content at a third party), Decap (login setup), Keystatic and TinaCMS (more setup).
 
-### 4. Fixed collections, not flexible page blocks
-Content is a few collections (events, people, links, text pages) plus two settings files (`home.json`, `site.json`). Pages are not built from mixed lists of blocks. Why: fewer ways for the editor to break things, and nothing in the Pages CMS block feature has been tested. Flexibility comes from text pages (Markdown), which become new pages automatically. Revisit when the real content shows what is missing.
+**Claude is not an editing path for the admin.** It would need a paid plan and a GitHub account, which priority 2 rules out. Claude is a tool for the maintainer only (`CLAUDE.md`).
 
-### 5. Links between content are file paths, resolved by file name
-An event's `people` field stores paths such as `src/content/people/teacher-anna.json`. The site uses only the file name (without extension), and ids are generated from file names (`generateId` in `src/content.config.ts`). A reference to a deleted person is ignored. Consequence: renaming a person's file silently unlinks them from events.
+Revisit if the invited-editor sign-in is a struggle (this is still untested and is the first thing to test). Because the content is files, another editor can replace Pages CMS without changing the site.
 
-### 6. The code is lenient, the forms are strict
-Every field is optional in `src/content.config.ts`, and empty, null or wrong-typed values are converted or fall back to defaults (`src/lib/schema.ts`); only unreadable file syntax, such as broken JSON, can fail a build. "Required" is enforced only in the forms (`.pages.yml`). Why: a failed build leaves the site unchanged and the editor has no idea why. Broken entries (for example an event without a valid date) are skipped and logged as `[content-warning]` lines in the build output. The warnings are the only signal, so read them.
+### 4. One site, two levels: community above, festival below
+Addresses: `/<lang>/` is the community home, `/<lang>/festival/...` is the festival. The community level is an empty shell with the same header, banner and footer; content types for it (classes, events) are **not designed yet** and should be designed when the admin knows what she wants there.
+Why: the admin and owner agreed the festival moves under a community site, and that the festival design is reused. Considered: two separate sites (two things to maintain and two designs).
 
-### 7. Past events hide themselves in the browser
-Each event row carries its date, and a small inline script hides rows before today. Why: no scheduled rebuilds are needed. Without JavaScript, everything stays visible. The home page also limits itself to the next 6 events at build time.
+### 5. Two languages, in the address, with both languages in one entry
+- Every page exists at `/en/...` and `/hu/...`. The root `/` sends the visitor to Hungarian if the browser prefers Hungarian, otherwise to the default language (`defaultLang` in `site.json`).
+- Each content entry holds both languages side by side: `bio_en` and `bio_hu`, `title_en` and `title_hu`. Things that are the same in both (name, photo, Instagram link, order) are entered once.
+- If one language is empty, the page shows the other language instead of a gap.
+- Short fixed wording (menu words, "Skip to content", the 404 text) lives in `src/lib/i18n.ts`, not in the forms.
 
-### 8. Photos: our own resize step
-Uploads go to `public/uploads`. `scripts/optimize-images.mjs` runs before every build and writes web-sized WebP copies (480, 960 and 1600 px wide) to `public/_img` (not committed), plus a manifest the site reads. The script never fails the build; an unreadable photo falls back to the original. Why not Astro's built-in image handling: it needs images under `src/`, and the Pages CMS docs say nothing about how stored image paths work with Astro. Revisit once the real stored path format has been seen (see assumptions). Uploads are limited to JPG, PNG and WebP so unsupported formats are rejected clearly instead of failing quietly.
+Why side by side: she writes both languages herself, sees at once which translation is missing, and cannot end up with a teacher who exists in only one language. Considered: a separate folder of files per language (clean files, but every photo and link entered twice, and the two sets drift apart). Revisit if a third language is ever needed; side-by-side forms get long.
 
-### 9. No third-party fonts, scripts or trackers
-Why: independence, speed and avoiding privacy-consent problems. System fonts are used. Self-host a font if the design needs one. Add analytics only when someone asks, and choose one that needs no consent banner or decide on the banner then.
+### 6. Fixed content types that match the real site
+Content is: festival settings (one file), people (teachers and artists), text pages, plus site and community settings. Pages are not built from free blocks.
 
-### 10. Link safety
-Only `https://`, `http://`, `mailto:` and site-relative links are rendered (`safeUrl` in `src/lib/content.ts`). The forms also require `https://`.
+**The program is uploaded images, not structured data.** The Wix site publishes the program as graphics the admin designs, the same image for both languages. So there is no event collection, no dates to parse and no hiding of past events. An optional text field under the images exists for notes.
+Why: this is how she already works, and it removed the most fragile part of the first prototype. Cost: the program is not readable by screen readers or search engines; the text field is the place to add a plain version if wanted. Revisit if she wants an editable text schedule, or when the community level needs dated events.
 
-### 11. The prototype hides itself from Google
-`noindex` in `site.json` defaults to true. Turn it off when the site goes live.
+### 7. Links between content: none
+The first prototype linked events to people by file path. With the program as images, nothing references anything else. Renaming or deleting an entry cannot break another one.
 
-### 12. One language for now; wording is configurable
-All fixed wording (menu, headings, messages) lives in `site.json` under `labels`, and date language under `locale`. A real two-language site (for example `/hu/` and `/en/`) is not designed. It would roughly double the content to edit, so decide it deliberately with the admin.
+### 8. The code is lenient, and warnings never block publishing
+Every field is optional in `src/content.config.ts`; empty, null or wrong-typed values are converted or fall back (`src/lib/schema.ts`). Only unreadable file syntax (broken JSON) fails a build. "Required" is enforced only in the forms (`.pages.yml`).
 
-### 13. Documentation for people and for Claude
-`EDITING-GUIDE.md` is for the editor. `CLAUDE.md` holds the rules for any Claude session that edits this repo. `README.md` covers setup and deployment.
+Problems found at build time are logged as `[content-warning]` lines and copied to the run summary on GitHub. **They do not stop the deployment.**
+Why: if publishing stopped, the admin would see nothing happen and not know why, and every later edit would be stuck too. The first prototype blocked publishing on any warning, including a phone photo over 8 MB; that contradicted this decision and was removed.
 
-### 14. GitHub Pages for the test deployment (and possibly beyond)
-The test site is published with GitHub Pages through a GitHub Actions workflow (`.github/workflows/deploy.yml`). Why: free, one fewer account than Cloudflare, and the repo is already on GitHub. The code does not depend on it: the address comes from `SITE_URL`/`SITE_BASE`, so Cloudflare Pages, Netlify or a custom domain work by setting those variables. The repository is public for the test (placeholder content only); GitHub Pages on a private repo needs a paid plan. Revisit before real content and the real domain, and re-check decision 3 (the README still describes Cloudflare as the production option; either works).
+### 9. Photos: our own resize step
+Uploads go to `public/uploads`. `scripts/optimize-images.mjs` runs before every build and writes WebP copies (480, 960, 1600 px wide) to `public/_img` (not committed), plus a manifest. It never fails the build. Uploads are limited to JPG, PNG and WebP in the forms.
+Why not Astro's built-in image handling: it wants images under `src/`, and how Pages CMS stores image paths is unverified. Revisit once the stored path format has been seen.
+Known cost: original photos live in Git, and every build re-encodes all of them. Fine for tens of photos; revisit with hundreds.
 
-### 15. Check before deploy; the host never sees a broken build
-The workflow runs `npm run check` first and deploys only if it passes and the build succeeds. A failed run leaves the previous deployment online (standard Pages behaviour: a deployment replaces the old one only when it succeeds; not yet confirmed here). Content warnings are copied into the run summary by `scripts/ci-build.mjs`. A check failing because of a content edit is possible only for things the check asserts about the real content (for example `[content-warning]` lines); that is deliberate, so mistakes are noticed before publishing.
+### 10. Fonts are self-hosted; no third-party requests at all
+The Wix look needs a serif and two sans-serif fonts. They are installed as npm packages (`@fontsource-variable/fraunces`, `libre-franklin`, `open-sans`) and served from the site itself. No external fonts, scripts, trackers or embeds.
+Why: independence, speed, no cookie banner. The font choices are a **visual match by eye**, not confirmed; ask the admin which fonts the Wix design uses.
 
-### 16. Pinned versions
-`astro` and `sharp` are exact versions, `package-lock.json` is committed and installs use `npm ci`, and `.node-version` is the exact Node 22.23.4. Why: the site should not change or break because a dependency released a new version. Upgrade deliberately (see ARCHITECTURE). Workflow actions use major-version tags (`actions/checkout@v7`, `actions/setup-node@v7`, `withastro/action@v6`, `actions/deploy-pages@v5`) taken from their documentation on 2026-11-11; they were not run against a real repository. If the first run complains about an action, check its current version.
+### 11. Link safety
+Only `https://`, `http://`, `mailto:` and site-relative links are rendered (`safeUrl`). The forms also require `https://`.
 
-### 17. Base path via environment variables, Markdown rewritten after rendering
-`base` in `astro.config.mjs` comes from `SITE_BASE`. Markdown pages are rewritten with `rebaseHtml()` because the `markdown.rehypePlugins` option needs an extra package under Astro 7 (the default processor changed). Considered: adding `@astrojs/markdown-remark` (more dependency for one small job).
+### 12. The prototype hides itself from Google
+`noindex` in `site.json` defaults to true. Turn it off at launch.
+
+### 13. Hosting: GitHub Pages for the proof of concept
+Published by `.github/workflows/deploy.yml`. Why: free, and one fewer account. The code does not depend on it: the address comes from `SITE_URL` and `SITE_BASE`.
+Caveat: free GitHub Pages needs a **public repository**, so everything in it (photos, texts, edit history) is public. That is acceptable for the proof of concept because the content is already public on the Wix site. Before launch, decide between staying public, a paid GitHub plan, or Cloudflare Pages (free with a private repository).
+
+### 14. Publishing is one build; the test suite runs only when code changes
+- `deploy.yml`: every push to `main` builds once and deploys. If the build fails, nothing is deployed and the previous version stays online.
+- `check.yml`: runs `npm run check` (several test builds) only when something outside `src/content` and `public/uploads` changes, and on pull requests.
+
+Why: the first prototype ran five builds for every content edit, so a saved change took far longer than "a couple of minutes". Content edits cannot break code, so they do not need the code tests. Cost: a code push to `main` deploys without waiting for the checks; make code changes on a branch with a pull request.
+
+### 15. Pinned versions
+All dependencies are exact versions, `package-lock.json` is committed, installs use `npm ci`, `.node-version` is exact. Upgrade deliberately (see ARCHITECTURE). Node 22 leaves maintenance in spring 2027; plan one upgrade before then. Workflow actions use major-version tags taken from documentation; they have not been run on a real repository.
+
+### 16. Base path from environment variables
+`base` in `astro.config.mjs` comes from `SITE_BASE`. Every internal address goes through `withBase()`; HTML made from text-page bodies is rewritten by `rebaseHtml()`.
+
+### 17. Text page bodies are stored in JSON and rendered with `marked`
+A text page is one JSON file with `body_en` and `body_hu`. The body is rendered by the `marked` package, which accepts both Markdown and HTML.
+Why: both languages must live in one entry (decision 5), which a Markdown file with a single body cannot do. And it is not yet known whether the Pages CMS rich-text field saves Markdown or HTML; this works with either.
+
+### 18. Documentation
+`EDITING-GUIDE.md` is for the admin. `CLAUDE.md` holds the rules for a Claude session working for the maintainer. `README.md` covers setup and deployment. `docs/` explains the design. The Claude project holds copies of `docs/`; the repository is the source of truth.
 
 ## Assumptions not yet verified
 
-`.pages.yml` was written from the Pages CMS documentation. The live tool has not been run against it. Check these on the first test and fix the code or config where they are wrong:
+`.pages.yml` was written from the Pages CMS documentation. The live tool has never been connected. Check these on the first test and fix the code or config where they are wrong:
 
 | Assumption | What breaks if it is wrong |
 |---|---|
-| Image fields store the media `output` path plus file name (for example `/uploads/photo.jpg`) | Photos would not match the resize manifest or would be left out; check the first saved person file |
-| Reference fields with `value: "{path}"` store a repo-relative file path | Teachers would silently not show on program items (matching uses the file name only) |
-| The `{fields.date}-{primary}.json` file name pattern works for JSON, and two items with the same title and date do not clash | Odd file names or overwritten items |
-| Select fields store the option text as written | The people page would not group by role |
-| Date fields store `yyyy-MM-dd` | Events are skipped with a warning |
-| Empty optional fields are saved as empty strings or omitted | Already tolerated, but forms may show validation errors on empty link fields |
-| `format: yaml-frontmatter` with a `body` rich-text field suits the Markdown pages | Text pages lose their body |
-| Invited editors without a GitHub account can sign in easily | The central assumption of the setup; see the README, "First test" |
-| Cloudflare Pages keeps the previous version live when a build fails | A bad edit could take the site down |
-| The GitHub workflow runs as written (action versions, `withastro/action` honouring `node-version`, `build-cmd` and the `SITE_*` variables set through `GITHUB_ENV`) | First deployment fails; read the run log and adjust the workflow |
-| A Pages CMS save (a commit to `main`) triggers the workflow | Edits would not go live automatically |
-| Pages CMS commits made as the app, not a person, still trigger workflows | Same |
+| Invited editors without a GitHub account can sign in easily, on a phone | The central assumption; the whole editing plan |
+| Image fields store the media `output` path plus file name (`/uploads/photo.jpg`) | Photos would not match the resize manifest; check the first saved person |
+| An image field with `list: true` stores a list of such paths | The program images and page galleries would not show |
+| The `rich-text` field stores Markdown or HTML as a string in JSON | Text page bodies would be empty or show raw markup |
+| Select fields store the option text as written (`Teacher`, `Artist`) | People would not appear on the right page |
+| File names made from `{primary}` cope with accents (for example "Dóri Czakó") | Odd file names; harmless to the site but untidy |
+| Empty optional fields are saved as empty strings or omitted | Already tolerated; forms may complain about empty link fields |
+| A Pages CMS save (a commit to `main` by the app) triggers the workflow | Edits would not go live automatically |
+| The workflows run as written (action versions, `withastro/action` inputs) | First deployment fails; read the run log |
+| A failed build leaves the previous version live | A bad change could take the site down |
 
 ## What was tested, and what was not
 
-Tested (by running them; the build-level checks are now repeatable with `npm run check`, and the browser checks have a recipe in `HANDOFF.md`):
-- The build passes, producing all pages.
-- Mobile and desktop screenshots look right, with no horizontal overflow or console errors.
-- Past events are hidden with JavaScript on and shown with it off.
-- A deliberately broken copy still builds: an event with no date, an impossible date, null fields, a deleted person reference, a missing photo, a `javascript:` link, a reserved page name, and settings with null values. Each was skipped or fell back, with a warning, and no unsafe link or broken image reached the output.
-- The photo script handles an oversized photo with a rotation tag from a phone.
-- Hungarian date formatting works.
-- `.pages.yml` parses, and every field in the content files has a matching form field.
-
-Not tested:
-- The live Pages CMS (every row of the table above).
-- Deployment on Cloudflare Pages and the domain switch.
-- Real phone photos in other formats (HEIC is not accepted).
-- Accessibility beyond basics (focus styles, skip link, contrast by eye), and browsers other than Chromium.
-- Browser behaviour (hiding past events, layout) is not part of `npm run check`; it was checked by hand once.
+See `HANDOFF.md`, "Status", for the current test record. In short: the build, the automated checks and a browser look at phone and desktop sizes were done in a sandbox. Nothing involving GitHub, Pages CMS or the admin has been tested.
 
 ## Open questions
 
-- The real content types, page list and languages, and how often the admin updates.
-- The admin's own design. It replaces `src/styles/global.css` and the markup in `src/pages` and `src/components`; the content stays.
-- Where the domain is registered, and when the Wix plan renews. Do not cancel Wix until the new site is live and the domain points to it.
+- What the community level should contain (classes, events, people?), and its design details.
+- The real image files: logo, banner photo, program graphics, people photos, location photos.
+- The fonts used in the Wix design.
+- Where the domain is registered and when the Wix plan renews. Do not cancel Wix until the new site is live and the domain points to it.
+- Whether the repository may stay public after launch (decision 13).
+- Who owns the GitHub repository and the Pages CMS installation. It should be the admin or a community organisation account, not one developer's personal account.
 - Who receives build-failure emails.
 
 ## History
 
-An earlier throwaway version (plain HTML and JavaScript reading JSON files in the browser, no build step) was used to practise the idea. It is superseded and not part of this repo.
+**2026-11-11, first prototype (built by another Claude session).** A generic festival site: English only, events as structured data with client-side hiding of past events, events linked to people by file path, a "links" collection, system fonts, a placeholder design, and a deployment that ran the whole test suite before every publish and blocked on warnings.
+
+**2026-11-11, revision after review.** Changed because of what the review and the real Wix site showed:
+- Scope became a community site with the festival one level down (decision 4).
+- Two languages, side by side in each entry (decision 5). Previously deferred.
+- The event collection, past-event hiding, event-to-person links and the links collection were removed; the program is images (decisions 6 and 7).
+- People are now two groups, teachers and artists, each with its own page, matching the Wix site.
+- Warnings no longer block publishing, and content edits run one build instead of five (decisions 8 and 14).
+- The design copies the Wix site; fonts are self-hosted (decision 10).
+- Claude was dropped as an editing path for the admin (decision 3).
+- Social sharing image (`og:image`) and language alternates were added.
+
+An even earlier throwaway version (plain HTML reading JSON in the browser) is not part of this repository.

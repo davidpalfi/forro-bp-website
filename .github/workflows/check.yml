@@ -1,0 +1,27 @@
+# Runs the test suite (npm run check) when CODE changes: on pull requests, and on pushes to
+# main that touch anything other than content and photos. Content edits from the editor do
+# not run this; they cannot break code and should go live quickly (see deploy.yml).
+name: Check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'src/content/**'
+      - 'public/uploads/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+      - run: npm ci
+      - run: npm run check

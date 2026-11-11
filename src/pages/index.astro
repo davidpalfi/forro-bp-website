@@ -1,121 +1,38 @@
 ---
-import Base from '../layouts/Base.astro';
-import Picture from '../components/Picture.astro';
-import EventRow from '../components/EventRow.astro';
-import PersonCard from '../components/PersonCard.astro';
-import {
-  getSite,
-  getHome,
-  getEvents,
-  getPeople,
-  getLinks,
-  resolvePeople,
-  safeUrl,
-  todayIso,
-  withBase,
-} from '../lib/content';
+// The bare address "/". Sends the visitor to their language: Hungarian if the browser
+// prefers it, otherwise the default language from Site settings. Works without JavaScript too.
+import { getSite, withBase } from '../lib/content';
+import { LANGS, LANG_NAME } from '../lib/i18n';
 
 const site = getSite();
-const home = getHome();
-const L = site.labels;
-
-const [events, people, links] = await Promise.all([getEvents(), getPeople(), getLinks()]);
-const upcoming = events.filter((e) => e.day >= todayIso()).slice(0, 6);
-const featured = people.filter((p) => p.featured).slice(0, 8);
-const ctaUrl = safeUrl(home.ctaUrl);
-const intro = home.intro.split(/\n{2,}/).filter(Boolean);
+const target = withBase(`/${site.defaultLang}/`);
 ---
 
-<Base>
-  <section class="hero">
-    <div class="hero-text">
-      <h1>{home.heroTitle || site.name}</h1>
-      {home.dateLine && <p class="hero-date">{home.dateLine}</p>}
-      {home.heroSubtitle && <p class="lead">{home.heroSubtitle}</p>}
-      {
-        ctaUrl && home.ctaLabel && (
-          <a class="button" href={ctaUrl} target="_blank" rel="noopener">
-            {home.ctaLabel}
-          </a>
-        )
+<!doctype html>
+<html lang={site.defaultLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{site.name}</title>
+    <meta name="robots" content="noindex, follow" />
+    <link rel="canonical" href={new URL(target, Astro.site).href} />
+    <script is:inline define:vars={{ base: withBase('/'), fallback: site.defaultLang, langs: [...LANGS] }}>
+      var prefs = navigator.languages || [navigator.language || ''];
+      var pick = fallback;
+      for (var i = 0; i < prefs.length; i++) {
+        var code = String(prefs[i]).slice(0, 2).toLowerCase();
+        if (langs.indexOf(code) !== -1) {
+          pick = code;
+          break;
+        }
       }
-    </div>
-    {home.heroImage && <Picture src={home.heroImage} class="hero-image" sizes="100vw" eager />}
-  </section>
-
-  {
-    intro.length > 0 && (
-      <section class="block intro">
-        {intro.map((p) => (
-          <p>{p}</p>
-        ))}
-      </section>
-    )
-  }
-
-  <section class="block" data-events>
-    <h2>{home.eventsHeading}</h2>
-    <ol class="events">
-      {
-        upcoming.map((e) => (
-          <EventRow
-            event={e}
-            people={resolvePeople(e.people, people)}
-            locale={site.locale}
-            detailsLabel={L.details}
-            showDate
-          />
-        ))
-      }
-    </ol>
-    <p class="empty" data-events-empty hidden={upcoming.length > 0}>{L.noEvents}</p>
-    {
-      events.length > 0 && (
-        <p class="more">
-          <a href={withBase('/program/')}>{L.program}</a>
-        </p>
-      )
-    }
-  </section>
-
-  {
-    featured.length > 0 && (
-      <section class="block">
-        <h2>{home.peopleHeading}</h2>
-        <ul class="people">
-          {featured.map((p) => (
-            <PersonCard person={p} />
-          ))}
-        </ul>
-        <p class="more">
-          <a href={withBase('/people/')}>{L.people}</a>
-        </p>
-      </section>
-    )
-  }
-
-  {
-    links.length > 0 && (
-      <section class="block">
-        <h2>{home.linksHeading}</h2>
-        <ul class="links">
-          {links.map((l) => {
-            const url = safeUrl(l.url);
-            return (
-              url && (
-                <li>
-                  <a class="link" href={url} target="_blank" rel="noopener" data-kind={l.kind.toLowerCase()}>
-                    <span class="link-label">{l.label}</span>
-                    {(l.description || l.kind) && (
-                      <span class="link-kind">{l.description || l.kind}</span>
-                    )}
-                  </a>
-                </li>
-              )
-            );
-          })}
-        </ul>
-      </section>
-    )
-  }
-</Base>
+      location.replace(base + pick + '/');
+    </script>
+    <meta http-equiv="refresh" content={`0; url=${target}`} />
+  </head>
+  <body>
+    <p>
+      {LANGS.map((l) => <a href={withBase(`/${l}/`)} lang={l}>{LANG_NAME[l]}</a>)}
+    </p>
+  </body>
+</html>

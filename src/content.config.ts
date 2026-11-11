@@ -1,65 +1,47 @@
 // The shape of the content. Every field is optional on purpose: a missing or empty
 // field should never break the build and take the site down. The editing forms
 // (.pages.yml) are where "required" is enforced.
+//
+// Two-language fields come in pairs: bio_en and bio_hu. Read them with tr() from lib/i18n.
 
 import { defineCollection } from 'astro/content/config';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { text, flag, num, textList } from './lib/schema';
 
-// Use the file name (without extension) as the id, so a stored reference like
-// "src/content/people/ana-silva.json" matches the id "ana-silva".
+// The file name (without extension) is the id, and for text pages also the address.
 const idFromFile = ({ entry }: { entry: string }) => entry.replace(/\.[^.]+$/, '');
 
 const people = defineCollection({
   loader: glob({ pattern: '*.json', base: './src/content/people', generateId: idFromFile }),
   schema: z.object({
     name: text,
-    role: text,
+    group: text, // "Teacher" or "Artist": decides which page the person is on
+    role_en: text,
+    role_hu: text,
     photo: text,
-    country: text,
-    bio: text,
-    link: text,
-    featured: flag(false),
-    order: num,
-  }),
-});
-
-const events = defineCollection({
-  loader: glob({ pattern: '*.json', base: './src/content/events', generateId: idFromFile }),
-  schema: z.object({
-    title: text,
-    date: text, // yyyy-MM-dd
-    startTime: text,
-    endTime: text,
-    place: text,
-    type: text,
-    description: text,
-    url: text,
-    people: textList,
-  }),
-});
-
-const links = defineCollection({
-  loader: glob({ pattern: '*.json', base: './src/content/links', generateId: idFromFile }),
-  schema: z.object({
-    label: text,
-    url: text,
-    kind: text,
-    description: text,
+    bio_en: text,
+    bio_hu: text,
+    instagram: text,
     order: num,
   }),
 });
 
 const pages = defineCollection({
-  loader: glob({ pattern: '*.md', base: './src/content/pages', generateId: idFromFile }),
+  loader: glob({ pattern: '*.json', base: './src/content/pages', generateId: idFromFile }),
   schema: z.object({
-    title: text,
-    menuLabel: text,
-    showInMenu: flag(true),
-    order: num,
+    title_en: text,
+    title_hu: text,
+    menuLabel_en: text,
+    menuLabel_hu: text,
+    body_en: text,
+    body_hu: text,
     image: text,
+    gallery: textList,
+    showInMenu: flag(true),
+    showOnHome: flag(false),
+    order: num,
   }),
 });
 
-export const collections = { people, events, links, pages };
+export const collections = { people, pages };

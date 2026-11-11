@@ -1,0 +1,41 @@
+---
+// The list on the teachers and artists pages: photo, role, name, bio, Instagram link.
+import Picture from './Picture.astro';
+import { paragraphs, safeUrl, type Person } from '../lib/content';
+import { UI, tr, type Lang } from '../lib/i18n';
+
+interface Props {
+  people: Person[];
+  lang: Lang;
+}
+
+const { people, lang } = Astro.props;
+---
+
+<ul class="people">
+  {
+    people.map((p) => {
+      const role = tr(p, 'role', lang);
+      const bio = paragraphs(tr(p, 'bio', lang));
+      const ig = safeUrl(p.instagram);
+      return (
+        <li class="person">
+          {p.photo && <Picture src={p.photo} class="person-photo" sizes="(min-width: 860px) 460px, 100vw" />}
+          <div class="person-text">
+            {role && <p class="person-role">{role}</p>}
+            <h2 class="person-name">{p.name}</h2>
+            {bio.map((para) => (
+              <p class="person-bio">{para}</p>
+            ))}
+            {ig && (
+              <a class="person-link" href={ig} target="_blank" rel="noopener">
+                {UI[lang].instagram}
+                <span class="sr-only"> – {p.name}</span>
+              </a>
+            )}
+          </div>
+        </li>
+      );
+    })
+  }
+</ul>

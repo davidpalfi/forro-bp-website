@@ -1,0 +1,51 @@
+---
+// The big banner: photo behind, then logo or name, ticket button and date line.
+// An optional second photo is used on phones (the Wix site shows a taller picture there).
+import { getImage } from '../lib/content';
+
+interface Props {
+  image?: string;
+  imagePhone?: string;
+  logo?: string;
+  title: string;
+  dateLine?: string;
+  buttonUrl?: string;
+  buttonLabel?: string;
+  buttonNewTab?: boolean;
+}
+
+const { image, imagePhone, logo, title, dateLine, buttonUrl, buttonLabel, buttonNewTab = false } = Astro.props;
+const wide = getImage(image) ?? getImage(imagePhone);
+const phone = image ? getImage(imagePhone) : undefined;
+const logoImg = getImage(logo);
+---
+
+<section class="hero">
+  {
+    wide && (
+      <picture>
+        {phone && <source media="(max-width: 719px)" srcset={phone.srcset ?? phone.src} sizes="100vw" />}
+        <img class="hero-photo" src={wide.src} srcset={wide.srcset} sizes="100vw" width={wide.width} height={wide.height} alt="" loading="eager" fetchpriority="high" />
+      </picture>
+    )
+  }
+  <div class="hero-inner">
+    <h1 class="hero-title">
+      {
+        logoImg ? (
+          <img src={logoImg.src} srcset={logoImg.srcset} sizes="(min-width: 720px) 420px, 70vw" alt={title} />
+        ) : (
+          title
+        )
+      }
+    </h1>
+    {
+      buttonUrl && buttonLabel && (
+        <a class="ticket" href={buttonUrl} target={buttonNewTab ? '_blank' : undefined} rel={buttonNewTab ? 'noopener' : undefined}>
+          {buttonLabel}
+        </a>
+      )
+    }
+    {dateLine && <p class="hero-date">{dateLine}</p>}
+  </div>
+</section>

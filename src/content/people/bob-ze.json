@@ -1,0 +1,11 @@
+{
+  "name": "Bob Zé",
+  "group": "Artist",
+  "role_en": "",
+  "role_hu": "",
+  "photo": "/uploads/placeholder-person-2.jpg",
+  "bio_en": "[Placeholder] The bio from the current site goes here.\n\nA blank line starts a new paragraph.",
+  "bio_hu": "[Helykitöltő] Ide kerül a jelenlegi oldalon szereplő bemutatkozás.\n\nEgy üres sor új bekezdést kezd.",
+  "instagram": "https://www.instagram.com/bobze96539/",
+  "order": 4
+}
