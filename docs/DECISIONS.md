@@ -13,6 +13,8 @@ The site replaces a Wix festival site (Budapest Forró Festival). The owner want
 
 The site is mainly Hungarian. The prototype's wording is English and is configurable (see decision 12).
 
+The needs behind these priorities, and how well each is known, are in `USER-NEEDS.md`. Only the three priorities above are firmly stated; page-level needs are assumptions.
+
 ## Decisions
 
 ### 1. Static site, no server and no database

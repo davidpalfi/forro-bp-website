@@ -12,6 +12,8 @@ A public website for a dance festival, replacing an existing Wix site, with cont
 | Admin (non-technical, also a designer) | Add or change program items, people, links and text pages; replace photos; change home page texts. Without a developer, in a few minutes |
 | Maintainer (developer, or an AI agent working for one) | Change the structure, fix problems, deploy |
 
+The evidence behind this table is thin; see `USER-NEEDS.md` for what is stated, observed or assumed.
+
 ## 2. Scope
 
 In scope: public pages listed in section 3, the content model in section 5, editing through forms, building and hosting as a static site.

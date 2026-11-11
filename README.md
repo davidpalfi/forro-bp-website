@@ -7,6 +7,7 @@
 | File | For | What it holds |
 |---|---|---|
 | `docs/HANDOFF.md` | Anyone picking the project up | Status, next steps in order, commands, how to check things, known issues |
+| `docs/USER-NEEDS.md` | Anyone judging whether the design fits | Who the users are, what is known vs assumed about their needs, what to ask them |
 | `docs/SPEC.md` | Anyone changing behaviour | What the site does: pages, content model, rules, acceptance criteria |
 | `docs/ARCHITECTURE.md` | Anyone changing code | Code map, data flow, Astro 7 notes, recipes for common changes |
 | `docs/DECISIONS.md` | Anyone questioning a choice | Why it is built this way, unverified assumptions, test record |

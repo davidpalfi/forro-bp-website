@@ -1,6 +1,6 @@
 # Handoff: start here
 
-If you are picking this project up with no other context, read this file first, then `SPEC.md` (what the site does), `DECISIONS.md` (why), and `ARCHITECTURE.md` (how the code is organised). `CLAUDE.md` has the rules for editing content; `EDITING-GUIDE.md` is for the person who edits the site.
+If you are picking this project up with no other context, read this file first, then `USER-NEEDS.md` (who it is for, and how little is verified), then `SPEC.md` (what the site does), `DECISIONS.md` (why), and `ARCHITECTURE.md` (how the code is organised). `CLAUDE.md` has the rules for editing content; `EDITING-GUIDE.md` is for the person who edits the site.
 
 ## In 60 seconds
 
