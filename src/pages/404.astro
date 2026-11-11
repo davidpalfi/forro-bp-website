@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/Base.astro';
+import { getSite, withBase } from '../lib/content';
+
+const site = getSite();
+---
+
+<Base title="Page not found">
+  <section class="page">
+    <h1>Page not found</h1>
+    <p>This address does not exist. <a href={withBase('/')}>Go to the {site.labels.home.toLowerCase()} page.</a></p>
+  </section>
+</Base>

@@ -1,0 +1,1 @@
+{ "title": "Concert: Band Alpha", "date": "2027-06-19", "startTime": "21:00", "endTime": "23:30", "place": "Main hall", "type": "Concert", "description": "Live music and dancing all night.", "url": "https://example.com/tickets", "people": ["src/content/people/band-alpha.json"] }

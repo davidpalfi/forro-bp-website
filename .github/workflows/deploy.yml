@@ -1,0 +1,67 @@
+# Publishes the site to GitHub Pages on every push to main (including saves from Pages CMS).
+# One-time setup: repository Settings > Pages > Build and deployment > Source: "GitHub Actions".
+# If checks or the build fail, nothing is deployed and the previous version stays online.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+      - run: npm ci
+      - run: npm run check
+
+  build:
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - name: Work out the site address
+        shell: bash
+        run: |
+          owner="${GITHUB_REPOSITORY_OWNER,,}"
+          repo="${GITHUB_REPOSITORY#*/}"
+          if [ -s public/CNAME ]; then
+            echo "SITE_URL=https://$(tr -d ' \r\n' < public/CNAME)" >> "$GITHUB_ENV"
+            echo "SITE_BASE=/" >> "$GITHUB_ENV"
+          elif [ "${repo,,}" = "$owner.github.io" ]; then
+            echo "SITE_URL=https://$owner.github.io" >> "$GITHUB_ENV"
+            echo "SITE_BASE=/" >> "$GITHUB_ENV"
+          else
+            echo "SITE_URL=https://$owner.github.io" >> "$GITHUB_ENV"
+            echo "SITE_BASE=/$repo" >> "$GITHUB_ENV"
+          fi
+      - name: Install, build and upload
+        uses: withastro/action@v6
+        with:
+          node-version: 22.23.4
+          build-cmd: node scripts/ci-build.mjs
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

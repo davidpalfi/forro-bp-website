@@ -1,0 +1,297 @@
+# Pages CMS: the editing forms. Each entry below maps to files in src/content.
+# Written from the Pages CMS docs (pagescms.org/docs/configuration); not yet tested
+# in the live tool. Test it first (see README, "First test").
+#
+# Keep this file in step with src/content.config.ts: a new field needs adding in both places.
+
+media:
+  - name: images
+    label: Photos
+    input: public/uploads
+    output: /uploads
+    rename: safe
+    extensions: [jpg, jpeg, png, webp]
+
+content:
+  - name: pages-group
+    label: Pages
+    type: group
+    items:
+      - name: home
+        label: Home page
+        type: file
+        path: src/content/settings/home.json
+        format: json
+        fields:
+          - name: heroTitle
+            label: Big title
+            type: string
+          - name: dateLine
+            label: Dates and place
+            type: string
+            description: "Shown under the title, for example: 18-20 June 2027, Budapest"
+          - name: heroSubtitle
+            label: Short intro under the title
+            type: text
+          - name: heroImage
+            label: Main photo
+            type: image
+            options:
+              media: images
+          - name: ctaLabel
+            label: Button text
+            type: string
+          - name: ctaUrl
+            label: Button link
+            type: string
+            pattern: "^$|^https?://.+"
+            description: "Must start with https://"
+          - name: intro
+            label: Welcome text
+            type: text
+            description: "A blank line starts a new paragraph."
+          - name: eventsHeading
+            label: Heading above the program
+            type: string
+          - name: peopleHeading
+            label: Heading above the people
+            type: string
+          - name: linksHeading
+            label: Heading above the links
+            type: string
+
+      - name: text-pages
+        label: Text pages (location, rules, ...)
+        type: collection
+        path: src/content/pages
+        format: yaml-frontmatter
+        filename: "{primary}.md"
+        view:
+          primary: title
+          sort: order
+          order: asc
+        fields:
+          - name: title
+            label: Title
+            type: string
+            required: true
+          - name: menuLabel
+            label: Name in the menu
+            type: string
+            description: "Leave empty to use the title."
+          - name: showInMenu
+            label: Show in the menu
+            type: boolean
+            default: true
+          - name: order
+            label: Menu order
+            type: number
+            description: "Lower numbers come first."
+          - name: image
+            label: Photo (optional)
+            type: image
+            options:
+              media: images
+          - name: body
+            label: Text
+            type: rich-text
+
+  - name: events
+    label: Program
+    type: collection
+    path: src/content/events
+    format: json
+    filename: "{fields.date}-{primary}.json"
+    view:
+      primary: title
+      sort: date
+      order: asc
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: date
+        label: Date
+        type: date
+        required: true
+        default: ""
+        options:
+          format: yyyy-MM-dd
+      - name: startTime
+        label: Start time
+        type: string
+        description: "24-hour time, for example 20:00"
+      - name: endTime
+        label: End time
+        type: string
+        description: "24-hour time, for example 22:30"
+      - name: place
+        label: Place
+        type: string
+      - name: type
+        label: Type
+        type: select
+        options:
+          values: [Workshop, Concert, Party, Social, Other]
+      - name: people
+        label: Teachers and performers
+        type: reference
+        options:
+          collection: people
+          multiple: true
+          search: name
+          value: "{path}"
+          label: "{primary}"
+      - name: description
+        label: Description
+        type: text
+      - name: url
+        label: Link for tickets or details
+        type: string
+        pattern: "^$|^https?://.+"
+        description: "Must start with https://"
+
+  - name: people
+    label: People
+    type: collection
+    path: src/content/people
+    format: json
+    filename: "{primary}.json"
+    view:
+      primary: name
+      sort: name
+      order: asc
+    fields:
+      - name: name
+        label: Name
+        type: string
+        required: true
+      - name: role
+        label: Role
+        type: select
+        required: true
+        options:
+          values: [Teacher, Performer, Organizer]
+      - name: photo
+        label: Photo
+        type: image
+        description: "Any size is fine. The site makes web-sized copies."
+        options:
+          media: images
+      - name: country
+        label: Country
+        type: string
+      - name: bio
+        label: Short bio
+        type: text
+      - name: link
+        label: Website or social link
+        type: string
+        pattern: "^$|^https?://.+"
+        description: "Must start with https://"
+      - name: featured
+        label: Show on the home page
+        type: boolean
+        default: false
+      - name: order
+        label: Order
+        type: number
+        description: "Lower numbers come first. Leave empty to sort by name."
+
+  - name: links
+    label: Videos, photos and social links
+    type: collection
+    path: src/content/links
+    format: json
+    filename: "{primary}.json"
+    view:
+      primary: label
+      sort: order
+      order: asc
+    fields:
+      - name: label
+        label: Title
+        type: string
+        required: true
+      - name: url
+        label: Link
+        type: string
+        required: true
+        pattern: "^https?://.+"
+        description: "Must start with https://"
+      - name: kind
+        label: Type
+        type: select
+        options:
+          values: [Video, Photos, Social, Tickets, Other]
+      - name: description
+        label: Short description
+        type: string
+      - name: order
+        label: Order
+        type: number
+        description: "Lower numbers come first."
+
+  - name: settings-group
+    label: Site settings
+    type: group
+    items:
+      - name: site
+        label: Name, contact and wording
+        type: file
+        path: src/content/settings/site.json
+        format: json
+        fields:
+          - name: name
+            label: Site name
+            type: string
+            required: true
+          - name: tagline
+            label: One-line description
+            type: string
+            description: "Shown in search results and when the site is shared."
+          - name: locale
+            label: Language for dates
+            type: select
+            options:
+              values: [en-GB, hu-HU]
+          - name: email
+            label: Contact email
+            type: string
+          - name: instagram
+            label: Instagram link
+            type: string
+            pattern: "^$|^https?://.+"
+          - name: facebook
+            label: Facebook link
+            type: string
+            pattern: "^$|^https?://.+"
+          - name: ticketLabel
+            label: Ticket button text (top right)
+            type: string
+          - name: ticketUrl
+            label: Ticket button link
+            type: string
+            pattern: "^$|^https?://.+"
+          - name: footerNote
+            label: Small text at the bottom
+            type: text
+          - name: noindex
+            label: Hide the site from Google
+            type: boolean
+            default: true
+            description: "Keep this ON while testing. Turn it OFF when the site goes live."
+          - name: labels
+            label: Wording (change these to translate the site)
+            type: object
+            fields:
+              - { name: home, label: Menu - Home, type: string }
+              - { name: program, label: Menu - Program, type: string }
+              - { name: people, label: Menu - People, type: string }
+              - { name: details, label: Link text on program items, type: string }
+              - { name: noEvents, label: Message when there is no program, type: string }
+              - { name: teachers, label: Heading - Teachers, type: string }
+              - { name: performers, label: Heading - Performers, type: string }
+              - { name: organizers, label: Heading - Organizers, type: string }
+              - { name: others, label: Heading - Other people, type: string }

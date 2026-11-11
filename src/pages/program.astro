@@ -1,0 +1,46 @@
+---
+import Base from '../layouts/Base.astro';
+import EventRow from '../components/EventRow.astro';
+import { getSite, getEvents, getPeople, resolvePeople, formatDay } from '../lib/content';
+
+const site = getSite();
+const L = site.labels;
+const [events, people] = await Promise.all([getEvents(), getPeople()]);
+
+// Group the program by day, in date order.
+const days = new Map<string, typeof events>();
+for (const e of events) {
+  if (!days.has(e.day)) days.set(e.day, []);
+  days.get(e.day)!.push(e);
+}
+---
+
+<Base title={L.program}>
+  <section class="page" data-events>
+    <h1>{L.program}</h1>
+    {
+      [...days].map(([, items]) => (
+        <section class="day" data-day-group>
+          <h2 class="day-title">
+            {formatDay(items[0].dateObj, site.locale, {
+              weekday: 'long',
+              day: 'numeric',
+              month: 'long',
+            })}
+          </h2>
+          <ol class="events">
+            {items.map((e) => (
+              <EventRow
+                event={e}
+                people={resolvePeople(e.people, people)}
+                locale={site.locale}
+                detailsLabel={L.details}
+              />
+            ))}
+          </ol>
+        </section>
+      ))
+    }
+    <p class="empty" data-events-empty hidden={events.length > 0}>{L.noEvents}</p>
+  </section>
+</Base>

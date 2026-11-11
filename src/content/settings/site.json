@@ -1,0 +1,23 @@
+{
+  "name": "Dance Festival",
+  "tagline": "Workshops, live music and social dancing over one weekend.",
+  "locale": "en-GB",
+  "email": "hello@example.com",
+  "instagram": "https://www.instagram.com/",
+  "facebook": "",
+  "ticketLabel": "Get tickets",
+  "ticketUrl": "https://example.com/tickets",
+  "footerNote": "Placeholder content for the prototype. Everything here is replaced in the editor.",
+  "noindex": true,
+  "labels": {
+    "home": "Home",
+    "program": "Program",
+    "people": "People",
+    "details": "Details and tickets",
+    "noEvents": "The program will be announced soon.",
+    "teachers": "Teachers",
+    "performers": "Performers",
+    "organizers": "Organizers",
+    "others": "More people"
+  }
+}

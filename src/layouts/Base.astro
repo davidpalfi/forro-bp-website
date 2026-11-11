@@ -1,0 +1,124 @@
+---
+import '../styles/global.css';
+import { getSite, getPages, safeUrl, withBase } from '../lib/content';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const site = getSite();
+const L = site.labels;
+const menuPages = (await getPages()).filter((p) => p.showInMenu);
+
+const nav = [
+  { href: withBase('/'), label: L.home },
+  { href: withBase('/program/'), label: L.program },
+  { href: withBase('/people/'), label: L.people },
+  ...menuPages.map((p) => ({ href: withBase(`/${p.slug}/`), label: p.menuLabel })),
+];
+
+const path = Astro.url.pathname;
+const fullTitle = title ? `${title} | ${site.name}` : site.name;
+const desc = description || site.tagline;
+const canonical = new URL(path, Astro.site).href;
+const ticketUrl = safeUrl(site.ticketUrl);
+const social = [
+  { label: 'Instagram', url: safeUrl(site.instagram) },
+  { label: 'Facebook', url: safeUrl(site.facebook) },
+].filter((s) => s.url);
+---
+
+<!doctype html>
+<html lang={site.locale.split('-')[0]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    {desc && <meta name="description" content={desc} />}
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={fullTitle} />
+    {desc && <meta property="og:description" content={desc} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta name="theme-color" content="#1c1838" />
+    {site.noindex && <meta name="robots" content="noindex, nofollow" />}
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header class="top">
+      <a class="brand" href={withBase('/')}>{site.name}</a>
+      <nav aria-label="Main">
+        {
+          nav.map((item) => (
+            <a href={item.href} aria-current={path === item.href ? 'page' : undefined}>
+              {item.label}
+            </a>
+          ))
+        }
+        {
+          ticketUrl && site.ticketLabel && (
+            <a class="nav-cta" href={ticketUrl} target="_blank" rel="noopener">
+              {site.ticketLabel}
+            </a>
+          )
+        }
+      </nav>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer>
+      <p class="footer-name">{site.name}</p>
+      {
+        site.email && (
+          <p>
+            <a href={`mailto:${site.email}`}>{site.email}</a>
+          </p>
+        )
+      }
+      {
+        social.length > 0 && (
+          <p class="footer-social">
+            {social.map((s) => (
+              <a href={s.url} target="_blank" rel="noopener">
+                {s.label}
+              </a>
+            ))}
+          </p>
+        )
+      }
+      {site.footerNote && <p class="small">{site.footerNote}</p>}
+    </footer>
+
+    <!--
+      Hides program items whose date has passed, so the site never shows old
+      events even if it has not been rebuilt. Without JavaScript, everything stays visible.
+    -->
+    <script is:inline>
+      (function () {
+        var d = new Date();
+        var today =
+          d.getFullYear() +
+          '-' +
+          String(d.getMonth() + 1).padStart(2, '0') +
+          '-' +
+          String(d.getDate()).padStart(2, '0');
+        document.querySelectorAll('[data-day]').forEach(function (el) {
+          if (el.getAttribute('data-day') < today) el.hidden = true;
+        });
+        document.querySelectorAll('[data-day-group]').forEach(function (g) {
+          g.hidden = !g.querySelector('[data-day]:not([hidden])');
+        });
+        document.querySelectorAll('[data-events]').forEach(function (box) {
+          var empty = box.querySelector('[data-events-empty]');
+          if (empty) empty.hidden = !!box.querySelector('[data-day]:not([hidden])');
+        });
+      })();
+    </script>
+  </body>
+</html>
