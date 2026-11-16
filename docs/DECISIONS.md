@@ -4,6 +4,22 @@ Read this before changing the structure of the site. When you change or add a de
 
 Last full revision: 2026-11-11, after a design review and a look at every page of the current Wix site. What changed in that revision is listed under "History" at the end.
 
+## Current port status (2026-11-15)
+
+This file's numbered decisions describe the original Pages CMS/GitHub Pages proof of concept. A Sanity port was proposed after Pages CMS was connected and found unintuitive. The direction is Sanity with an Astro visual-editing preview; implementation has not started beyond dependency preparation. Do not apply the old decisions below as instructions for the port without checking this status and the brief.
+
+| Area | Original PoC | Sanity port status |
+|---|---|---|
+| Content/editor | JSON in GitHub, Pages CMS forms | Sanity selected for exploration; schemas and migration not implemented |
+| Public site | Static Astro on GitHub Pages | Remain static; target hosting/provider is not finalized |
+| Visual editing | None | SSR preview on Cloudflare proposed; not implemented |
+| Languages | English and Hungarian side by side, with fallback | Keep this behavior proposed, awaiting confirmation |
+| Page content | Fixed fields and Markdown/HTML JSON bodies | Reorderable blocks for home/text pages proposed, awaiting confirmation |
+| Images | Local uploads resized at build time | Sanity image service/cropping proposed, awaiting confirmation |
+| Publishing | GitHub Actions on pushes to `main` | Sanity publish should trigger a rebuild; mechanism/provider not implemented |
+
+The only hard account constraint confirmed in the port brief is no subscription. Re-check the current Sanity free plan and Cloudflare terms before launch; old provider assumptions below are historical. The source brief is [SANITY-PORT-BRIEF.md](../SANITY-PORT-BRIEF.md); current task inventory is [SANITY-PORT-STATUS.md](SANITY-PORT-STATUS.md).
+
 ## Context and priorities
 
 The Forró Budapest community wants one website. Today it has only a festival site on Wix (forrobudapest.com, Budapest Forró Festival). The plan:
@@ -100,7 +116,7 @@ A text page is one JSON file with `body_en` and `body_hu`. The body is rendered 
 Why: both languages must live in one entry (decision 5), which a Markdown file with a single body cannot do. And it is not yet known whether the Pages CMS rich-text field saves Markdown or HTML; this works with either.
 
 ### 18. Documentation
-`EDITING-GUIDE.md` is for the admin. `CLAUDE.md` holds the rules for a Claude session working for the maintainer. `README.md` covers setup and deployment. `docs/` explains the design. The Claude project holds copies of `docs/`; the repository is the source of truth.
+For the original PoC, root `EDITING-GUIDE.md` was the admin guide. It now applies only to Pages CMS; `docs/EDITING-GUIDE.md` is the provisional Sanity guide. `CLAUDE.md` holds maintainer-session rules, `README.md` covers setup and deployment, and `docs/` is the repository's design and handoff record.
 
 ## Assumptions not yet verified
 
@@ -134,6 +150,8 @@ See `HANDOFF.md`, "Status", for the current test record. In short: the build, th
 - Who receives build-failure emails.
 
 ## History
+
+**2026-11-15, Sanity port proposed.** Pages CMS was connected to the live proof of concept and found unintuitive for the admin. Sanity with click-to-edit was selected for exploration. This changes the direction of decisions 1, 3, 6, 9, 10, 13 and 17, but the detailed choices remain subject to owner confirmation. See the current port status above and `SANITY-PORT-STATUS.md`. No port implementation was present at this checkpoint.
 
 **2026-11-11, first prototype (built by another Claude session).** A generic festival site: English only, events as structured data with client-side hiding of past events, events linked to people by file path, a "links" collection, system fonts, a placeholder design, and a deployment that ran the whole test suite before every publish and blocked on warnings.
 

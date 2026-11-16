@@ -1,6 +1,6 @@
 # Specification
 
-What the site does and how it must behave, as built on 2026-11-11. Requirement IDs (R1, R2, ...) are referred to in the acceptance criteria at the end. For why, see `DECISIONS.md`.
+What the original Pages CMS proof of concept does and how it behaved when checked on 2026-11-11. Requirement IDs (R1, R2, ...) refer to that baseline. The Sanity port is planned, not implemented; its current proposed requirements are recorded in section 11. For current status and decisions, see `HANDOFF.md` and `DECISIONS.md`.
 
 ## 1. Purpose and users
 
@@ -205,3 +205,20 @@ A = automated by `npm run check`. M = by hand (see `HANDOFF.md`).
 - Whether the program should also exist as text.
 - Launch details: domain, redirects from old Wix addresses, private or public repository, failure notifications.
 - A sitemap, analytics, alt-text fields for photos.
+
+## 11. Sanity port requirements (planned; not yet implemented)
+
+These requirements are based on [SANITY-PORT-BRIEF.md](../SANITY-PORT-BRIEF.md). The admin-facing choices below are proposals and need Dávid's confirmation before implementation. Do not mark any of these as passing until the code exists and the checks have been run.
+
+- **P1. Preserve the existing site behavior.** Keep the routes, two languages, translation fallback, responsive design, metadata, accessibility behavior, and content represented by the original PoC unless a change is explicitly approved.
+- **P2. Sanity content model.** Represent site settings, community settings, festival settings, people, text pages, and program images in Sanity. Keep English/Hungarian side by side with fallback unless the owner confirms a different model.
+- **P3. Migrate existing content.** Provide a script to import the current `src/content` JSON into the configured Sanity project. Define and document how repeated runs avoid duplicate or destructive writes before running it against a production dataset.
+- **P4. Public rendering.** The public site remains statically generated from published Sanity content. Serve Sanity images through the image service if the proposed image choice is confirmed.
+- **P5. Visual editing.** Provide an SSR preview for Sanity click-to-edit, expected to run on Cloudflare. The public site remains static; preview-only behavior and credentials must not leak into public pages.
+- **P6. Publish rebuild.** Publishing in Sanity triggers a production rebuild. The deployment provider and exact webhook mechanism remain to be selected and tested.
+- **P7. Admin acceptance.** Before replacing the PoC, the admin must sign in herself, edit content, preview it, publish a change, and confirm the result on phone and desktop.
+- **P8. Security and privacy.** Keep tokens in the chosen hosting providers' secret stores, never in the repository or chat. Keep private care-team contact details out of the public repository and dataset exports.
+
+### Port acceptance state
+
+All P1-P8 are pending. The current branch checkpoint contains only dependency additions and the port brief. The original automated and browser checks listed above describe the old PoC; they are not validation of the Sanity integration.

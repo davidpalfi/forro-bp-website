@@ -1,8 +1,17 @@
 # Handoff: start here
 
-If you are picking this project up with no other context, read this file first, then `USER-NEEDS.md` (who it is for and how little is verified), `DECISIONS.md` (why), `SPEC.md` (what the site does) and `ARCHITECTURE.md` (how the code is organised). `CLAUDE.md` has the rules for a Claude session working in the repo; `EDITING-GUIDE.md` is for the person who edits the site.
+If you are picking this project up with no other context, read this file first, then `USER-NEEDS.md` (who it is for and how little is verified), `DECISIONS.md` (why), `SPEC.md` (what the site does) and `ARCHITECTURE.md` (how the code is organised). `CLAUDE.md` has the rules for a Claude session working in the repo. The root-level [EDITING-GUIDE.md](../EDITING-GUIDE.md) is for the old Pages CMS PoC; [docs/EDITING-GUIDE.md](EDITING-GUIDE.md) is a draft for Sanity and is not ready to send to the admin.
 
-## In 60 seconds
+## Current handoff (2026-11-15)
+
+- The active work is on `feature/sanity`; keep `main`, the live GitHub Pages proof of concept, and `.pages.yml` unchanged.
+- Checkpoint `e4c49b5` (`WIP: prepare Sanity port`) adds pinned Sanity/Astro/Cloudflare/Portable Text dependencies and the planning brief. It contains no Sanity schemas, migration, page integration, preview, or publish webhook.
+- The working tree was clean after that checkpoint. No build or test was run for the dependency-only checkpoint.
+- Implementation is waiting for Dávid's go-ahead. The choices in [SANITY-PORT-BRIEF.md](../SANITY-PORT-BRIEF.md) are proposals unless confirmed; do not treat them as implemented or final.
+- Read [SANITY-PORT-STATUS.md](SANITY-PORT-STATUS.md) for the current inventory, [GO-LIVE-CHECKLIST.md](GO-LIVE-CHECKLIST.md) for the owner and maintainer steps, and [EDITING-GUIDE.md](EDITING-GUIDE.md) for the not-yet-final admin guide.
+- The sections below document the original Pages CMS proof of concept, not the Sanity branch's current behavior. For port requirements and known conflicts, see the status, decision, spec, and architecture notes linked above.
+
+## Original Pages CMS PoC (2026-11-11)
 
 - **What:** one static website (Astro) for the Forró Budapest community. The community level is an empty shell; the Budapest Forró Festival sits below it at `/<lang>/festival/`. English and Hungarian. The look is copied from the festival's current Wix site (forrobudapest.com), which this is meant to replace.
 - **How it is edited:** content is JSON files in this repo. A free editor (Pages CMS) gives the non-technical admin forms that save those files. GitHub Pages builds and hosts it.
@@ -10,7 +19,7 @@ If you are picking this project up with no other context, read this file first, 
 - **State:** a proof of concept to show the admin. It builds, the automated checks pass, and it was looked at in a browser at phone and desktop size. It has **never been on GitHub**, and **Pages CMS has never been connected**. Photos, the logo and most longer texts are placeholders.
 - **First thing to do:** publish it and run the editor trial with the admin (steps 1 to 3 below). The whole plan rests on that.
 
-## Status (2026-11-11)
+## Original PoC status (2026-11-11; historical)
 
 Done:
 - Pages in both languages: community home, festival home, program, teachers, artists, text pages (location, code of conduct), 404, and the language redirect on `/`.
@@ -45,7 +54,9 @@ Not done:
 - Browsers other than Chromium; a real accessibility review.
 - The changes of 2026-11-11 are in the working folder but **not committed** to Git.
 
-## Next steps, in order
+## Superseded Pages CMS next steps
+
+The sequence below was written for the original Pages CMS/GitHub Pages plan and is no longer the launch plan. Use [GO-LIVE-CHECKLIST.md](GO-LIVE-CHECKLIST.md) for Sanity. The old-address table below remains useful when planning redirects.
 
 1. **Publish on GitHub Pages.** Commit the working folder. Create an empty public repository, add it as `origin`, push `main`. In the repository: Settings > Pages > Build and deployment > Source: **GitHub Actions**. Watch the Actions tab; the address is `https://<user>.github.io/<repo>/`. If a workflow fails, read its log: the workflows were written from documentation and have not run yet.
 2. **Connect Pages CMS** (pagescms.org, sign in with GitHub, install its app on the repository). Walk through every form and fill in the assumptions table in `DECISIONS.md`: what exactly is saved for photos, photo lists, rich text and selects? Fix code or config where it differs.

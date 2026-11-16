@@ -2,6 +2,22 @@
 
 How the code is organised and how to change it safely. For what the site does, see `SPEC.md`; for why it is built this way, see `DECISIONS.md`.
 
+## Current state and planned port
+
+The file map and data flow below describe the original Pages CMS/GitHub Pages PoC. On `feature/sanity`, commit `e4c49b5` only prepares pinned dependencies and adds the port brief; the application still reads JSON and no Sanity/Cloudflare integration is implemented. Do not assume the planned data flow below is live.
+
+Target direction from the 2026-11-15 brief:
+
+```text
+Admin -> hosted Sanity Studio -> published Sanity content
+                                  |                 |
+                                  |                 +-> publish trigger -> static production rebuild (provider TBD)
+                                  +-> SSR visual-editing preview on Cloudflare
+Public visitors -> static site
+```
+
+The public output is intended to remain static. The preview needs SSR for visual editing. Whether Cloudflare also hosts production and how the Sanity webhook invokes a rebuild are unresolved. Bilingual fields, flexible home/text blocks, hosted Studio, and Sanity image delivery are proposals pending owner confirmation. See `SANITY-PORT-STATUS.md` and `GO-LIVE-CHECKLIST.md`.
+
 ## Data flow
 
 ```
