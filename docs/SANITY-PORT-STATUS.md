@@ -1,6 +1,6 @@
 # Sanity Port Status
 
-Status as of 2026-11-15. This is the current progress record for the `feature/sanity` branch. Update it as work is completed; do not treat plans as implementation.
+Status as of 2026-11-16. This is the current progress record for the `feature/sanity` branch. Update it as work is completed; do not treat plans as implementation.
 
 ## Current checkpoint
 
@@ -10,7 +10,7 @@ Status as of 2026-11-15. This is the current progress record for the `feature/sa
 - A credential-pattern scan of the committed files found no secrets. No API token, project ID, dataset name, Cloudflare account setting, or production secret has been added to the repository.
 - No Sanity schemas, Studio, migration script, content query, Astro integration, SSR preview, image integration, webhook, or deployment configuration has been implemented.
 - No build or test was run for the dependency-only checkpoint. The original proof-of-concept checks described in `HANDOFF.md` were run on 2026-11-11 and do not validate this port.
-- Implementation is waiting for Dávid's go-ahead. The port brief says not to start building before he confirms the plan.
+- Dávid confirmed the plan and the four choices on 2026-11-16 (see "Confirmed choices"). Implementation starts once he has created the Sanity project and supplied the project ID and dataset name.
 - The current worktree adds this status record, a go-live checklist, a provisional Sanity editing guide, and updates to the handoff, decisions, spec, architecture, and user-needs docs. These documentation changes are not part of `e4c49b5` and have not yet been committed; no application behavior changed.
 
 ## Existing product baseline
@@ -31,21 +31,28 @@ Status as of 2026-11-15. This is the current progress record for the `feature/sa
 
 None of these implementation items is complete yet. The documentation now records the planned acceptance criteria, not passing results.
 
-## Choices still awaiting confirmation or verification
+## Confirmed choices (Dávid, 2026-11-16)
 
-- Keep English/Hungarian side by side in each document, with the current fallback behavior.
-- Use reorderable blocks on the community home and text pages; keep people and settings as fixed fields.
-- Host Sanity Studio at Sanity's hosted address rather than embedding it.
-- Serve images from Sanity's image service for cropping.
+Settled; do not ask again. Details and reasons are in `DECISIONS.md`, "Sanity port decisions" (S1 to S4).
+
+- **S1 Languages:** English and Hungarian side by side in each document, with the current fallback.
+- **S2 Page content:** a full page builder. The admin can create pages; every page is a list of blocks (heading, text, image, gallery, button, banner, columns, video, divider, people grid) with a few style options; teachers and artists are reusable entries placed with the people grid block. This is wider than the brief's proposal.
+- **S3 Editor:** Sanity Studio hosted by Sanity, not embedded in the site.
+- **S4 Photos:** Sanity's image service, with cropping in the editor.
+
+Dávid has also approved starting the implementation, in stages, once the Sanity project exists (project ID and dataset name).
+
+## Still open or to verify
+
 - Use Cloudflare for the SSR preview; decide whether it also hosts production.
 - Choose the production rebuild provider and the exact webhook mechanism.
 - Verify current Sanity free-plan limits, dataset visibility, roles/seats, visual-editing availability, and invited-editor sign-in before relying on them.
-- Test the admin's actual editor workflow on a phone; click-to-edit is expected to be a desktop workflow.
+- Test the admin's actual editor workflow; click-to-edit is expected to be a desktop workflow.
 
 ## Handoff for the next agent
 
 1. Read [SANITY-PORT-BRIEF.md](../SANITY-PORT-BRIEF.md), `HANDOFF.md`, `DECISIONS.md`, `SPEC.md`, and this file before changing code.
-2. Confirm Dávid has approved implementation and resolve the choices above before locking a schema or hosting workflow.
+2. Build to the confirmed choices above. Resolve the items under "Still open or to verify" before locking the hosting workflow.
 3. Work only on `feature/sanity`; do not change `main`, the deployed PoC, or `.pages.yml` as part of this port unless explicitly asked.
 4. Read the current official Sanity Astro visual-editing guidance before implementing integration. Verify current provider and plan details rather than relying on old pricing notes.
 5. Never request or commit tokens. Dávid should enter secrets directly into GitHub/Cloudflare secret settings; project ID and dataset name are configuration, not secrets.

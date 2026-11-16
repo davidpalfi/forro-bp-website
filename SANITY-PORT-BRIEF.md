@@ -2,7 +2,7 @@
 
 Written 2026-11-15 from a planning conversation with Dávid (repo owner). This is a brief for a Claude Code session working in `davidpalfi/forro-bp-website`. Read `docs/HANDOFF.md` and `docs/DECISIONS.md` first; this brief changes several decisions recorded there.
 
-**Do not start building until Dávid confirms.** He asked to review the plan first.
+**Dávid confirmed the plan on 2026-11-16.** Build in stages, starting once the Sanity project ID and dataset name are available.
 
 ## Why this change
 
@@ -27,10 +27,12 @@ Create branch `feature/sanity` from `main` and port the whole site. `main`, the 
 5. **Publish trigger:** a Sanity webhook rebuilds the site when she publishes.
 6. **Docs:** update `DECISIONS.md`, `ARCHITECTURE.md`, `HANDOFF.md`, `SPEC.md`, and write a new `EDITING-GUIDE.md` for Sanity.
 
-## Choices proposed to Dávid (not yet confirmed)
+## Choices (confirmed by Dávid on 2026-11-16)
 
-- **Languages:** keep English and Hungarian side by side in each entry (`title_en`, `title_hu`), with the existing fall-back to the other language.
-- **Blocks:** the home page and text pages become lists of blocks she can add, reorder and remove (text, image, button, gallery). People and settings stay fixed fields.
+Settled; see `docs/DECISIONS.md`, "Sanity port decisions", for the full text.
+
+- **Languages:** English and Hungarian side by side in each entry, with the existing fall-back to the other language.
+- **Page content:** a full page builder, wider than first proposed. She can create pages; every page is a list of blocks; teachers and artists are reusable entries placed with a people grid block.
 - **Studio:** hosted by Sanity at its own address, not embedded in the site.
 - **Photos:** served from Sanity's image service (gives her cropping). This drops decision 10's "no third-party requests" rule and replaces the custom resize step (decision 9).
 

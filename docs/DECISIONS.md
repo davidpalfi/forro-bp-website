@@ -10,15 +10,46 @@ This file's numbered decisions describe the original Pages CMS/GitHub Pages proo
 
 | Area | Original PoC | Sanity port status |
 |---|---|---|
-| Content/editor | JSON in GitHub, Pages CMS forms | Sanity selected for exploration; schemas and migration not implemented |
+| Content/editor | JSON in GitHub, Pages CMS forms | Sanity, Studio hosted by Sanity (S3 below); schemas and migration not implemented |
 | Public site | Static Astro on GitHub Pages | Remain static; target hosting/provider is not finalized |
 | Visual editing | None | SSR preview on Cloudflare proposed; not implemented |
-| Languages | English and Hungarian side by side, with fallback | Keep this behavior proposed, awaiting confirmation |
-| Page content | Fixed fields and Markdown/HTML JSON bodies | Reorderable blocks for home/text pages proposed, awaiting confirmation |
-| Images | Local uploads resized at build time | Sanity image service/cropping proposed, awaiting confirmation |
+| Languages | English and Hungarian side by side, with fallback | **Confirmed 2026-11-16:** kept (S1 below) |
+| Page content | Fixed fields and Markdown/HTML JSON bodies | **Confirmed 2026-11-16:** full page builder (S2 below) |
+| Images | Local uploads resized at build time | **Confirmed 2026-11-16:** Sanity image service (S4 below) |
 | Publishing | GitHub Actions on pushes to `main` | Sanity publish should trigger a rebuild; mechanism/provider not implemented |
 
 The only hard account constraint confirmed in the port brief is no subscription. Re-check the current Sanity free plan and Cloudflare terms before launch; old provider assumptions below are historical. The source brief is [SANITY-PORT-BRIEF.md](../SANITY-PORT-BRIEF.md); current task inventory is [SANITY-PORT-STATUS.md](SANITY-PORT-STATUS.md).
+
+## Sanity port decisions (confirmed by Dávid, 2026-11-16)
+
+These are settled. Do not ask about them again; build to them. Each can be changed later if it does not work for the admin.
+
+### S1. Languages: English and Hungarian side by side in each entry
+One entry per person or page, with the English and Hungarian fields next to each other. Things that are the same in both languages (name, photo, links) are entered once. If one language is empty, the page shows the other. Considered: a separate entry per language (photos and links entered twice; the two drift apart). Dávid: "we change later if it's not good".
+
+### S2. Page content: a full page builder
+Chosen because the exact pages and layouts are not known yet, so the admin should have the most freedom a block system can give. This goes further than the brief's proposal (blocks on the home and text pages only).
+- The admin can **create new pages** herself and add them to the menu.
+- **Every page is a list of blocks** she adds, removes and reorders. Core set to start with: heading, text, image, gallery, button, banner, a row of columns, embedded video, divider, people grid.
+- **Teachers and artists stay reusable entries** (name, photo, bio, links). They are placed on a page with the people grid block, so a person is entered once and the cards stay consistent.
+- **Each block has a few style options** from the site's design, such as background colour (red, cream, dark) and alignment.
+
+Limits, stated to Dávid: her freedom is within the blocks that exist. There is no free drag-to-any-position as in Wix, and a new kind of block is a code change. Do not guess further blocks now; add them when the admin's drawings arrive.
+Considered: fixed fields everywhere (as in the PoC); blocks only on the home and text pages; blocks everywhere with no reusable people entries (cards would become inconsistent).
+This replaces decision 6 (fixed content types) for the port.
+
+### S3. Editor: Sanity Studio hosted by Sanity
+The admin opens an address at Sanity (`<name>.sanity.studio`). Why: free, nothing to maintain, the site stays simpler. Considered: Studio embedded in the site at `/admin` (ties the editor to the site's hosting and makes the site more complicated).
+
+### S4. Photos: Sanity's image service
+The admin uploads, crops and sets the focus point in the editor; Sanity resizes for phones and desktops; visitors load photos from Sanity's servers. Why: simpler, and better for her. Cost: photos depend on Sanity's free plan, which Dávid accepts as long as there is no subscription. Considered: downloading and resizing at build time so everything is served from our own host (more code, less cropping convenience); it can be switched to later without the admin noticing.
+This replaces decisions 9 (own resize step) and 10 (no third-party requests) for the port. Fonts stay self-hosted.
+
+### Still open for the port
+- Whether Cloudflare hosts only the click-to-edit preview or the public site too.
+- The rebuild mechanism when she publishes (webhook and provider).
+- Sanity's current free-plan limits, dataset visibility, seats and roles, and the invited-editor sign-in: verify before relying on them.
+- The admin's own trial of the editor; click-to-edit is expected to be a desktop workflow.
 
 ## Context and priorities
 
@@ -150,6 +181,8 @@ See `HANDOFF.md`, "Status", for the current test record. In short: the build, th
 - Who receives build-failure emails.
 
 ## History
+
+**2026-11-16, Sanity port choices confirmed.** Dávid confirmed four choices: languages side by side, a full page builder (more freedom than the brief proposed), Studio hosted by Sanity, photos from Sanity's image service. See "Sanity port decisions" above.
 
 **2026-11-15, Sanity port proposed.** Pages CMS was connected to the live proof of concept and found unintuitive for the admin. Sanity with click-to-edit was selected for exploration. This changes the direction of decisions 1, 3, 6, 9, 10, 13 and 17, but the detailed choices remain subject to owner confirmation. See the current port status above and `SANITY-PORT-STATUS.md`. No port implementation was present at this checkpoint.
 
