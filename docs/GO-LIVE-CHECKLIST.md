@@ -4,13 +4,15 @@ This checklist is for replacing the Pages CMS proof of concept only after the Sa
 
 ## 1. Confirm the plan
 
-**Dávid:** approve implementation and confirm or change the proposals in `SANITY-PORT-STATUS.md`: bilingual fields and fallback, flexible page blocks, hosted Studio, Sanity image delivery, and Cloudflare preview/production hosting.
+**Confirmed by Dávid (2026-11-16):** bilingual fields, a full page builder, hosted Studio, and Sanity image delivery (S1-S4). Stage 1 schemas are implemented on `feature/sanity`; they do not yet power the site.
 
-**Dávid:** verify current Sanity free-plan limits and terms directly: seats, roles, private/public dataset options, visual editing, and any usage limits relevant to the site. Verify Cloudflare's current free-plan capabilities too. Record the date and findings in `DECISIONS.md`.
+**Next owner action:** verify current Sanity Free-plan limits and terms directly: seats, roles, dataset visibility, Studio hosting, image usage, and any limits relevant to the site. Verify Cloudflare Free-plan capabilities before choosing preview/production hosting. Record the date and findings in `DECISIONS.md`; the Growth trial is temporary and must not justify paid-only features.
 
 ## 2. Create and secure accounts
 
-**Dávid:** create or select the Sanity account, project, and dataset. Decide whether the dataset can be public; never put private care-team contact details in public content. Provide the project ID and dataset name to the maintainer through the agreed project configuration process. These identifiers are not secrets.
+**Done:** the Studio is configured for Sanity project `8hc671sk`, dataset `production`. These identifiers are not secrets.
+
+**Still required:** confirm dataset visibility and access roles. Never put private care-team contact details in public content. Provide write credentials only through a local secret manager or provider secret settings, never in chat or source control.
 
 **Dávid:** create or select the Cloudflare account and connect the repository after the preview build is ready. Ensure the account and repository ownership are understood and recovery access is available.
 
@@ -18,7 +20,7 @@ This checklist is for replacing the Pages CMS proof of concept only after the Sa
 
 ## 3. Finish the port on `feature/sanity`
 
-**Maintainer/agent:** implement and review the Sanity schemas, Astro data access, migration script, image handling, SSR preview, static production build, and publish-triggered rebuild. Preserve existing routes and behavior unless Dávid approves a change.
+**Maintainer/agent:** verify Free-plan fit, deploy the Studio with `npm run studio:deploy`, and test the hosted URL and maintainer access. Then audit the Stage 1 schemas against every current JSON field and document schema corrections. Implement the idempotent migration, Sanity data access, image handling, SSR preview, static production build, and publish-triggered rebuild in that order. Preserve existing routes and behavior unless Dávid approves a change. The detailed sequence and current gaps are in `SANITY-PORT-STATUS.md`.
 
 **Maintainer/agent:** document actual environment variables, secret names, local commands, deployment provider settings, and rollback steps in `README.md`/`ARCHITECTURE.md` once they are known. Do not add credentials to example files.
 

@@ -16,7 +16,7 @@ Admin -> hosted Sanity Studio -> published Sanity content
 Public visitors -> static site
 ```
 
-The public output is intended to remain static. The preview needs SSR for visual editing. Whether Cloudflare also hosts production and how the Sanity webhook invokes a rebuild are unresolved. Bilingual fields, flexible home/text blocks, hosted Studio, and Sanity image delivery are proposals pending owner confirmation. See `SANITY-PORT-STATUS.md` and `GO-LIVE-CHECKLIST.md`.
+The public output is intended to remain static. The preview needs SSR for visual editing. Whether Cloudflare also hosts production and how the Sanity webhook invokes a rebuild are unresolved. S1-S4 (bilingual fields, a full page builder, hosted Studio, Sanity image delivery) are confirmed; schemas exist, but runtime behavior is not implemented. See `SANITY-PORT-STATUS.md` and `GO-LIVE-CHECKLIST.md`.
 
 ## Data flow
 
@@ -71,7 +71,7 @@ Nothing runs on a server. Browser JavaScript is two small inline scripts: the me
 | `.github/workflows/deploy.yml` | Build once and deploy, on every push to `main` |
 | `.github/workflows/check.yml` | `npm run check`, only when code changes and on pull requests |
 | `astro.config.mjs` | Reads `SITE_URL` and `SITE_BASE`; trailing slashes |
-| `.node-version`, `package.json`, `package-lock.json` | Pinned Node and six exactly pinned dependencies: `astro`, `sharp`, `marked`, three `@fontsource-variable/*` fonts |
+| `.node-version`, `package.json`, `package-lock.json` | Pinned Node and exact-pinned root dependencies for Astro, Sanity, Cloudflare/React, Portable Text, fonts, and image handling |
 
 ## Rules the code follows
 
@@ -149,4 +149,4 @@ Change the exact versions in `package.json` and `.node-version` (and `node-versi
 
 ### Change the Sanity content model
 
-Edit the schemas in `studio/schemaTypes/`. Keep translated fields paired and add new page blocks to both the schema type list and `pageBlockMembers`. Validate with `cd studio && npx sanity schemas validate`, then run `npm run studio:build`. Studio commands are `npm run studio`, `npm run studio:build`, and `npm run studio:deploy`; deployment requires Sanity account access. Do not change the Astro pages or read path as part of a schema-only change.
+Edit the schemas in `studio/schemaTypes/`. Keep translated fields paired and add new page blocks to both the schema type list and `pageBlockMembers`. Validate with `cd studio && npx sanity schemas validate`, then run `npm run studio:build`. Studio commands are `npm run studio`, `npm run studio:build`, and `npm run studio:deploy`; deployment requires Sanity account access. Schema changes do not migrate content or implement translation fallback. Before a migration, map every legacy JSON field and document the mapping. Do not change Astro pages or the read path as part of a schema-only change.
