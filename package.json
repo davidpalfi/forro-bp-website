@@ -10,7 +10,10 @@
     "check": "node scripts/check.mjs",
     "studio": "cd studio && sanity dev",
     "studio:build": "cd studio && sanity build",
-    "studio:deploy": "cd studio && sanity deploy"
+    "studio:deploy": "cd studio && sanity deploy",
+    "sanity:import-file": "node scripts/make-sanity-import.mjs",
+    "sanity:import": "npm run sanity:import-file && cd studio && sanity datasets import ../sanity-import/data.ndjson --dataset production --missing",
+    "sanity:login": "cd studio && sanity login"
   },
   "dependencies": {
     "@astrojs/cloudflare": "14.4.8",

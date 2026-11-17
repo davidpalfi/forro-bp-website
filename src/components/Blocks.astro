@@ -1,0 +1,197 @@
+---
+// The content of a page: the blocks the admin put together in Sanity, in her order.
+// Neighbouring blocks with the same background and alignment share one band.
+// A block of an unknown kind is skipped with a [content-warning], never an error.
+import Picture from './Picture.astro';
+import PersonList from './PersonList.astro';
+import {
+  groupBlocks,
+  renderRich,
+  richPlain,
+  trRich,
+  blockLink,
+  peopleForBlock,
+  videoEmbed,
+  getImage,
+  warnOnce,
+  type Block,
+} from '../lib/content';
+import { tr, type Lang } from '../lib/i18n';
+
+interface Props {
+  blocks: Record<string, unknown>[];
+  lang: Lang;
+  /** The page colour; blocks with background "Same as page" use it. */
+  tone?: string;
+  /** The class of the element just before the blocks, for spacing (e.g. "after-title"). */
+  class?: string;
+}
+
+const { blocks, lang, tone = 'red', class: className } = Astro.props;
+const KNOWN = ['textBlock', 'headingBlock', 'imageBlock', 'galleryBlock', 'buttonBlock', 'bannerBlock', 'columnsBlock', 'videoBlock', 'dividerBlock', 'peopleGridBlock', 'ticketLink'];
+const groups = groupBlocks(blocks, tone).map((g) => ({
+  ...g,
+  blocks: g.blocks.filter((b) => {
+    if (KNOWN.includes(b._type)) return true;
+    warnOnce(`a block of an unknown kind (${b._type}) was skipped`);
+    return false;
+  }),
+}));
+
+const look = (b: Block) => (['large', 'statement'].includes(String(b.look)) ? String(b.look) : 'normal');
+const headingTag = (b: Block) => (b.level === 3 ? 'h3' : b.level === 4 ? 'h4' : 'h2');
+const imageWidth = (b: Block) => (b.width === 'text' ? 'b-text' : b.width === 'full' ? 'b-full' : 'b-xwide');
+const images = (b: Block) => (Array.isArray(b.images) ? (b.images as unknown[]).filter((i) => getImage(i)) : []);
+const link = (b: Block) => {
+  const l = blockLink(b, lang);
+  return { ...l, label: tr(b, 'label', lang) || l.label };
+};
+---
+
+{
+  groups.map((g, gi) =>
+    g.blocks.length === 0 ? null : (
+      <section
+        class:list={[
+          'blocks',
+          `bg-${g.background}`,
+          `align-${g.alignment}`,
+          gi > 0 && groups[gi - 1].background === g.background && 'blocks--joined',
+          gi === 0 && className,
+        ]}
+      >
+        {g.blocks.map((b) => {
+          switch (b._type) {
+            case 'textBlock': {
+              const value = trRich(b, 'body', lang);
+              if (!value) return null;
+              if (look(b) === 'statement') return <p class="b-text b-statement stats">{richPlain(value)}</p>;
+              return <div class:list={['b-text', 'prose', look(b) === 'large' && 'b-large intro']} set:html={renderRich(value, lang)} />;
+            }
+            case 'headingBlock': {
+              const t = tr(b, 'heading', lang);
+              const Tag = headingTag(b);
+              return t ? <Tag class:list={['b-text', 'b-heading', `b-heading--${Tag}`]}>{t}</Tag> : null;
+            }
+            case 'imageBlock': {
+              const img = getImage(b.image);
+              if (!img) return null;
+              const caption = tr(b, 'caption', lang);
+              return (
+                <figure class:list={['b-image', imageWidth(b)]}>
+                  <Picture image={b.image} lang={lang} class="b-image-photo" sizes={b.width === 'text' ? '(min-width: 760px) 704px, 100vw' : '(min-width: 1200px) 1150px, 100vw'} />
+                  {caption && <figcaption>{caption}</figcaption>}
+                </figure>
+              );
+            }
+            case 'galleryBlock': {
+              const list = images(b);
+              if (list.length === 0) return null;
+              const caption = tr(b, 'caption', lang);
+              return (
+                <figure class="b-wide b-gallery">
+                  <ul class="gallery">
+                    {list.map((i) => (
+                      <li>
+                        <Picture image={i} lang={lang} sizes="(min-width: 720px) 33vw, 50vw" />
+                      </li>
+                    ))}
+                  </ul>
+                  {caption && <figcaption>{caption}</figcaption>}
+                </figure>
+              );
+            }
+            case 'buttonBlock': {
+              const l = link(b);
+              if (!l.url || !l.label) return null;
+              return (
+                <p class="b-text b-button">
+                  <a class="button" href={l.url} target={l.external ? '_blank' : undefined} rel={l.external ? 'noopener' : undefined}>
+                    {l.label}
+                  </a>
+                </p>
+              );
+            }
+            case 'ticketLink': {
+              const url = String(b.url ?? '');
+              return url ? (
+                <p class="b-text b-button">
+                  <a class="ticket-text" href={url} target="_blank" rel="noopener">
+                    {String(b.label ?? '')}
+                  </a>
+                </p>
+              ) : null;
+            }
+            case 'bannerBlock': {
+              const photo = getImage(b.image);
+              const title = tr(b, 'title', lang);
+              const body = renderRich(trRich(b, 'body', lang), lang);
+              const l = link(b);
+              return (
+                <div class:list={['b-wide', 'b-banner', !photo && 'b-banner--plain']}>
+                  {photo && <Picture image={b.image} lang={lang} class="b-banner-photo" sizes="(min-width: 1100px) 1088px, 100vw" />}
+                  <div class="b-banner-inner">
+                    {title && <h2 class="b-banner-title">{title}</h2>}
+                    {body && <div class="prose" set:html={body} />}
+                    {l.url && l.label && (
+                      <a class="button" href={l.url} target={l.external ? '_blank' : undefined} rel={l.external ? 'noopener' : undefined}>
+                        {l.label}
+                      </a>
+                    )}
+                  </div>
+                </div>
+              );
+            }
+            case 'columnsBlock': {
+              const cols = Array.isArray(b.columns) ? (b.columns as Record<string, unknown>[]) : [];
+              if (cols.length === 0) return null;
+              return (
+                <div class="b-wide b-columns" style={`--cols: ${Math.min(Math.max(cols.length, 1), 4)}`}>
+                  {cols.map((c) => {
+                    const h = tr(c, 'heading', lang);
+                    const body = renderRich(trRich(c, 'body', lang), lang);
+                    return (
+                      <div class="b-column">
+                        {c.image ? <Picture image={c.image} lang={lang} class="b-column-photo" sizes="(min-width: 900px) 30vw, 100vw" /> : null}
+                        {h && <h3 class="b-heading b-heading--h3">{h}</h3>}
+                        {body && <div class="prose" set:html={body} />}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            }
+            case 'videoBlock': {
+              const embed = videoEmbed(b.url);
+              const caption = tr(b, 'caption', lang);
+              if (!embed) {
+                if (b.url) warnOnce(`the video "${String(b.url)}" is not a YouTube or Vimeo address and was left out`);
+                return null;
+              }
+              return (
+                <figure class="b-wide b-video">
+                  <div class="b-video-frame">
+                    <iframe src={embed} title={caption || 'Video'} loading="lazy" allow="fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" />
+                  </div>
+                  {caption && <figcaption>{caption}</figcaption>}
+                </figure>
+              );
+            }
+            case 'dividerBlock':
+              return b.style === 'space' ? <div class="b-space" aria-hidden="true" /> : <hr class="b-text b-divider" />;
+            case 'peopleGridBlock': {
+              const people = peopleForBlock(b);
+              return people.length ? (
+                <div class="b-people">
+                  <PersonList people={people} lang={lang} />
+                </div>
+              ) : null;
+            }
+            default:
+              return null;
+          }
+        })}
+      </section>
+    ),
+  )
+}

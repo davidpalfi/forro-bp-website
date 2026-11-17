@@ -1,30 +1,15 @@
 # Handoff: start here
 
-If you are picking this project up with no other context, read this file first, then `USER-NEEDS.md` (who it is for and how little is verified), `DECISIONS.md` (why), `SPEC.md` (what the site does) and `ARCHITECTURE.md` (how the code is organised). `CLAUDE.md` has the rules for a Claude session working in the repo. The root-level [EDITING-GUIDE.md](../EDITING-GUIDE.md) is for the old Pages CMS PoC; [docs/EDITING-GUIDE.md](EDITING-GUIDE.md) is a draft for Sanity and is not ready to send to the admin.
+If you are picking this project up with no other context, read this file and `SANITY-PORT-STATUS.md` first, then `USER-NEEDS.md` (who it is for and how little is verified), `DECISIONS.md` (why), `SPEC.md` (what the site does) and `ARCHITECTURE.md` (how the code is organised). `CLAUDE.md` has the rules for a Claude session working in the repo. The root-level [EDITING-GUIDE.md](../EDITING-GUIDE.md) is for the old Pages CMS PoC; [docs/EDITING-GUIDE.md](EDITING-GUIDE.md) is the admin guide for Sanity; check it against the deployed Studio before sending it.
 
-## Current handoff (2026-11-17)
+## Current handoff (2026-11-17, evening)
 
-- The active work is on `feature/sanity`; keep `main`, the live GitHub Pages proof of concept, and `.pages.yml` unchanged.
-- Stage 1 implementation is commit `2e6a644` (`feat: add Sanity Studio schemas`) on `feature/sanity`. It adds the Studio source/config under `studio/` for project `8hc671sk` and dataset `production`, with schemas for settings, reusable people, pages, all agreed blocks, Portable Text, and cropped images. The Studio has not yet been deployed to Sanity hosting.
-- `npm run build`, `npm run check`, `npm run studio:build`, and `cd studio && npx sanity schemas validate` pass. The schema validator reports zero errors and warnings.
-- Astro pages still read the existing JSON. No migration, Sanity query, Astro integration, preview, webhook, or deployment workflow is implemented.
-- The choices in [SANITY-PORT-BRIEF.md](../SANITY-PORT-BRIEF.md) are confirmed in `DECISIONS.md`, S1-S4. Treat the schemas as implemented, but do not treat rendering or migration as implemented.
-- Read [SANITY-PORT-STATUS.md](SANITY-PORT-STATUS.md) for the current inventory, [GO-LIVE-CHECKLIST.md](GO-LIVE-CHECKLIST.md) for the owner and maintainer steps, and [EDITING-GUIDE.md](EDITING-GUIDE.md) for the not-yet-final admin guide.
-- The sections below document the original Pages CMS proof of concept, not the Sanity branch's current behavior. For port requirements and known conflicts, see the status, decision, spec, and architecture notes linked above.
-
-## Next steps for takeover
-
-Do these on `feature/sanity`; keep `main`, its deployed PoC, and `.pages.yml` unchanged. The immediate next work is still the content/data layer, not a production launch.
-
-1. **Verify Free-plan fit and deploy the Studio.** Check Sanity's current Free-plan limits (including Studio hosting, seats/roles, dataset visibility, and image usage), sign in using the maintainer's own account, run `npm run studio:deploy`, and verify the hosted Studio opens. Do not select or use Growth-only features. The hosted deployment and invited-editor sign-in are not yet tested.
-2. **Reconcile the schemas with source content before importing.** Compare every file under `src/content/` with `studio/schemaTypes/`. In particular, account for community/festival home content, stats and intro fields, program image ordering, the phone hero image, page visibility/order flags, both languages, and any content that does not map cleanly into blocks. Update schemas and decisions/spec docs first if the model needs to change. S1-S4 are confirmed; hosting/provider details remain open.
-3. **Design and test a safe migration.** Use stable Sanity document IDs and idempotent upsert behavior, provide a dry-run/report mode, preserve image and list order, and do not delete documents automatically. Test mapping and repeat-run behavior against a disposable fixture or dataset before touching `production`. The current branch has no migration script and has not written to Sanity.
-4. **Implement and test the Sanity read layer.** Add GROQ queries and typed content helpers, preserve current route templates, bilingual fallback, safe-link handling, metadata, ordering, and image behavior, then switch Astro pages from JSON only after the data path is verified. Keep `src/content/` available as the migration source until parity is proven.
-5. **Build the preview separately from public output.** Read current Cloudflare Free-plan terms and official Astro integration guidance first. Add SSR and Visual Editing only to preview mode; keep public output static, preview secrets server-side, and draft content out of public builds.
-6. **Choose and implement publishing.** Decide whether Cloudflare also hosts production and select a rebuild provider/webhook. Store tokens and webhook secrets only in provider secret stores; test successful rebuild, failed-build behavior, and rollback.
-7. **Prove acceptance before launch.** Run clean install, `npm run check`, `npm run build`, Studio/schema checks, and browser checks at phone and desktop sizes. Compare imported counts and representative bilingual records. Have the admin sign in, edit, preview, publish, and approve the result before changing traffic.
-
-For detailed status, schema inventory, and completion gates, use [SANITY-PORT-STATUS.md](SANITY-PORT-STATUS.md). Do not run a production import or expose a token as part of the schema-only checkpoint.
+- **Read [SANITY-PORT-STATUS.md](SANITY-PORT-STATUS.md) first.** It has the state, what was and was not verified, and the exact next commands.
+- The Sanity proof of concept is built on branch `claude/site-progress-backlog-k1rq9i` (from `feature/sanity`): refined Studio schemas, the site rendering Sanity documents (from Sanity, or from the JSON files converted to the same documents), a repeatable import file and command, a wider `npm run check`, and the admin guide [EDITING-GUIDE.md](EDITING-GUIDE.md). Decisions S5-S7 in `DECISIONS.md`; behaviour in `SPEC.md` section 11; code map in `ARCHITECTURE.md`.
+- Nothing has touched the real Sanity project yet: the Studio is not deployed and the content is not imported. Dávid does both with three commands on his computer.
+- The default build still reads the JSON files and looks the same as the live proof of concept. `main`, its GitHub Pages site and `.pages.yml` are unchanged.
+- Not built: click-to-edit preview, rebuild on publish, hosting choice. See [BACKLOG.md](BACKLOG.md).
+- The sections below document the original Pages CMS proof of concept.
 
 ## Original Pages CMS PoC (2026-11-11)
 
@@ -105,6 +90,10 @@ npm run check      # the test suite, about 20-40 seconds
 npm run studio     # start Sanity Studio at http://localhost:3333
 npm run studio:build
 npm run studio:deploy  # deploy to Sanity hosting; requires account access
+npm run sanity:login   # sign in to Sanity on this computer (once)
+npm run sanity:import-file  # write sanity-import/ from src/content; sends nothing
+npm run sanity:import  # write it and import missing documents into Sanity
+CONTENT_SOURCE=sanity npm run build   # build from the published content in Sanity
 ```
 
 Needs Node 22.23.4 or newer. Build for a sub-path locally: `SITE_URL=https://x.github.io SITE_BASE=/repo npm run build`.

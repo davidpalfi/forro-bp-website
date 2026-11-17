@@ -6,12 +6,12 @@ Last full revision: 2026-11-11, after a design review and a look at every page o
 
 ## Current port status (2026-11-17)
 
-This file's numbered decisions describe the original Pages CMS/GitHub Pages proof of concept. A Sanity port was proposed after Pages CMS was connected and found unintuitive. The direction is Sanity with an Astro visual-editing preview; implementation has not started beyond dependency preparation. Do not apply the old decisions below as instructions for the port without checking this status and the brief.
+This file's numbered decisions describe the original Pages CMS/GitHub Pages proof of concept. A Sanity port was proposed after Pages CMS was connected and found unintuitive. The direction is Sanity with an Astro visual-editing preview. On `feature/sanity` the Studio, the migration and the site's Sanity read path are built and tested offline (S5 to S7); preview and publish rebuild are not. Do not apply the old decisions below as instructions for the port without checking this status and the brief.
 
 | Area | Original PoC | Sanity port status |
 |---|---|---|
-| Content/editor | JSON in GitHub, Pages CMS forms | Sanity, Studio hosted by Sanity (S3 below); Stage 1 schemas implemented, migration not implemented |
-| Public site | Static Astro on GitHub Pages | Remain static; target hosting/provider is not finalized |
+| Content/editor | JSON in GitHub, Pages CMS forms | Sanity, Studio hosted by Sanity (S3); schemas refined (S5); import file and command built (S7), not yet run against Sanity |
+| Public site | Static Astro on GitHub Pages | Static; built from Sanity documents, from Sanity or from the JSON files (S6); hosting not finalized |
 | Visual editing | None | SSR preview on Cloudflare proposed; not implemented |
 | Languages | English and Hungarian side by side, with fallback | **Confirmed 2026-11-16:** kept (S1 below) |
 | Page content | Fixed fields and Markdown/HTML JSON bodies | **Confirmed 2026-11-16:** full page builder (S2 below) |
@@ -44,6 +44,23 @@ The admin opens an address at Sanity (`<name>.sanity.studio`). Why: free, nothin
 ### S4. Photos: Sanity's image service
 The admin uploads, crops and sets the focus point in the editor; Sanity resizes for phones and desktops; visitors load photos from Sanity's servers. Why: simpler, and better for her. Cost: photos depend on Sanity's free plan, which Dávid accepts as long as there is no subscription. Considered: downloading and resizing at build time so everything is served from our own host (more code, less cropping convenience); it can be switched to later without the admin noticing.
 This replaces decisions 9 (own resize step) and 10 (no third-party requests) for the port. Fonts stay self-hosted.
+
+### S5. Content model refinements (Claude, 2026-11-17, for Dávid to review)
+Made while mapping every JSON field to Sanity. Each keeps today's site and makes the editor simpler for the admin:
+- **Program, Teachers and Artists are ordinary pages** (`program`, `teachers`, `artists`) made of blocks, not built-in templates. The admin can edit, reorder or hide them like any page; nothing is reserved under `/festival/`. The People block shows everyone in its group when no one is picked, so a new teacher appears without touching the page.
+- **The two home pages hold their blocks themselves** (`homeBlocks` in Festival and Community home page), instead of pointing at a separate page document that must not be deleted. `programPage` and `homePage` references were removed.
+- **Pages have a colour (red, cream, dark), an optional big heading and an optional top photo**, which reproduce the old red pages (program, people) and cream text pages.
+- **Text blocks have a style (Normal, Large, Statement)** for the festival introduction and the numbers line. **Buttons link to a chosen page** (the label defaults to its name) or to an address. **Images** can be wide, text width or full width; **columns** can have a photo.
+- **Names are entered once** (community, festival, person), as S1 says for things the same in both languages. The phone banner photo was added to the festival.
+- **Video** embeds YouTube through youtube-nocookie.com and Vimeo with `dnt=1`, loaded only when the block is used. This is the one exception to "no third-party requests" besides Sanity's photos.
+Revisit when the admin has tried it.
+
+### S6. One rendering path; the JSON files become Sanity documents
+The site only knows Sanity documents. The JSON files are converted to the same documents (`src/lib/from-json.ts`) at build time, and the same conversion writes the import file. Why: the existing test suite (forgiving content, warnings, base paths) now tests the Sanity rendering and the migration mapping at once, and a test proves the import file and the JSON files give an identical site. `CONTENT_SOURCE` picks the source; it stays `json` by default until Sanity holds the imported content, then the build switches with one setting. Considered: a separate Sanity-only code path (two renderers to keep in step), and switching straight to Sanity (the site could not be built or tested before the import).
+Text that the old editor saved as Markdown is converted to Sanity rich text. An image written inside Markdown text is not a rich-text feature in Sanity; use an Image block.
+
+### S7. Migration by import file, run by Dávid
+`npm run sanity:import` imports with `--missing`: it only creates documents that are not in Sanity yet, so a repeat never overwrites the admin's work, and nothing is deleted. Ids are fixed and contain no dots (Sanity hides dotted ids from public reads). Why an import file and not a script with a write token: no token is needed anywhere but Dávid's own signed-in computer, and the file can be read before it is sent. `--replace` resets documents to the JSON content and is only for before the admin starts.
 
 ### Still open for the port
 - Whether Cloudflare hosts only the click-to-edit preview or the public site too.
@@ -181,6 +198,8 @@ See `HANDOFF.md`, "Status", for the current test record. In short: the build, th
 - Who receives build-failure emails.
 
 ## History
+
+**2026-11-17, proof of concept on Sanity.** Schemas refined (S5); the site renders Sanity documents and the JSON files are converted to them (S6); import file and command (S7); `npm run check` gained a schema check and two sections for the import file and Sanity-shaped content; admin guide written (`docs/EDITING-GUIDE.md`). Not run against the real Sanity project: this session had no network access to Sanity.
 
 **2026-11-16, Sanity port choices confirmed.** Dávid confirmed four choices: languages side by side, a full page builder (more freedom than the brief proposed), Studio hosted by Sanity, photos from Sanity's image service. See "Sanity port decisions" above.
 

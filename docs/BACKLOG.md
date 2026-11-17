@@ -9,30 +9,29 @@ Priority:
 
 Owner: **D** = Dávid (accounts, decisions), **M** = maintainer/agent (code), **A** = admin.
 
-## Where things stand
+## Where things stand (updated 2026-11-17, evening)
 
 | Phase | State |
 |---|---|
-| Pages CMS proof of concept (`main`) | Done and live at davidpalfi.github.io/forro-bp-website. Pages CMS was connected on 2026-11-15 and judged unintuitive, so the project moved to Sanity. |
+| Pages CMS proof of concept (`main`) | Done and live at davidpalfi.github.io/forro-bp-website |
 | Sanity decisions S1-S4 | Confirmed 2026-11-16 |
-| Stage 1: Studio + schemas (`feature/sanity`) | Done and validated locally. Not deployed to Sanity hosting. |
-| Migration, Sanity reads, preview, publish rebuild | Not started |
+| Sanity proof of concept: schemas, site reading Sanity documents, migration, admin guide | **Built and tested offline** (S5-S7). Not yet run against the real Sanity project |
+| Studio online, content imported | Waiting for Dávid: three commands (`SANITY-PORT-STATUS.md`, "Next steps") |
+| Preview, rebuild on publish, hosting | Not started |
 | Real content, admin trial, launch | Not started |
-
-The public site still reads the JSON files. Nothing has been written to Sanity yet.
 
 ## P0: finish the Sanity port
 
 | # | Item | Owner | Done when | Depends on |
 |---|---|---|---|---|
 | 1 | Check Sanity Free-plan limits (seats, roles, dataset visibility, Studio hosting, image usage) and record the findings with a date in `DECISIONS.md` | D | Findings recorded; no feature used needs Growth | none |
-| 2 | Deploy the Studio (`npm run studio:deploy`) and open the hosted URL | D + M | Studio opens at `*.sanity.studio` with the maintainer's account | 1 |
+| 2 | Deploy the Studio (`npm run studio:deploy`) and open the hosted URL. **Ready to run**: address set to forro-budapest | D | Studio opens at `*.sanity.studio` with the maintainer's account | 1 |
 | 3 | Test the invited-editor sign-in with a test invite | D | A non-developer account can sign in, on a phone too | 2 |
-| 4 | Audit schema coverage: map every field under `src/content/` to a Sanity field (home intro and numbers line, program image order, phone banner image, page visibility and order, routing) | M | Mapping table written; gaps fixed in `studio/`, `DECISIONS.md`, `SPEC.md` | none (can run alongside 1-3) |
-| 5 | Write the migration script: stable IDs, safe to re-run, dry-run report, image upload, keeps order, never deletes | M | Dry run and a repeat run against a throwaway dataset show the expected result | 4 |
-| 6 | Run the migration into `production` after review | D + M | Document counts and sample bilingual records match `src/content/` | 5, 1 |
-| 7 | Sanity read layer: GROQ queries and typed helpers; switch Astro pages from JSON while keeping routes, language fallback, safe links, metadata, ordering, `[content-warning]` handling | M | `npm run check` passes with parity tests; site looks the same at phone and desktop width | 6 |
-| 8 | Render the page-builder blocks (heading, text, image, gallery, button, banner, columns, video, divider, people grid) and Sanity images with crop/focus point | M | Every block type renders in both languages | 7 |
+| 4 | ✅ **Done 2026-11-17.** Audit schema coverage: every JSON field mapped (`SPEC.md` 11.2), gaps fixed (S5), checked automatically by `npm run check` [0] | M | | |
+| 5 | ✅ **Done 2026-11-17** (offline). Import file + `npm run sanity:import --missing`: fixed ids, repeatable, report, photo upload, order kept, never deletes (S7). Not yet tried against a real dataset | M | | |
+| 6 | Run `npm run sanity:import` into `production` | D | 20 documents and 6 photos in Sanity; `CONTENT_SOURCE=sanity npm run build` passes and looks the same | 1, 2 |
+| 7 | ✅ **Done 2026-11-17.** Sanity read layer (`CONTENT_SOURCE`); routes, fallback, safe links, metadata, ordering, warnings kept; parity proven by `npm run check` [5]. Still to do: switch the default to `sanity` after item 6 | M | | |
+| 8 | ✅ **Done 2026-11-17.** All ten blocks and Sanity photos with crop and focus point, tested by `npm run check` [6] and in a browser | M | | |
 | 9 | Decide hosting: Cloudflare for preview only, or for the public site as well | D | Decision recorded in `DECISIONS.md` | 1 |
 | 10 | Click-to-edit preview: SSR on Cloudflare, preview only, secrets server-side, drafts never in public builds | M | Preview shows drafts; public build shows none | 7, 9 |
 | 11 | Publish rebuild: choose provider and webhook; secrets only in provider settings | D + M | One publish triggers one rebuild; a failed build keeps the last good site; rollback tested | 7, 9 |
@@ -43,7 +42,7 @@ The public site still reads the JSON files. Nothing has been written to Sanity y
 | # | Item | Owner | Done when | Depends on |
 |---|---|---|---|---|
 | 13 | Admin trial: she signs in, edits a bilingual text, a person, a program image and a page block, previews and publishes, on desktop and phone. Watch, do not help | D + A | Her problems are written down and fixed, or the editor choice is reconsidered | 3, 10, 11 |
-| 14 | Finish the admin editing guide (`docs/EDITING-GUIDE.md`) from the tested interface, with screenshots | M | She has read it on her phone | 13 |
+| 14 | Admin guide **written** (`docs/EDITING-GUIDE.md`); check it against the deployed Studio, add screenshots, then send | M | She has read it on her phone | 2 |
 | 15 | Real content: logo, banner photos (desktop and phone), program graphics, people photos, location photos, all bios, location text | A | No placeholders left | 6 or 13 |
 | 16 | Hungarian gaps: code of conduct, artists heading, roles "Consent Facilitator" and "Music Teacher", ticket button label | A | All Hungarian fields filled | 15 |
 | 17 | A native Hungarian speaker checks the fixed wording in `src/lib/i18n.ts` | A or D | Corrections made | none |

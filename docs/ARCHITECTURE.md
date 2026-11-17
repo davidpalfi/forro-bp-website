@@ -2,40 +2,34 @@
 
 How the code is organised and how to change it safely. For what the site does, see `SPEC.md`; for why it is built this way, see `DECISIONS.md`.
 
-## Current state and planned port
+## Current state (2026-11-17, `feature/sanity`)
 
-The original file map and data flow below describe the Pages CMS/GitHub Pages PoC. Stage 1 on `feature/sanity` adds a standalone hosted Sanity Studio and its schemas under `studio/`. The public Astro application still reads JSON; no Sanity queries, migration, Astro integration, preview, or rebuild workflow is implemented. Do not assume the planned data flow below is live.
-
-Target direction from the 2026-11-15 brief:
+The site renders **Sanity documents**. They come from Sanity, or from the JSON files in `src/content` converted to the same documents; `CONTENT_SOURCE` chooses (`SPEC.md` 11.1). The default is still the JSON files, so the site builds and is tested without Sanity access. The hosted Studio is configured in `studio/` but not deployed. Not built yet: the click-to-edit preview and the rebuild on publish.
 
 ```text
-Admin -> hosted Sanity Studio -> published Sanity content
-                                  |                 |
-                                  |                 +-> publish trigger -> static production rebuild (provider TBD)
-                                  +-> SSR visual-editing preview on Cloudflare
-Public visitors -> static site
+Admin -> hosted Sanity Studio -> published documents in Sanity ---------+
+                                                                         |  CONTENT_SOURCE=sanity
+src/content/*.json --(src/lib/from-json.ts)--> the same documents -------+  (default: json)
+        |                                                                |
+        +--> npm run sanity:import-file -> sanity-import/ -> npm run sanity:import (Dávid, signed in)
+                                                                         v
+                                              npm run build -> dist/ (static) -> host (not chosen)
+Planned: SSR preview for click-to-edit; Sanity webhook -> rebuild.
 ```
 
-The public output is intended to remain static. The preview needs SSR for visual editing. Whether Cloudflare also hosts production and how the Sanity webhook invokes a rebuild are unresolved. S1-S4 (bilingual fields, a full page builder, hosted Studio, Sanity image delivery) are confirmed; schemas exist, but runtime behavior is not implemented. See `SANITY-PORT-STATUS.md` and `GO-LIVE-CHECKLIST.md`.
-
-## Data flow
+## Data flow of a build
 
 ```
-Editor (Pages CMS forms)
-   |  a save = a commit to main
-   v
-GitHub repository:  src/content/**  and  public/uploads/**
-   |  the push starts .github/workflows/deploy.yml
-   v
 npm run build
    1. scripts/optimize-images.mjs   public/uploads/*  ->  public/_img/*.webp + manifest.json
    2. astro build
-        src/content.config.ts   loads the people and pages collections (forgiving)
-        src/lib/content.ts      settings, people, pages, links, images, text rendering
+        src/lib/source.ts       loads the documents (CONTENT_SOURCE), once
+        src/lib/from-json.ts    (json) converts src/content to documents
+        src/lib/content.ts      settings, pages, people, links, images, rich text, block grouping
         src/lib/i18n.ts         languages, fixed wording, the tr() fallback helper
         src/pages, layouts, components   render HTML for every language
    v
-dist/   plain static files, published to GitHub Pages
+dist/   plain static files
 ```
 
 Nothing runs on a server. Browser JavaScript is two small inline scripts: the menu button (`Base.astro`) and the language redirect on `/` (`pages/index.astro`). The site works without either.
@@ -44,49 +38,49 @@ Nothing runs on a server. Browser JavaScript is two small inline scripts: the me
 
 | Path | Responsibility |
 |---|---|
-| `src/content/settings/site.json` | Community name, main language, contact, "hide from Google" |
-| `src/content/settings/community.json` | Community home page (nearly empty on purpose) |
-| `src/content/settings/festival.json` | Festival home, ticket link, program images, page headings |
-| `src/content/people/*.json` | One file per teacher or artist |
-| `src/content/pages/*.json` | One file per festival text page; the file name is the address |
-| `public/uploads/` | Uploaded photos (committed). `public/_img/` is generated and ignored by Git |
-| `.pages.yml` | The editing forms. Must mirror the content model |
-| `studio/sanity.config.ts`, `studio/sanity.cli.ts` | Hosted Sanity Studio configuration for project `8hc671sk`, dataset `production` |
-| `studio/schemaTypes/` | Sanity document, Portable Text, image, and page-block schemas for the confirmed S1-S4 model |
-| `studio/package.json` | Studio's exact-pinned Sanity CLI dependencies, shared with the root install |
-| `src/content.config.ts` | Declares the two collections and their forgiving shape |
+| `studio/sanity.config.ts` | The Studio: menu (structure), fixed settings documents, new-document templates |
+| `studio/sanity.cli.ts` | Project `8hc671sk`, dataset `production`, Studio address `forro-budapest` |
+| `studio/schemaTypes/documents.ts` | Settings, page and person documents |
+| `studio/schemaTypes/blocks.ts` | The page blocks and `BLOCK_TYPES` |
+| `studio/schemaTypes/shared.ts` | Two-language field pairs, block style fields, rich text, image with alt text, link rule |
+| `src/lib/source.ts` | Loads the documents: JSON, Sanity HTTP API, or an `.ndjson` file |
+| `src/lib/from-json.ts` | JSON files -> Sanity documents. Used by the site and the import file; runs in plain Node too |
+| `src/lib/content.ts` | The only place pages get content from: `getSite`, `getFestival`, `getCommunity`, `getPages`, `getPeople`, `peopleForBlock`, `blockLink`, `groupBlocks`, `renderRich`, `getImage`, `href`, `withBase`, `safeUrl`, `trFirst`, `warnOnce` |
 | `src/lib/schema.ts` | Forgiving field types: `text`, `flag`, `num`, `textList` |
-| `src/lib/i18n.ts` | `LANGS`, the fixed wording in each language (`UI`), and `tr(obj, 'field', lang)` |
-| `src/lib/content.ts` | The only place pages get content from: settings, people, pages, `href`, `withBase`, `safeUrl`, `getImage`, `paragraphs`, `renderBody` |
-| `src/layouts/Base.astro` | Head tags, header (brand, date, language switch, menu), footer. Takes `lang`, `section`, `pagePath` and optionally `tone` (page background: `red`, `dark` or `cream`) |
+| `src/lib/i18n.ts` | `LANGS`, the fixed wording (`UI`), `tr(obj, 'field', lang)` |
+| `src/components/Blocks.astro` | Renders a list of blocks in bands |
+| `src/components/PageView.astro` | One editor-made page: top photo, heading, blocks |
+| `src/components/Hero.astro`, `PageTitle.astro`, `PersonList.astro`, `Picture.astro` | Banner, title band, people cards, responsive photo (Sanity or local) |
+| `src/layouts/Base.astro` | Head tags, header with menu built from pages, footer. Takes `lang`, `section`, `pagePath`, `tone` |
 | `src/pages/index.astro` | `/`: redirect to a language |
-| `src/pages/[lang]/index.astro` | Community home |
-| `src/pages/[lang]/festival/index.astro`, `program.astro`, `teachers.astro`, `artists.astro`, `[slug].astro` | The festival |
+| `src/pages/[lang]/index.astro`, `[lang]/[slug].astro` | Community home and community pages |
+| `src/pages/[lang]/festival/index.astro`, `festival/[slug].astro` | Festival home and every festival page |
 | `src/pages/404.astro` | Not found, both languages |
-| `src/components/Hero.astro`, `PageTitle.astro`, `PersonList.astro`, `Picture.astro` | Banner, red title band, people list, responsive photo |
-| `src/styles/global.css` | All styling; colours and fonts as variables at the top |
-| `scripts/optimize-images.mjs` | Photo resizing before each build |
-| `scripts/check.mjs` | `npm run check`: four test builds with assertions |
-| `scripts/ci-build.mjs` | The build as run on GitHub; copies warnings to the run summary |
-| `.github/workflows/deploy.yml` | Build once and deploy, on every push to `main` |
-| `.github/workflows/check.yml` | `npm run check`, only when code changes and on pull requests |
+| `src/content/` | The proof-of-concept content (JSON); the migration source |
+| `public/uploads/` | Photos of the JSON content. `public/_img/` is generated; never edit it |
+| `src/styles/global.css` | All styling; colours and fonts at the top; page blocks at the end |
+| `scripts/make-sanity-import.mjs` | `npm run sanity:import-file`: writes `sanity-import/` (ignored by Git) |
+| `scripts/check.mjs` | `npm run check`: schema check and six test builds |
+| `scripts/check-schema.mjs`, `scripts/lib/` | Documents vs Studio schema; Node loader for Studio files; Sanity-shaped test content |
+| `scripts/optimize-images.mjs`, `scripts/ci-build.mjs` | Photo resizing; the build as run on GitHub |
+| `.pages.yml`, `.github/workflows/` | The Pages CMS forms and GitHub Pages deploy of the old proof of concept. They still match the JSON files |
 | `astro.config.mjs` | Reads `SITE_URL` and `SITE_BASE`; trailing slashes |
-| `.node-version`, `package.json`, `package-lock.json` | Pinned Node and exact-pinned root dependencies for Astro, Sanity, Cloudflare/React, Portable Text, fonts, and image handling |
 
 ## Rules the code follows
 
-1. **Pages never read raw files.** They call helpers in `src/lib/content.ts`.
-2. **Every field is optional in the code.** "Required" lives only in `.pages.yml`. Problems become `[content-warning]` lines, never failures.
-3. **Two-language fields are always read with `tr()`**, which falls back to the other language. Never read `x_en` or `x_hu` directly in a page.
-4. **Every page takes its language from the address** (`Astro.params.lang`) and passes `lang`, `section` and `pagePath` to `Base`. `pagePath` is the address without the language (`/festival/program/`); the language switch, the menu marker and `hreflang` all depend on it being right.
-5. **Never write an address by hand.** Use `href(lang, '/festival/...')` for pages and `withBase()` for anything else; `safeUrl()` and `getImage()` already apply the base path. HTML from text bodies goes through `renderBody()`, which also rewrites root-relative links. `npm run check` section 4 fails if an address ignores the base.
-6. **Links go through `safeUrl`; photos go through `getImage`** (or the `Picture` component).
-7. **No third-party requests.** Fonts come from the `@fontsource-variable` packages, imported in `Base.astro`.
+1. **Pages never read raw content.** They call helpers in `src/lib/content.ts`.
+2. **Every field is optional in the code.** "Required" lives in the Studio schema. Content problems become `[content-warning]` lines, never failures. The only deliberate failures are a malformed JSON file and, with `CONTENT_SOURCE=sanity`, an unreachable or empty Sanity (`SPEC.md` P3).
+3. **Two-language fields are always read with `tr()`** (or `trFirst`, `trRich`), which fall back to the other language. Never read `x_en` or `x_hu` directly in a page.
+4. **Every page takes its language from the address** (`Astro.params.lang`) and passes `lang`, `section` and `pagePath` to `Base`. `pagePath` is the address without the language (`/festival/program/`); the language switch, the menu marker and `hreflang` depend on it.
+5. **Never write an address by hand.** Use `href(lang, '/festival/...')` for pages and `withBase()` for anything else; `safeUrl()`, `getImage()` and `renderRich()` already apply the base path (and the language, for site links written without one).
+6. **Links go through `safeUrl` or `blockLink`; photos through `getImage` or `Picture`.**
+7. **Outside requests: only Sanity's photos and, when a Video block is used, YouTube without cookies or Vimeo** (`DECISIONS.md` S4, S5). Fonts come from the `@fontsource-variable` packages.
+8. **The JSON conversion and the Studio schema stay in step.** `npm run check` [0] fails when a converted document has a field the schema does not.
 
 ## Astro 7 specifics (this repo uses Astro 7.4)
 
-- `defineCollection` comes from `astro/content/config`, the `glob` loader from `astro/loaders`, `z` from `astro/zod`. The collections file is `src/content.config.ts`.
-- Entry ids are generated from file names (`generateId` in `content.config.ts`).
+- No content collections: `src/lib/source.ts` loads all documents once with a top-level `await`, and `content.ts` reads from that. `z` comes from `astro/zod`.
+- `from-json.ts`, `schema.ts` and `i18n.ts` also run in plain Node (Node strips the types). Import between them with the `.ts` ending, and use no Astro-only modules there.
 - `getStaticPaths` is hoisted; it cannot use variables declared outside it. Imports are fine.
 - Astro 7 needs Node 22.23.4 or newer.
 - `create-astro` templates could not be downloaded in the sandbox this was built in; the project was set up by hand.
@@ -98,7 +92,8 @@ Nothing runs on a server. Browser JavaScript is two small inline scripts: the me
 - The phone menu depends on the `js` and `menu-open` classes the inline script puts on `<html>`. Without the script the menu is visible by default; keep it that way.
 - The header is sticky and the open phone menu is positioned below it using `--header-h` in `global.css`. If the header height changes, change that variable.
 - The one-row desktop header starts at 1180 px because the menu does not fit below that. Adding a menu entry or a longer word means re-testing 1180 px in both languages and raising the breakpoint if it overflows.
-- A text page's file name is its address in both languages. Renaming the file changes the address and breaks links to it.
+- A page's address (`slug`) is its address in both languages. Changing it breaks saved links; the Studio says so.
+- Sanity document ids must not contain dots: dotted ids are hidden from public reads.
 - In `.pages.yml`, `{primary}` in a file name pattern is the primary field's value; how it treats accented letters is unverified.
 - Pages CMS's stored value formats were assumed from its docs, not observed. See the assumptions table in `DECISIONS.md`.
 
@@ -106,27 +101,25 @@ Nothing runs on a server. Browser JavaScript is two small inline scripts: the me
 
 ### Add a field to something that exists
 
-1. `src/content.config.ts` (people, pages) or the schema in `src/lib/content.ts` (settings files): add the field with a helper from `lib/schema.ts`. For a two-language field add both `x_en` and `x_hu`.
-2. `.pages.yml`: add the form field or fields in the same place.
-3. The page or component that shows it: read it with `tr()` if it has two languages, `safeUrl` if it is a link.
-4. Add a value to a content file, a line in `SPEC.md` section 5, and run `npm run check`.
+1. `studio/schemaTypes/`: add the field (a `localizedFields` pair if it has two languages). Give it a title and, if useful, a description the admin understands.
+2. The component that shows it: read it with `tr()` if it has two languages, `safeUrl` if it is a link, `getImage`/`Picture` if it is a photo.
+3. If the JSON files have a matching value, map it in `src/lib/from-json.ts`.
+4. `SPEC.md` section 11, the admin guide if she will use it, `npm run check`, `npm run studio:build`.
 
-### Add a new kind of content (for example classes on the community level)
+### Add a new block
 
-1. Create the folder under `src/content/` with a sample file.
-2. `content.config.ts`: a new `defineCollection` with `generateId: idFromFile`; add it to `collections`.
-3. `lib/content.ts`: a `getX()` helper that sorts and warns about anything it skips.
-4. A page under `src/pages/[lang]/...` with `getStaticPaths` returning every language.
-5. `.pages.yml`: a new `content` entry.
-6. `scripts/check.mjs`: add an assertion. `SPEC.md` and, if it is a real decision, `DECISIONS.md`.
+1. `studio/schemaTypes/blocks.ts`: define it with `groups: blockGroups`, `...blockStyleFields()` and a `preview`; add it to `blockTypes` and `BLOCK_TYPES`.
+2. `src/components/Blocks.astro`: add it to `KNOWN` and a `case` that renders it; styles at the end of `global.css`.
+3. `scripts/lib/sanity-fixture.mjs`: use it on the "everything" page; add an assertion in `scripts/check.mjs` [6].
+4. `SPEC.md` P9 and the block table in `docs/EDITING-GUIDE.md`.
 
-### Add a page (route)
+### Add a new kind of document (for example classes on the community level)
 
-Add a file under `src/pages/[lang]/`, export `getStaticPaths` that returns `LANGS`, wrap it in `Base` with the right `section` and `pagePath`. Add it to the menu in `Base.astro`, its menu word to both languages in `i18n.ts`, and, if it sits under `/festival/`, its name to `RESERVED_SLUGS` in `lib/content.ts`.
+Schema in `documents.ts` and the Studio menu in `sanity.config.ts`; add the type to `DOCUMENT_TYPES` in `src/lib/source.ts`; a helper in `content.ts` that sorts and warns about anything it skips; a block or a page that shows it; test content and assertions; `SPEC.md`, and `DECISIONS.md` if it is a real decision.
 
-### Add a text page without code
+### Add a page
 
-Use the editor (Festival > Text pages), or add a JSON file in `src/content/pages/`.
+No code: the admin creates it in the Studio. A page with a fixed layout that is not made of blocks: add a file under `src/pages/[lang]/` with `getStaticPaths` returning `LANGS`, wrap it in `Base`, and reserve its address in `RESERVED` (`content.ts`) and `RESERVED_SLUGS` (`documents.ts`).
 
 ### Change fixed wording or add a language
 
@@ -138,10 +131,9 @@ A third language: add it to `LANGS`, `LANG_LABEL`, `LANG_NAME` and `UI`; add `_x
 Colours and fonts: the variables at the top of `src/styles/global.css`. Layout: that file and the markup in `src/components` and `src/pages`. Keep calling the same helpers and keep rules 3 to 6. Then run `npm run check` and the browser checks in `HANDOFF.md`.
 To change a font: install the `@fontsource-variable/<name>` package with an exact version, import it in `Base.astro`, and set the variable in `global.css`.
 
-### Swap the editing tool or the host
+### Switch the site to Sanity, or change the host
 
-Editor: the content files do not change. Replace `.pages.yml` with the new tool's configuration and re-check the stored value formats.
-Host: any static host. Build command `npm run build`, output folder `dist`, Node 22.23.4 or newer, `SITE_URL` set to the real address (`SITE_BASE` only under a sub-path).
+After the import (`SANITY-PORT-STATUS.md`), set `CONTENT_SOURCE=sanity` in the host's build settings. Build command `npm run build`, output `dist`, Node 22.23.4 or newer, `SITE_URL` set to the real address (`SITE_BASE` only under a sub-path). `SANITY_READ_TOKEN` only if the dataset is private, as a secret.
 
 ### Upgrade Astro, Node or another dependency
 
@@ -149,4 +141,4 @@ Change the exact versions in `package.json` and `.node-version` (and `node-versi
 
 ### Change the Sanity content model
 
-Edit the schemas in `studio/schemaTypes/`. Keep translated fields paired and add new page blocks to both the schema type list and `pageBlockMembers`. Validate with `cd studio && npx sanity schemas validate`, then run `npm run studio:build`. Studio commands are `npm run studio`, `npm run studio:build`, and `npm run studio:deploy`; deployment requires Sanity account access. Schema changes do not migrate content or implement translation fallback. Before a migration, map every legacy JSON field and document the mapping. Do not change Astro pages or the read path as part of a schema-only change.
+Edit `studio/schemaTypes/`, then `cd studio && npx sanity schema validate`, `npm run studio:build` and `npm run check` (its section 0 compares the converted documents with the schema). A field renamed or removed in the schema keeps its old value in Sanity documents until they are edited or migrated; keep the site tolerant of both, or write a migration. Deploy the Studio with `npm run studio:deploy` (needs Sanity sign-in).

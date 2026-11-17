@@ -1,0 +1,15 @@
+---
+// Community pages made in the editor: /<language>/<address>/ ("festival" is taken).
+import PageView from '../../components/PageView.astro';
+import { getPages } from '../../lib/content';
+import { LANGS, type Lang } from '../../lib/i18n';
+
+export function getStaticPaths() {
+  return LANGS.flatMap((lang) => getPages('community').map((page) => ({ params: { lang, slug: page.slug }, props: { page } })));
+}
+
+const lang = Astro.params.lang as Lang;
+const { page } = Astro.props;
+---
+
+<PageView page={page} lang={lang} />

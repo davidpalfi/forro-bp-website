@@ -4,9 +4,9 @@
 import { getImage } from '../lib/content';
 
 interface Props {
-  image?: string;
-  imagePhone?: string;
-  logo?: string;
+  image?: unknown;
+  imagePhone?: unknown;
+  logo?: unknown;
   title: string;
   dateLine?: string;
   buttonUrl?: string;
@@ -15,8 +15,9 @@ interface Props {
 }
 
 const { image, imagePhone, logo, title, dateLine, buttonUrl, buttonLabel, buttonNewTab = false } = Astro.props;
-const wide = getImage(image) ?? getImage(imagePhone);
-const phone = image ? getImage(imagePhone) : undefined;
+const main = getImage(image);
+const wide = main ?? getImage(imagePhone);
+const phone = main ? getImage(imagePhone) : undefined;
 const logoImg = getImage(logo);
 ---
 
@@ -25,7 +26,18 @@ const logoImg = getImage(logo);
     wide && (
       <picture>
         {phone && <source media="(max-width: 719px)" srcset={phone.srcset ?? phone.src} sizes="100vw" />}
-        <img class="hero-photo" src={wide.src} srcset={wide.srcset} sizes="100vw" width={wide.width} height={wide.height} alt="" loading="eager" fetchpriority="high" />
+        <img
+          class="hero-photo"
+          src={wide.src}
+          srcset={wide.srcset}
+          sizes="100vw"
+          width={wide.width}
+          height={wide.height}
+          alt=""
+          style={wide.position ? `object-position: ${wide.position}` : undefined}
+          loading="eager"
+          fetchpriority="high"
+        />
       </picture>
     )
   }

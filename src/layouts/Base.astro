@@ -5,7 +5,7 @@ import '@fontsource-variable/fraunces/index.css';
 import '@fontsource-variable/libre-franklin/index.css';
 import '@fontsource-variable/open-sans/index.css';
 import '../styles/global.css';
-import { getSite, getFestival, getCommunity, getPages, getImage, safeUrl, href } from '../lib/content';
+import { getSite, getFestival, getCommunity, getPages, getImage, safeUrl, href, trFirst } from '../lib/content';
 import { LANGS, LANG_LABEL, LANG_NAME, UI, tr, type Lang } from '../lib/i18n';
 
 interface Props {
@@ -15,8 +15,8 @@ interface Props {
   pagePath: string;
   title?: string;
   description?: string;
-  /** Photo for link previews on social media (a path like /uploads/x.jpg). */
-  shareImage?: string;
+  /** Photo for link previews on social media (a Sanity image or a path like /uploads/x.jpg). */
+  shareImage?: unknown;
   /** Background of the page body: red (default), dark or cream. */
   tone?: 'red' | 'dark' | 'cream';
 }
@@ -35,17 +35,13 @@ const canonical = new URL(href(lang, pagePath), Astro.site).href;
 const share = getImage(shareImage || (inFestival ? festival.heroImage : community.heroImage) || festival.heroImage);
 const shareUrl = share ? new URL(share.src, Astro.site).href : '';
 
-const menuPages = inFestival ? (await getPages()).filter((p) => p.showInMenu) : [];
+// The menu: the section's pages marked "Show in the menu", in their menu order.
+const menuPages = getPages(section)
+  .filter((p) => p.showInMenu)
+  .map((p) => ({ path: p.path, label: trFirst(p, ['menuLabel', 'title'], lang) }));
 const nav = inFestival
-  ? [
-      { path: '/festival/', label: t.home },
-      { path: '/festival/program/', label: t.program },
-      { path: '/festival/teachers/', label: t.teachers },
-      { path: '/festival/artists/', label: t.artists },
-      ...menuPages.map((p) => ({ path: `/festival/${p.slug}/`, label: tr(p, 'menuLabel', lang) || tr(p, 'title', lang) })),
-      { path: '/', label: site.name },
-    ]
-  : [{ path: '/festival/', label: festival.name }];
+  ? [{ path: '/festival/', label: t.home }, ...menuPages, { path: '/', label: site.name }]
+  : [{ path: '/festival/', label: festival.name }, ...menuPages];
 
 const brandPath = inFestival ? '/festival/' : '/';
 const logo = inFestival ? getImage(festival.logo) : undefined;

@@ -1,27 +1,137 @@
-# Editing the Site in Sanity
+# How to edit the Forró Budapest website
 
-**Draft, not ready to send to the admin.** The Studio configuration and schemas are implemented, but the Studio has not been deployed or tested with the admin, content has not been imported, and preview/publishing are not implemented. Update this guide after the real account workflow is tested. The old root-level `EDITING-GUIDE.md` describes Pages CMS and does not apply to the Sanity version.
+A guide for the person who updates the site. You need no technical knowledge, and nothing you do here can break the website.
 
-## Before editing
+> **For the maintainer, before sending this guide:** it describes the editor as configured in `studio/` on 2026-11-17. Before sending it, deploy the editor, import the content, test every step below yourself, and replace anything that differs. Automatic publishing (step "Publish") and the click-to-edit preview are not built yet; until they are, tell her that changes appear on the site after you rebuild it. See `docs/SANITY-PORT-STATUS.md`.
 
-You will receive an invitation and the address for the Sanity editor from the site maintainer. You do not need to edit code or use GitHub. If you cannot sign in, stop and contact the maintainer rather than creating another account or repeatedly retrying.
+---
 
-## Planned editing flow
+## 1. Signing in
 
-The eventual workflow is expected to be:
+1. You will get an email invitation from Sanity. Open it and accept it.
+2. Go to **https://forro-budapest.sanity.studio** and sign in with the same Google account or email address the invitation was sent to.
+3. Bookmark the page. On a phone you can add it to your home screen.
 
-1. Open the Sanity editor and choose the page or item you want to change.
-2. Edit the fields for the content. The proposed setup keeps English and Hungarian together; fill both when the page asks for both languages. If one is left empty, the site may show the other language as a fallback.
-3. Upload or select images in the image fields. The proposed Sanity image setup may offer cropping; check the preview at phone and desktop sizes.
-4. Open the visual preview, check the page, language, links, and images, then publish when ready.
-5. Wait for the site rebuild and check the published page in both languages.
+Larger changes (new pages, photos) are easier on a computer. Small text changes work fine on a phone.
 
-The schema currently provides paired English/Hungarian fields, page blocks (heading, text, image, gallery, button, banner, columns, video, divider, people grid), reusable people, and hotspot image fields. The exact labels, sign-in, draft/publish behavior, preview controls, image rules, and click-to-edit experience have not been tested. The steps above are not an operational guide until the maintainer verifies them against the deployed Studio and working site.
+## 2. Finding your way around
 
-## If something looks wrong
+On the left is the **Content** menu:
 
-Do not keep publishing repeated corrections if the result is unclear. Contact the maintainer with the page name, language, what you changed, and what you expected to see. The current proof of concept remains the fallback until the Sanity editor and site have been accepted.
+| In the menu | What it is |
+|---|---|
+| **Festival home page** | The big banner (photo, logo, dates, ticket button) and everything below it on the festival's front page |
+| **Festival pages** | Program, Teachers, Artists, Location, Code of Conduct, and any page you add |
+| **Teachers** / **Artists** | One entry per person |
+| **Community home page** | The front page of the community site |
+| **Community pages** | Pages of the community site (none yet) |
+| **Everyone (teachers and artists)** | All people in one list |
+| **Site settings** | Community name, contact email, social links, "Hide the site from Google" |
 
-## Maintainer: finalize this guide
+Click an item to open it. Fields you can type in appear on the right.
 
-After the editor trial, replace the draft workflow with screenshots or exact menu names from the tested interface. Cover adding/editing a person, editing a page, uploading/cropping images, program image ordering, previewing, publishing, and where to report a failed rebuild. Confirm the guide on the admin's phone before sending it.
+## 3. Two languages, side by side
+
+Most texts have two boxes next to each other: **English** and **Magyar**.
+
+- Fill in both when you can.
+- If you leave one empty, the site shows the other language there, so a page is never blank. You can translate later.
+- Names, photos and links are entered once and used in both languages.
+
+## 4. Saving and publishing
+
+- **Everything you type is saved automatically** as a draft. Visitors do not see drafts.
+- When you are happy, click **Publish** (green button, bottom right). The website updates a few minutes later.
+- To throw away changes you have not published yet, open the menu next to **Publish** and choose **Discard changes**.
+- Made a mistake you already published? Click the clock icon (**History**) at the top of the document, pick an earlier version and restore it, then publish.
+
+## 5. Common tasks
+
+### Change the festival dates, ticket link or banner photo
+1. Open **Festival home page**.
+2. On the **Banner and tickets** tab, change **Dates** (both languages), **Ticket shop address** or **Banner photo**.
+3. **Publish**.
+
+The dates also appear in the header on wide screens.
+
+### Change the festival introduction or the numbers line
+1. Open **Festival home page** and go to the **Page content** tab.
+2. Click a block (for example the introduction text) to open it, edit, and close it.
+3. **Publish**.
+
+### Add a teacher or an artist
+1. Open **Teachers** (or **Artists**) and click the **+** (Create) button at the top of the list.
+2. Fill in **Name**, choose the **Group**, add a **Photo**, the **Role** (teachers only, e.g. "Dance Teacher" / "Tánctanár"), the **Biography** in both languages and the **Instagram address** (copy it from the browser, starting with https://).
+3. **Display order**: smaller numbers come first. Give the new person a number between the people they should sit between (e.g. 2.5 between 2 and 3).
+4. **Publish**. The person appears on the Teachers or Artists page by themselves.
+
+In the biography, an empty line starts a new paragraph.
+
+### Remove a person
+Open the person, click the **⋯** menu next to **Publish** and choose **Unpublish** (hides them; you can publish again later) or **Delete** (removes them for good).
+
+### Photos: upload and choose what stays visible
+1. Click **Upload** in a photo field, or drag a photo onto it. Photos straight from a phone are fine; the site makes smaller copies itself.
+2. Some places show photos cut to a shape (people cards are square on computers, wider on phones). To choose what stays visible, click the **crop** (or pencil) button on the photo:
+   - drag the **circle** onto the important part, such as a face. That part always stays in view;
+   - drag the **corners** of the frame to cut away edges you never want to show.
+3. Optional: under **Description for blind visitors**, write one short sentence about what the photo shows.
+
+### Replace the program images
+1. Open **Festival pages** → **Program**.
+2. Each program graphic is an **Image** block. Click one and upload a new photo over it, or add a new **Image** block with **Add item** at the bottom.
+3. Drag the blocks by their handle (⋮⋮) to change the order.
+4. **Publish**.
+
+### Edit a text page (Location, Code of Conduct)
+1. Open **Festival pages** and choose the page.
+2. Click the **Text** block. The toolbar gives you **bold**, *italic*, headings, lists and links.
+3. To add a link: select words, click the link button, and type the address: `https://…` for another website, or for a page of this site just the part after the language, such as `/festival/program/`.
+4. **Publish**.
+
+## 6. Building pages with blocks
+
+Every page is a list of **blocks**, one under the other. You can add, remove and reorder them.
+
+- **Add a block:** click **Add item** under the list and choose a kind.
+- **Reorder:** drag a block by its handle (⋮⋮).
+- **Remove:** open the block's **⋯** menu and choose **Remove**.
+
+| Block | What it shows |
+|---|---|
+| **Text** | Paragraphs with headings, lists and links. **Style** tab → *Text style*: Normal, **Large** (big serif text, like the festival introduction) or **Statement** (one bold line, like "14 Workshops \| 4 Bands …") |
+| **Heading** | A heading on its own, in three sizes |
+| **Image** | One photo, wide, at text width, or across the whole screen, with an optional caption |
+| **Gallery** | Several photos in a grid (three across, two on phones) |
+| **Button** | A button to one of your pages (choose it from the list) or to an address |
+| **People** | Teacher or artist cards. Leave the list empty to show everyone in the group automatically, or pick people to show only them |
+| **Banner** | A photo with a title, short text and a button on top |
+| **Columns** | 2 to 4 columns side by side (one under the other on phones), each with an optional photo, heading and text |
+| **Video** | A YouTube or Vimeo video: paste the address from the browser |
+| **Divider** | A thin line, or empty space |
+
+Every block also has a **Style** tab:
+
+- **Background**: *Same as page*, Red, Cream or Dark.
+- **Alignment**: Left, Center or Right.
+
+Blocks next to each other with the same background and alignment are joined into one band. For example, the numbers line and the Code of Conduct button on the festival home page are both "Center", so they sit together.
+
+## 7. Making a new page
+
+1. Open **Festival pages** (or **Community pages**) and click **+**.
+2. **Page name** in both languages. It appears in the menu and the browser tab.
+3. Optional: a **Big heading** shown at the top of the page, and a **Photo above the page**.
+4. Add blocks under **Page content**.
+5. On the **Settings** tab:
+   - **Address**: click **Generate** to make it from the English name, e.g. `workshops` gives `/en/festival/workshops/`. Lowercase letters, numbers and hyphens only. Do not change it later: links people saved would stop working.
+   - **Page colour**: Red (like Program), Cream (like Location) or Dark.
+   - **Show in the menu** and **Menu order** (smaller numbers first; Program is 1, Teachers 2, Artists 3, Location 11).
+   - Optional: a shorter **Menu label**, and a **Short description** for Google and link previews.
+6. **Publish**.
+
+## 8. If something goes wrong
+
+- Nothing you do in the editor can take the website down. If something cannot be shown (a link that is not a real address, a missing photo), the site leaves just that part out and tells the maintainer.
+- If a change does not appear on the site within about ten minutes, or something looks wrong, tell the maintainer which page, which language, and what you changed. A screenshot helps.
+- Please do not put private phone numbers or private emails on the site. Everything you publish is public.

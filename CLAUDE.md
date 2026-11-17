@@ -10,7 +10,7 @@ For content edits you can skip this. For anything structural (new fields, new pa
 
 - Content is JSON in `src/content/`: `settings/` (`site.json`, `community.json`, `festival.json`), `people/`, `pages/`.
 - Photos are in `public/uploads/`. Never edit or delete `public/_img/`; it is generated at build time.
-- The editing forms are in `.pages.yml`. The content shape is in `src/content.config.ts` (people, pages) and `src/lib/content.ts` (settings). They must stay in step.
+- The editing forms are in `.pages.yml` (Pages CMS, `main`) and `studio/` (Sanity). On the Sanity branches the site renders Sanity documents; `src/lib/from-json.ts` converts the JSON files into them, and `npm run check` fails if they stop matching the Studio schema. See `docs/SANITY-PORT-STATUS.md`.
 - Fixed wording in both languages is in `src/lib/i18n.ts`.
 - Page code is in `src/pages/[lang]/`, `src/components/`, `src/layouts/`; styles are in `src/styles/global.css`.
 

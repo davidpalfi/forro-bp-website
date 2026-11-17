@@ -102,9 +102,19 @@ const jsonFiles = (rel) =>
     .map((f) => ({ id: f.replace(/\.json$/, ''), ...JSON.parse(fs.readFileSync(path.join(ROOT, rel, f), 'utf8')) }));
 
 /* ------------------------------------------------------------------ */
+console.log('\n[0] The content fits the Sanity Studio schema');
+{
+  const r = spawnSync(process.execPath, ['--import', './scripts/lib/ts-resolve.mjs', 'scripts/check-schema.mjs'], { cwd: ROOT, encoding: 'utf8', timeout: 120000 });
+  const out = `${r.stdout ?? ''}${r.stderr ?? ''}`.trim();
+  check(r.status === 0, `every field written by the JSON conversion and the test content exists in studio/schemaTypes${r.status === 0 ? '' : ':\n      ' + out.split('\n').join('\n      ')}`);
+}
+
+/* ------------------------------------------------------------------ */
+let realDir = '';
 console.log('\n[1] Real content');
 {
   const dir = copyProject('real');
+  realDir = dir;
   const { code, output } = build(dir);
   check(code === 0, 'build passes');
   check(fs.existsSync(dist(dir, 'index.html')) && fs.existsSync(dist(dir, '404.html')), 'root page and 404 page exist');
@@ -127,7 +137,7 @@ console.log('\n[1] Real content');
     check(/<html lang="en"/.test(en) && /<html lang="hu"/.test(hu), 'each language version declares its language');
     check(en.includes('hreflang="hu"') && hu.includes('hreflang="en"'), 'language versions point at each other (hreflang)');
     check(en.includes('/hu/festival/') && hu.includes('/en/festival/'), 'the language switch links to the same page in the other language');
-    check(!/javascript:/i.test(allHtml(dir)), 'no javascript: links in the output');
+    check(!/(?:href|src|action)\s*=\s*["']?\s*javascript:/i.test(allHtml(dir)), 'no javascript: links in the output');
     const broken = brokenReferences(dir);
     check(broken.length === 0, `no broken local links, images or srcset URLs${broken.length ? ': ' + broken.join(', ') : ''}`);
     const site = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/content/settings/site.json'), 'utf8'));
@@ -173,7 +183,7 @@ console.log('\n[2] Deliberately broken content (the site must still build)');
   check(output.includes('no-name') && output.includes('no group'), 'warning: person without a group is reported');
   if (code === 0) {
     const everything = allHtml(dir);
-    check(!/javascript:/i.test(everything), 'no javascript: links in the output');
+    check(!/(?:href|src|action)\s*=\s*["']?\s*javascript:/i.test(everything), 'no javascript: links in the output (as text it is harmless)');
     const broken = brokenReferences(dir);
     check(broken.length === 0, `no broken local links, images or srcset URLs${broken.length ? ': ' + broken.join(', ') : ''}`);
     check(read(dir, 'en/festival/program/index.html').includes('title-band') && !read(dir, 'en/festival/program/index.html').includes('Should be skipped'), '/festival/program/ is still the real program page, not the clashing text page');
@@ -217,6 +227,78 @@ console.log('\n[4] Served under a sub-path (GitHub Pages project site: name.gith
     check(read(dir, 'en/index.html').includes('<link rel="canonical" href="https://someone.github.io/repo-name/en/"'), 'canonical address includes site and base');
     check(read(dir, 'index.html').includes('/repo-name/en/'), 'the root redirect carries the base path');
     check(/property="og:image" content="https:\/\/someone\.github\.io\/repo-name\//.test(read(dir, 'en/festival/index.html')), 'the sharing image is a full address including the base path');
+  }
+}
+
+/* ------------------------------------------------------------------ */
+console.log('\n[5] Built from the Sanity import file (what npm run sanity:import sends)');
+{
+  const dir = copyProject('importfile');
+  const made = spawnSync(process.execPath, ['scripts/make-sanity-import.mjs'], { cwd: dir, encoding: 'utf8' });
+  check(made.status === 0 && fs.existsSync(path.join(dir, 'sanity-import/data.ndjson')), 'the import file is written');
+  const lines = fs.readFileSync(path.join(dir, 'sanity-import/data.ndjson'), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+  const ids = lines.map((d) => d._id);
+  check(new Set(ids).size === ids.length && ids.every((id) => /^[A-Za-z0-9_-]+$/.test(id)), 'every document has its own fixed id, without dots (dotted ids are hidden from public reads)');
+  const people = jsonFiles('src/content/people').length;
+  check(lines.filter((d) => d._type === 'person').length === people, `all ${people} people are in the import file`);
+  check(!JSON.stringify(lines).includes('_upload'), 'every photo is either an upload instruction or left out');
+  const made2 = spawnSync(process.execPath, ['scripts/make-sanity-import.mjs'], { cwd: dir, encoding: 'utf8' });
+  const again = fs.readFileSync(path.join(dir, 'sanity-import/data.ndjson'), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+  check(made2.status === 0 && JSON.stringify(again) === JSON.stringify(lines), 'making the import file twice gives exactly the same file (safe to repeat)');
+  const { code } = build(dir, { CONTENT_SOURCE: 'file:sanity-import/data.ndjson' });
+  check(code === 0, 'build passes with CONTENT_SOURCE=file:sanity-import/data.ndjson');
+  if (code === 0 && realDir) {
+    const rel = (d) => htmlFiles(d).map((f) => path.relative(path.join(d, 'dist'), f)).sort();
+    const a = rel(realDir);
+    const b = rel(dir);
+    const differ = a.filter((f) => !b.includes(f) || fs.readFileSync(path.join(realDir, 'dist', f), 'utf8') !== fs.readFileSync(path.join(dir, 'dist', f), 'utf8'));
+    check(a.length === b.length && differ.length === 0, `the site built from the import file is identical to the site built from the JSON files${differ.length ? ': differs in ' + differ.join(', ') : ''}`);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor mistakes');
+{
+  const dir = copyProject('sanity');
+  const { makeFixture } = await import('./lib/sanity-fixture.mjs');
+  const docs = makeFixture(path.join(dir, 'src/content'));
+  fs.writeFileSync(path.join(dir, 'fixture.ndjson'), docs.map((d) => JSON.stringify(d)).join('\n'));
+  const { code, output } = build(dir, { CONTENT_SOURCE: 'file:fixture.ndjson' });
+  check(code === 0, 'build passes');
+  for (const [text, what] of [
+    ['unknown kind (mysteryBlock)', 'a block of an unknown kind'],
+    ['not published (page-nope)', 'a button to a missing page'],
+    ['same address as another page (location)', 'two pages with the same address'],
+    ['reserved address (festival)', 'a community page called "festival"'],
+    ['"No address" has no usable address', 'a page without an address'],
+    ['not a YouTube or Vimeo address', 'a video from another site'],
+    ['person-musician" has no group', 'a person in an unknown group'],
+    ['"javascript:alert(1)" is not a usable address', 'an unsafe button link'],
+  ]) check(output.includes(text), `warning: ${what}`);
+  if (code === 0) {
+    const page = read(dir, 'en/festival/everything/index.html');
+    const pageHu = read(dir, 'hu/festival/everything/index.html');
+    const everything = allHtml(dir);
+    check(/src="https:\/\/cdn\.sanity\.io\/images\/8hc671sk\/production\/[0-9a-f]+-1600x1200\.jpg\?rect=320,120,1280,1080/.test(read(dir, 'en/festival/teachers/index.html')), 'photos come from Sanity\'s image service with the editor\'s crop');
+    check(read(dir, 'en/festival/teachers/index.html').includes('object-position: 50% 44%'), 'the editor\'s focus point decides which part of a cropped photo shows');
+    check(page.includes('alt="Dancers on the island"') && page.includes('alt="Full width photo"'), 'photo descriptions are used');
+    check(page.includes('href="/en/festival/program/"') && pageHu.includes('href="/hu/festival/program/"'), 'a site link written without a language gets the visitor\'s language');
+    check(page.includes('href="/en/festival/location/"') && page.includes('>Location<'), 'a button to a page uses its address and, without its own text, its menu name');
+    check(!page.includes('Evil button') && !/(?:href|src)="\s*javascript:/i.test(everything), 'a button with an unsafe link is left out');
+    check(page.includes('youtube-nocookie.com/embed/dQw4w9WgXcQ'), 'a YouTube video is embedded without tracking cookies');
+    check(['A small heading', 'Banner title', 'Banner button', 'Column three', 'A caption', 'b-divider', 'b-space', 'A statement line'].every((t) => page.includes(t)), 'every kind of block is shown');
+    check(page.indexOf('>Gisa<') > -1 && page.indexOf('>Gisa<') < page.indexOf('>Dóri Czakó<'), 'a People block with chosen people shows them in the chosen order');
+    check(/<main id="main" class="tone-dark"/.test(page), 'the page colour is used');
+    check(fs.existsSync(dist(dir, 'en/classes/index.html')) && read(dir, 'en/index.html').includes('href="/en/classes/"'), 'a community page gets its own address and appears in the community menu');
+    check(read(dir, 'en/festival/index.html').includes('href="/en/festival/everything/"'), 'a new festival page appears in the festival menu');
+    check(!everything.includes('DRAFT TITLE'), 'drafts never reach the public site');
+    check(read(dir, 'en/festival/broken/index.html').includes('<em>markdown</em>'), 'a text saved as a plain string is still shown');
+    check(read(dir, 'en/festival/location/index.html').includes('Kristály Színtér'), 'of two pages with the same address, the one first in the menu order is kept');
+    const hosts = new Set([...everything.matchAll(/(?:src|srcset)="(https?:\/\/[^/"]+)/g)].map((m) => m[1]));
+    const allowed = ['https://cdn.sanity.io', 'https://www.youtube-nocookie.com'];
+    check([...hosts].every((h) => allowed.includes(h)), `outside files come only from Sanity's image service and YouTube without cookies${[...hosts].filter((h) => !allowed.includes(h)).map((h) => ': ' + h).join('')}`);
+    const broken = brokenReferences(dir);
+    check(broken.length === 0, `no broken local links${broken.length ? ': ' + broken.join(', ') : ''}`);
   }
 }
 

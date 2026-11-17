@@ -2,6 +2,8 @@
 
 **New here (person or agent)?** Read `docs/HANDOFF.md` first.
 
+**Sanity version:** this branch renders the site from Sanity documents and has the Sanity Studio in `studio/`. The default build still uses the JSON files below; `CONTENT_SOURCE=sanity` builds from Sanity. Status and next steps: `docs/SANITY-PORT-STATUS.md`. Admin guide: `docs/EDITING-GUIDE.md`.
+
 One static website for the Forró Budapest community, with the Budapest Forró Festival as a section below it, in English and Hungarian. Astro builds plain HTML from content files in this repo. No database and no server. The admin changes content through forms (Pages CMS), which save the files back to this repo; GitHub then rebuilds and publishes the site.
 
 ```
