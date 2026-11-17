@@ -208,10 +208,10 @@ A = automated by `npm run check`. M = by hand (see `HANDOFF.md`).
 
 ## 11. Sanity port requirements (planned; not yet implemented)
 
-These requirements are based on [SANITY-PORT-BRIEF.md](../SANITY-PORT-BRIEF.md). The admin-facing choices below are proposals and need Dávid's confirmation before implementation. Do not mark any of these as passing until the code exists and the checks have been run.
+These requirements are based on [SANITY-PORT-BRIEF.md](../SANITY-PORT-BRIEF.md). Choices S1-S4 are confirmed in `DECISIONS.md`. Stage 1 defines the Studio and schemas only; the Astro pages and runtime remain unchanged.
 
 - **P1. Preserve the existing site behavior.** Keep the routes, two languages, translation fallback, responsive design, metadata, accessibility behavior, and content represented by the original PoC unless a change is explicitly approved.
-- **P2. Sanity content model.** Represent site settings, community settings, festival settings, people, text pages, and program images in Sanity. Keep English/Hungarian side by side with fallback unless the owner confirms a different model.
+- **P2. Sanity content model.** Represent site settings, community settings, festival settings, people, text pages, and program images in Sanity. Keep English/Hungarian side by side with fallback unless the owner confirms a different model. Stage 1 schemas now cover these document areas, reusable people, and the agreed page blocks; runtime rendering and fallback are not implemented.
 - **P3. Migrate existing content.** Provide a script to import the current `src/content` JSON into the configured Sanity project. Define and document how repeated runs avoid duplicate or destructive writes before running it against a production dataset.
 - **P4. Public rendering.** The public site remains statically generated from published Sanity content. Serve Sanity images through the image service if the proposed image choice is confirmed.
 - **P5. Visual editing.** Provide an SSR preview for Sanity click-to-edit, expected to run on Cloudflare. The public site remains static; preview-only behavior and credentials must not leak into public pages.
@@ -221,4 +221,4 @@ These requirements are based on [SANITY-PORT-BRIEF.md](../SANITY-PORT-BRIEF.md).
 
 ### Port acceptance state
 
-All P1-P8 are pending. The current branch checkpoint contains only dependency additions and the port brief. The original automated and browser checks listed above describe the old PoC; they are not validation of the Sanity integration.
+P2's schema-definition portion is implemented and validated in Stage 1. P1 and P3-P8 remain pending; public rendering has not changed. The original automated and browser checks listed above describe the old PoC; they are not validation of the Sanity integration.

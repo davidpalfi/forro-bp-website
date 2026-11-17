@@ -2,12 +2,13 @@
 
 If you are picking this project up with no other context, read this file first, then `USER-NEEDS.md` (who it is for and how little is verified), `DECISIONS.md` (why), `SPEC.md` (what the site does) and `ARCHITECTURE.md` (how the code is organised). `CLAUDE.md` has the rules for a Claude session working in the repo. The root-level [EDITING-GUIDE.md](../EDITING-GUIDE.md) is for the old Pages CMS PoC; [docs/EDITING-GUIDE.md](EDITING-GUIDE.md) is a draft for Sanity and is not ready to send to the admin.
 
-## Current handoff (2026-11-15)
+## Current handoff (2026-11-17)
 
 - The active work is on `feature/sanity`; keep `main`, the live GitHub Pages proof of concept, and `.pages.yml` unchanged.
-- Checkpoint `e4c49b5` (`WIP: prepare Sanity port`) adds pinned Sanity/Astro/Cloudflare/Portable Text dependencies and the planning brief. It contains no Sanity schemas, migration, page integration, preview, or publish webhook.
-- The working tree was clean after that checkpoint. No build or test was run for the dependency-only checkpoint.
-- Implementation is waiting for Dávid's go-ahead. The choices in [SANITY-PORT-BRIEF.md](../SANITY-PORT-BRIEF.md) are proposals unless confirmed; do not treat them as implemented or final.
+- The latest pulled checkpoint before Stage 1 was `bd3e72f` (`docs: record confirmed Sanity port decisions`). Stage 1 adds a standalone hosted Studio under `studio/`, configured for project `8hc671sk` and dataset `production`, with schemas for settings, reusable people, pages, all agreed blocks, Portable Text, and cropped images.
+- `npm run build`, `npm run check`, `npm run studio:build`, and `cd studio && npx sanity schemas validate` pass. The schema validator reports zero errors and warnings.
+- Astro pages still read the existing JSON. No migration, Sanity query, Astro integration, preview, webhook, or deployment workflow is implemented.
+- The choices in [SANITY-PORT-BRIEF.md](../SANITY-PORT-BRIEF.md) are confirmed in `DECISIONS.md`, S1-S4. Treat the schemas as implemented, but do not treat rendering or migration as implemented.
 - Read [SANITY-PORT-STATUS.md](SANITY-PORT-STATUS.md) for the current inventory, [GO-LIVE-CHECKLIST.md](GO-LIVE-CHECKLIST.md) for the owner and maintainer steps, and [EDITING-GUIDE.md](EDITING-GUIDE.md) for the not-yet-final admin guide.
 - The sections below document the original Pages CMS proof of concept, not the Sanity branch's current behavior. For port requirements and known conflicts, see the status, decision, spec, and architecture notes linked above.
 
@@ -87,6 +88,9 @@ npm ci             # once (exact versions from the lockfile)
 npm run dev        # preview at http://localhost:4321 (resizes photos first)
 npm run build      # builds dist/ ; read any [content-warning] lines
 npm run check      # the test suite, about 20-40 seconds
+npm run studio     # start Sanity Studio at http://localhost:3333
+npm run studio:build
+npm run studio:deploy  # deploy to Sanity hosting; requires account access
 ```
 
 Needs Node 22.23.4 or newer. Build for a sub-path locally: `SITE_URL=https://x.github.io SITE_BASE=/repo npm run build`.

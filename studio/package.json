@@ -1,0 +1,9 @@
+{
+  "name": "forro-budapest-studio",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "sanity": "6.23.0",
+    "styled-components": "6.6.0"
+  }
+}

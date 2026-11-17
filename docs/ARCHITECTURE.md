@@ -4,7 +4,7 @@ How the code is organised and how to change it safely. For what the site does, s
 
 ## Current state and planned port
 
-The file map and data flow below describe the original Pages CMS/GitHub Pages PoC. On `feature/sanity`, commit `e4c49b5` only prepares pinned dependencies and adds the port brief; the application still reads JSON and no Sanity/Cloudflare integration is implemented. Do not assume the planned data flow below is live.
+The original file map and data flow below describe the Pages CMS/GitHub Pages PoC. Stage 1 on `feature/sanity` adds a standalone hosted Sanity Studio and its schemas under `studio/`. The public Astro application still reads JSON; no Sanity queries, migration, Astro integration, preview, or rebuild workflow is implemented. Do not assume the planned data flow below is live.
 
 Target direction from the 2026-11-15 brief:
 
@@ -51,6 +51,9 @@ Nothing runs on a server. Browser JavaScript is two small inline scripts: the me
 | `src/content/pages/*.json` | One file per festival text page; the file name is the address |
 | `public/uploads/` | Uploaded photos (committed). `public/_img/` is generated and ignored by Git |
 | `.pages.yml` | The editing forms. Must mirror the content model |
+| `studio/sanity.config.ts`, `studio/sanity.cli.ts` | Hosted Sanity Studio configuration for project `8hc671sk`, dataset `production` |
+| `studio/schemaTypes/` | Sanity document, Portable Text, image, and page-block schemas for the confirmed S1-S4 model |
+| `studio/package.json` | Studio's exact-pinned Sanity CLI dependencies, shared with the root install |
 | `src/content.config.ts` | Declares the two collections and their forgiving shape |
 | `src/lib/schema.ts` | Forgiving field types: `text`, `flag`, `num`, `textList` |
 | `src/lib/i18n.ts` | `LANGS`, the fixed wording in each language (`UI`), and `tr(obj, 'field', lang)` |
@@ -143,3 +146,7 @@ Host: any static host. Build command `npm run build`, output folder `dist`, Node
 ### Upgrade Astro, Node or another dependency
 
 Change the exact versions in `package.json` and `.node-version` (and `node-version` in `deploy.yml`), run `npm install`, then `npm run check` and the browser checks.
+
+### Change the Sanity content model
+
+Edit the schemas in `studio/schemaTypes/`. Keep translated fields paired and add new page blocks to both the schema type list and `pageBlockMembers`. Validate with `cd studio && npx sanity schemas validate`, then run `npm run studio:build`. Studio commands are `npm run studio`, `npm run studio:build`, and `npm run studio:deploy`; deployment requires Sanity account access. Do not change the Astro pages or read path as part of a schema-only change.

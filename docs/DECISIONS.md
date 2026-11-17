@@ -4,13 +4,13 @@ Read this before changing the structure of the site. When you change or add a de
 
 Last full revision: 2026-11-11, after a design review and a look at every page of the current Wix site. What changed in that revision is listed under "History" at the end.
 
-## Current port status (2026-11-15)
+## Current port status (2026-11-17)
 
 This file's numbered decisions describe the original Pages CMS/GitHub Pages proof of concept. A Sanity port was proposed after Pages CMS was connected and found unintuitive. The direction is Sanity with an Astro visual-editing preview; implementation has not started beyond dependency preparation. Do not apply the old decisions below as instructions for the port without checking this status and the brief.
 
 | Area | Original PoC | Sanity port status |
 |---|---|---|
-| Content/editor | JSON in GitHub, Pages CMS forms | Sanity, Studio hosted by Sanity (S3 below); schemas and migration not implemented |
+| Content/editor | JSON in GitHub, Pages CMS forms | Sanity, Studio hosted by Sanity (S3 below); Stage 1 schemas implemented, migration not implemented |
 | Public site | Static Astro on GitHub Pages | Remain static; target hosting/provider is not finalized |
 | Visual editing | None | SSR preview on Cloudflare proposed; not implemented |
 | Languages | English and Hungarian side by side, with fallback | **Confirmed 2026-11-16:** kept (S1 below) |
@@ -22,7 +22,7 @@ The only hard account constraint confirmed in the port brief is no subscription.
 
 ## Sanity port decisions (confirmed by Dávid, 2026-11-16)
 
-These are settled. Do not ask about them again; build to them. Each can be changed later if it does not work for the admin.
+These are settled. Do not ask about them again; build to them. The initial Studio and schemas are implemented under `studio/`; Astro pages still use the existing JSON content. Each choice can be changed later if it does not work for the admin.
 
 ### S1. Languages: English and Hungarian side by side in each entry
 One entry per person or page, with the English and Hungarian fields next to each other. Things that are the same in both languages (name, photo, links) are entered once. If one language is empty, the page shows the other. Considered: a separate entry per language (photos and links entered twice; the two drift apart). Dávid: "we change later if it's not good".
@@ -183,6 +183,8 @@ See `HANDOFF.md`, "Status", for the current test record. In short: the build, th
 ## History
 
 **2026-11-16, Sanity port choices confirmed.** Dávid confirmed four choices: languages side by side, a full page builder (more freedom than the brief proposed), Studio hosted by Sanity, photos from Sanity's image service. See "Sanity port decisions" above.
+
+**2026-11-17, Stage 1 Studio and schemas.** Added a Sanity-hosted Studio for project `8hc671sk` / dataset `production`, with side-by-side English/Hungarian fields, singleton site/community/festival settings, reusable people, pages with the agreed block types, and Sanity image fields with hotspot cropping. The work uses standard Studio features and the pinned Sanity packages. It does not change Astro page rendering, migration, preview, or publishing workflows.
 
 **2026-11-15, Sanity port proposed.** Pages CMS was connected to the live proof of concept and found unintuitive for the admin. Sanity with click-to-edit was selected for exploration. This changes the direction of decisions 1, 3, 6, 9, 10, 13 and 17, but the detailed choices remain subject to owner confirmation. See the current port status above and `SANITY-PORT-STATUS.md`. No port implementation was present at this checkpoint.
 

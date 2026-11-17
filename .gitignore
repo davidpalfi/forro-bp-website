@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .astro/
+/studio/.sanity/
 # Web-sized copies generated at build time from public/uploads
 public/_img/
 .DS_Store

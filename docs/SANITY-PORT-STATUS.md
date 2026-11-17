@@ -1,17 +1,18 @@
 # Sanity Port Status
 
-Status as of 2026-11-16. This is the current progress record for the `feature/sanity` branch. Update it as work is completed; do not treat plans as implementation.
+Status as of 2026-11-17. This is the current progress record for the `feature/sanity` branch. Update it as work is completed; do not treat plans as implementation.
 
 ## Current checkpoint
 
 - Branch: `feature/sanity`, created for the port from `main`.
-- Latest commit: `e4c49b5` (`WIP: prepare Sanity port`). At that checkpoint, `git status` was clean and `git log --oneline main..HEAD` contained only this commit.
-- The checkpoint adds exact-pinned Sanity, Portable Text, Astro Cloudflare/React, and related dependencies to `package.json` and `package-lock.json`; it adds the planning brief at repository root as [SANITY-PORT-BRIEF.md](../SANITY-PORT-BRIEF.md).
-- A credential-pattern scan of the committed files found no secrets. No API token, project ID, dataset name, Cloudflare account setting, or production secret has been added to the repository.
-- No Sanity schemas, Studio, migration script, content query, Astro integration, SSR preview, image integration, webhook, or deployment configuration has been implemented.
-- No build or test was run for the dependency-only checkpoint. The original proof-of-concept checks described in `HANDOFF.md` were run on 2026-11-11 and do not validate this port.
-- Dávid confirmed the plan and the four choices on 2026-11-16 (see "Confirmed choices"). Implementation starts once he has created the Sanity project and supplied the project ID and dataset name.
-- The current worktree adds this status record, a go-live checklist, a provisional Sanity editing guide, and updates to the handoff, decisions, spec, architecture, and user-needs docs. These documentation changes are not part of `e4c49b5` and have not yet been committed; no application behavior changed.
+- Latest pulled commit before Stage 1 work: `bd3e72f` (`docs: record confirmed Sanity port decisions`).
+- The branch has exact-pinned Sanity, Portable Text, Astro Cloudflare/React, and related dependencies in `package.json` and `package-lock.json`; the planning brief is at repository root as [SANITY-PORT-BRIEF.md](../SANITY-PORT-BRIEF.md).
+- A credential-pattern scan found no secrets. The non-secret project ID and dataset name are configured in the Studio; no API token, Cloudflare account setting, or production secret has been added to the repository.
+- Stage 1 adds a Sanity-hosted Studio configuration in `studio/` for project `8hc671sk`, dataset `production`, and schemas for singleton settings, pages, reusable people, Portable Text, hotspot images, and all S2 page blocks. It uses standard Studio capabilities; no paid-plan feature is configured.
+- `npm run build` passed before Studio changes. `npm run studio:build` and Sanity schema validation pass after the changes.
+- No migration script, Sanity content query, Astro integration, SSR preview, page rendering change, webhook, or deployment workflow has been implemented. Site pages remain untouched.
+- Dávid confirmed the plan and the four choices on 2026-11-16 (see "Confirmed choices"). The Sanity project ID and dataset are now available and configured.
+- Stage 1 is implemented and validated on `feature/sanity`; it does not change site behavior. The schemas define the target content shape but do not migrate existing JSON data.
 
 ## Existing product baseline
 
@@ -29,7 +30,7 @@ Status as of 2026-11-16. This is the current progress record for the `feature/sa
 5. Rebuild the public site when content is published in Sanity.
 6. Update the decisions, architecture, handoff, specification, and Sanity editing documentation.
 
-None of these implementation items is complete yet. The documentation now records the planned acceptance criteria, not passing results.
+Stage 1 covers the schema portion of item 1. Items 2-5 remain pending. The docs record implementation status and planned acceptance criteria; only the checks named above have passed.
 
 ## Confirmed choices (Dávid, 2026-11-16)
 
