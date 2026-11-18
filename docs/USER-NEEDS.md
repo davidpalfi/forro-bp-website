@@ -26,7 +26,7 @@ Status labels: **Stated** (the owner said it), **Relayed** (the owner reported t
 | N6 | English and Hungarian | Stated; Observed on the Wix site | Two languages (5) |
 | N7 | The community level stays empty for now | Stated | Empty shell (4) |
 | N8 | A working copy on GitHub Pages to show her | Stated | GitHub Pages proof of concept (13) |
-| N9 | Detached forms are unintuitive for the admin; a page-context editing experience is preferred if it is usable | Stated by owner, 2026-11-15 | Explore Sanity visual editing, then validate with the admin rather than assuming it solves the problem |
+| N9 | Detached forms are unintuitive for the admin; a page-context editing experience is preferred if it is usable | Stated by owner, 2026-11-15; confirmed 2026-11-18 when the Sanity forms alone felt the same | Click-to-edit is built next (S8), then validated with the admin |
 | N10 | Old addresses keep working when the domain moves | Assumed | Redirect list in HANDOFF |
 | N11 | Someone technical learns of a failed build | Assumed | Open question: who gets failure emails |
 

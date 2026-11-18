@@ -9,15 +9,37 @@ Priority:
 
 Owner: **D** = Dávid (accounts, decisions), **M** = maintainer/agent (code), **A** = admin.
 
-## Where things stand (updated 2026-11-17, evening)
+## ▶ Next task for the next agent: click-to-edit, first on Dávid's computer
+
+**Why this is next (2026-11-18).** Dávid looked at the Sanity editor and found it still feels like the Pages CMS forms, which is true: the reason for moving to Sanity (USER-NEEDS N9, "detached forms are unintuitive") is only answered by **click-to-edit** (Sanity's Presentation tool: the real page beside the editor; click a text or photo on the page to edit it). Dávid agreed to build that **before** hosting, publish rebuild or anything else, as a cheap test of whether Sanity is worth it (`DECISIONS.md` S8). If it does not feel clearly better than forms, stop and reconsider the editor with Dávid.
+
+**Goal:** Dávid runs two commands on his computer, opens the Studio's Presentation view, sees the site, clicks a heading/text/photo, edits it, and the preview updates without publishing. Public builds stay static and never contain drafts.
+
+**Prerequisites (Dávid, check with him first):** the Studio is deployed or runs locally (`npm run studio`), and the content is imported (`npm run sanity:import`). On 2026-11-18 he had run `npm ci`; whether he ran login, deploy and import is unknown, so ask. He also needs a **Viewer token** (sanity.io/manage → project → API → Tokens) in a local `.env` file that is git-ignored; never ask for it in chat or commit it.
+
+**Where to start reading:** `docs/SANITY-PORT-STATUS.md`, `docs/ARCHITECTURE.md` ("Current state", file map, rules), `src/lib/source.ts`, `src/lib/content.ts`, `studio/sanity.config.ts`. Read the current official Sanity guide for visual editing with Astro before writing code; versions in `package.json` are pinned (`@sanity/astro`, `@sanity/visual-editing`, `@sanity/preview-url-secret`, `@astrojs/react` and `@astrojs/cloudflare` are already installed).
+
+**Design points to settle (record them as decisions):**
+1. **Preview mode in Astro.** Likely a separate mode (env, e.g. `PREVIEW=1`) where pages are server-rendered on request. This touches `astro.config.mjs`, which CLAUDE.md says to change only when asked: Dávid has asked for this task. Public `npm run build` must stay exactly as it is (check with `npm run check`).
+2. **Loading content per request.** Today `src/lib/content.ts` loads all documents **once** with a top-level `await` and keeps them in module-level constants (`byId`, `allPages`, `allPeople`). Preview needs fresh draft content on every request (perspective `drafts`, with a token, and "stega" encoding or Content Source Maps so clicks map to fields). Plan to turn the module constants into a function of the loaded documents (e.g. `loadContent(docs)` returning the same helpers) so static builds call it once and preview calls it per request.
+3. **Studio side.** Add `presentationTool` to `studio/sanity.config.ts` with the preview address (`http://localhost:4321` for now) and document locations/resolve so each page document opens its page.
+4. **Overlays in the page.** The visual-editing script runs only in preview mode. It is an exception to "no external scripts" for preview only; public pages must not include it (add a check).
+5. **Rich text and the Statement text** pass through Markdown (`renderRich`) and plain-text conversion; stega characters must survive or be handled, otherwise clicking text will not find its field. Test this early.
+
+**Done when:** works on Dávid's computer as described; `npm run check` passes and has a check that public output has no draft content and no visual-editing script; `SPEC.md` (new P-requirements), `DECISIONS.md`, `ARCHITECTURE.md`, `SANITY-PORT-STATUS.md`, this backlog and the admin guide's preview part are updated. Then ask Dávid whether click-to-edit is good enough to continue with Sanity.
+
+**Not this task:** Cloudflare hosting, webhooks, launch. A cloud Claude session cannot reach Sanity unless its environment allows `*.sanity.io` hosts; if needed, propose the exact hosts (`8hc671sk.api.sanity.io`, `8hc671sk.apicdn.sanity.io`, `cdn.sanity.io`) or build and test with the `file:` source and let Dávid try the real thing.
+
+## Where things stand (updated 2026-11-18)
 
 | Phase | State |
 |---|---|
 | Pages CMS proof of concept (`main`) | Done and live at davidpalfi.github.io/forro-bp-website |
 | Sanity decisions S1-S4 | Confirmed 2026-11-16 |
 | Sanity proof of concept: schemas, site reading Sanity documents, migration, admin guide | **Built and tested offline** (S5-S7). Not yet run against the real Sanity project |
-| Studio online, content imported | Waiting for Dávid: three commands (`SANITY-PORT-STATUS.md`, "Next steps") |
-| Preview, rebuild on publish, hosting | Not started |
+| Studio online, content imported | Dávid started 2026-11-18 (`npm ci` done); login, deploy and import not confirmed yet |
+| Click-to-edit | **Next task** (above). Dávid found the editor still "just forms"; click-to-edit is what should change that |
+| Hosting, rebuild on publish | Not started; after click-to-edit |
 | Real content, admin trial, launch | Not started |
 
 ## P0: finish the Sanity port
@@ -32,8 +54,8 @@ Owner: **D** = Dávid (accounts, decisions), **M** = maintainer/agent (code), **
 | 6 | Run `npm run sanity:import` into `production` | D | 20 documents and 6 photos in Sanity; `CONTENT_SOURCE=sanity npm run build` passes and looks the same | 1, 2 |
 | 7 | ✅ **Done 2026-11-17.** Sanity read layer (`CONTENT_SOURCE`); routes, fallback, safe links, metadata, ordering, warnings kept; parity proven by `npm run check` [5]. Still to do: switch the default to `sanity` after item 6 | M | | |
 | 8 | ✅ **Done 2026-11-17.** All ten blocks and Sanity photos with crop and focus point, tested by `npm run check` [6] and in a browser | M | | |
-| 9 | Decide hosting: Cloudflare for preview only, or for the public site as well | D | Decision recorded in `DECISIONS.md` | 1 |
-| 10 | Click-to-edit preview: SSR on Cloudflare, preview only, secrets server-side, drafts never in public builds | M | Preview shows drafts; public build shows none | 7, 9 |
+| 9 | Decide hosting: Cloudflare for preview only, or for the public site as well. After item 10 | D | Decision recorded in `DECISIONS.md` | 1, 10 |
+| 10 | **Next (see top).** Click-to-edit preview, first locally on Dávid's computer, later on the chosen host: SSR preview only, secrets server-side, drafts never in public builds | M | Dávid can click to edit on his computer; public build shows no drafts | 2, 6 |
 | 11 | Publish rebuild: choose provider and webhook; secrets only in provider settings | D + M | One publish triggers one rebuild; a failed build keeps the last good site; rollback tested | 7, 9 |
 | 12 | Document the real environment variables, secret names, commands and rollback in `README.md` / `ARCHITECTURE.md` | M | Docs match what was built | 10, 11 |
 
@@ -66,6 +88,7 @@ Owner: **D** = Dávid (accounts, decisions), **M** = maintainer/agent (code), **
 | 30 | Accessibility review and testing in browsers other than Chromium | M | Never done |
 | 31 | Sitemap | M | Not specified yet |
 | 32 | Decide whether to keep or retire the Pages CMS PoC and `.pages.yml` once Sanity is live | D | Keep it as the fallback until Sanity is stable |
+| 33 | Upgrade Astro and Sanity packages: `npm ci` reports 37 audit warnings (2026-11-18), all in build and editor tooling (file matching, YAML, dev server), none in the published static pages. Do not run `npm audit fix --force`; upgrade the pinned versions deliberately and run `npm run check` | M | Not urgent; do before launch |
 
 ## Open decisions to collect
 

@@ -62,6 +62,9 @@ Text that the old editor saved as Markdown is converted to Sanity rich text. An 
 ### S7. Migration by import file, run by Dávid
 `npm run sanity:import` imports with `--missing`: it only creates documents that are not in Sanity yet, so a repeat never overwrites the admin's work, and nothing is deleted. Ids are fixed and contain no dots (Sanity hides dotted ids from public reads). Why an import file and not a script with a write token: no token is needed anywhere but Dávid's own signed-in computer, and the file can be read before it is sent. `--replace` resets documents to the JSON content and is only for before the admin starts.
 
+### S8. Click-to-edit before hosting (Dávid, 2026-11-18)
+After seeing the Sanity editor, Dávid found it still "just forms", like Pages CMS. Gains so far (page builder, photo cropping, drafts and history, a tidier editor) do not answer the original complaint (USER-NEEDS N9). So click-to-edit is built next, first on his computer, before hosting or the publish rebuild: it is the cheapest test of whether Sanity solves the problem. If it does not feel clearly better, reconsider the editor before investing further. Click-to-edit is a computer workflow; on a phone she uses the forms.
+
 ### Still open for the port
 - Whether Cloudflare hosts only the click-to-edit preview or the public site too.
 - The rebuild mechanism when she publishes (webhook and provider).
@@ -198,6 +201,8 @@ See `HANDOFF.md`, "Status", for the current test record. In short: the build, th
 - Who receives build-failure emails.
 
 ## History
+
+**2026-11-18, click-to-edit first.** Dávid's review of the editor; S8. Backlog reordered.
 
 **2026-11-17, proof of concept on Sanity.** Schemas refined (S5); the site renders Sanity documents and the JSON files are converted to them (S6); import file and command (S7); `npm run check` gained a schema check and two sections for the import file and Sanity-shaped content; admin guide written (`docs/EDITING-GUIDE.md`). Not run against the real Sanity project: this session had no network access to Sanity.
 
