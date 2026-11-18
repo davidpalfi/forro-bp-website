@@ -31,10 +31,10 @@ Goal: the admin signs in, edits the real content herself (on the page on a compu
 - A test version of the public site (for example `forro-budapest.pages.dev`) that updates a few minutes after she clicks **Publish**.
 
 **1. Dávid: accounts and decisions (about 30 minutes)**
-- [ ] Check Sanity's free plan in sanity.io/manage: how many members and which roles are free. She needs a role that can edit and publish. Note the findings (date, numbers) in `docs/DECISIONS.md` or tell the agent.
-- [ ] Create a free Cloudflare account (recommended host for the preview and the test site). Connect it to the GitHub repository when the agent asks.
+- [x] Check Sanity's free plan in sanity.io/manage: how many members and which roles are free. She needs a role that can edit and publish. Done 2026-11-18: Free plan, both Administrators (`docs/DECISIONS.md` S10).
+- [x] Create a free Cloudflare account (done 2026-11-18, signed in with GitHub) (recommended host for the preview and the test site). Connect it to the GitHub repository when the agent asks.
 - [ ] Agree how the preview is protected. Recommended: Sanity's preview lock, so only people signed in to the Studio can see drafts, with nothing extra to log into.
-- [ ] Test the invite on yourself: invite a second e-mail address of yours, sign in on a phone, and check it is simple enough for her.
+- [ ] (Moved to step 3, just before sending) Test the invite on yourself: invite a second e-mail address of yours, sign in on a phone, and check it is simple enough for her.
 - [ ] Decide whether to do polish item A first (no page reload after each edit, about 1-2 hours; `docs/BACKLOG.md`). Recommended: it makes a better first impression.
 
 **2. Agent / maintainer: code (roughly a day, mostly the first item)**
