@@ -78,12 +78,12 @@ After seeing the Sanity editor, Dávid found it still "just forms", like Pages C
 
 ### S10. Sanity plan and the admin's role (Dávid, 2026-11-18)
 Stay on Sanity's **Free plan**. The admin gets the **Administrator** role; Dávid stays Administrator too, so either can recover access. Why: on Free the only roles are Administrator and Viewer (no Editor; Editor starts on Growth at about $15 per seat per month), and she is the owner of the site, so full rights are right for her. Mistakes are undone with Sanity's document history. Considered: Growth for an Editor-only role (a subscription, against the no-subscription constraint). Later: possibly move ownership/billing of the Sanity organization to her.
-Source: web search of sanity.io/pricing and the roles docs on 2026-11-18 (Free: 20 seats, Viewers do not use a seat, roles Administrator and Viewer; custom roles Enterprise only). The page itself could not be opened from the agent's session; Dávid to confirm the Free column on his phone. The organization was on a Growth trial on that date: check what it falls back to when the trial ends.
+Source: web search of sanity.io/pricing and the roles docs on 2026-11-18 (Free: 20 seats, Viewers do not use a seat, roles Administrator and Viewer; custom roles Enterprise only). Confirmed the same day from Dávid's screenshot of the organization's plan page: Free is "up to 20 user seats, 2 permission roles, 2 datasets (public only), live previews and visual editing tools", and the organization is on a Growth trial that downgrades to Free automatically (no charge; the end date is not shown). So build only on what Free offers: Administrator and Viewer roles, a public dataset (published content is readable by anyone, drafts are not; no private details in content), and check that the publish webhook works on Free.
 
 ### Still open for the port
 - Whether Cloudflare hosts only the click-to-edit preview or the public site too, and how the hosted preview is protected (S9).
 - The rebuild mechanism when she publishes (webhook and provider).
-- Sanity's dataset visibility, the trial's end and fallback, and the invited-editor sign-in (seats and roles: S10).
+- The invited-editor sign-in, and whether the publish webhook is available on Free (plan: S10).
 - The admin's own trial of the editor; click-to-edit is expected to be a desktop workflow.
 
 ## Context and priorities
