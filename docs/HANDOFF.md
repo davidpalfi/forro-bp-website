@@ -4,7 +4,7 @@ If you are picking this project up with no other context, read this file and `SA
 
 ## Current handoff (2026-11-18, evening)
 
-- **Next task: polish click-to-edit (items A-G), then host it for a live demo.** The full brief is at the top of [BACKLOG.md](BACKLOG.md).
+- **Next task: go live for the admin's review** (online preview with a lock, test site rebuilt on Publish, Studio redeployed, guide finished). Dávid's checklist is in the root [README.md](../README.md); the agent's brief is at the top of [BACKLOG.md](BACKLOG.md). It starts with Dávid's account steps (Sanity plan, Cloudflare account): ask him whether they are done. Click-to-edit polish A-G comes after her review (A possibly before).
 - **Click-to-edit is built and approved.** Dávid tried it on his computer on 2026-11-18 (`npm run preview:edit` plus the local Studio's "Edit on the page") and found it "pretty awesome"; Sanity stays (`DECISIONS.md` S8 outcome, S9; `SPEC.md` 11.7).
 - Confirmed against the real project on 2026-11-18: Dávid is signed in, the content is imported and the photos repaired, the Studio is deployed (without "Edit on the page"; do not redeploy before the preview is hosted), the dataset can be read without a token, and `CONTENT_SOURCE=sanity npm run build` passes. Dávid has also published one community page himself.
 - Dávid's `.env` holds his Viewer token for the preview. Never read it out, print it or ask for it.

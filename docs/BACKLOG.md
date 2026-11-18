@@ -9,9 +9,27 @@ Priority:
 
 Owner: **D** = Dávid (accounts, decisions), **M** = maintainer/agent (code), **A** = admin.
 
-## ▶ Next task for the next agent: polish click-to-edit, then put it online for a demo
+## ▶ Next task for the next agent: go live for the admin's review
 
-**Why (2026-11-18, evening).** Dávid tried click-to-edit on his computer (`npm run preview:edit` + local Studio, "Edit on the page") and found it works "pretty awesome"; he also created a community page in the Studio without help. Verdict on S8: **continue with Sanity**. He wants it as polished as Sanity allows, then to **see it live and demo it**. So: polish first (items A-G below), then host the preview (backlog items 9 and 10).
+**Why (2026-11-18, late evening).** Dávid tried click-to-edit and approved it (S8 outcome: Sanity stays). Next he wants **the current version online so he can send it to the admin for review** and collect her input, before further polish. The full checklist (who does what) is in the root [README.md](../README.md), "Next step: go live for the admin's review". In short:
+
+- **Dávid first** (he had no time on 2026-11-18; ask him whether these are done): Sanity free-plan check (members, roles), a free Cloudflare account, agree the preview protection (recommended: Sanity's preview lock), test the invite on himself, decide whether polish item A comes first (recommended).
+- **Agent:**
+  1. **Preview on Cloudflare** (the main work). Cloudflare Workers cannot read project files: in preview, `src/lib/content.ts` must not touch `node:fs` (the `public/_img` manifest, `localImage`) and the start-up load must not read the JSON files (`from-json.ts`). Everything in preview comes from Sanity. Use `@astrojs/cloudflare` (installed, 14.4.8) only in preview mode; the public build stays static and must stay byte-identical (`npm run check` [7]). Read the installed adapter's README and the current Cloudflare free-plan terms first.
+  2. **Preview lock**: `@sanity/preview-url-secret` (installed): Presentation's `previewMode.enable` route validates the secret and sets a cookie; without it the preview shows nothing unpublished. The Viewer token only in Cloudflare's secret settings. Record the result in `DECISIONS.md` S9 "Access".
+  3. **Test site**: static build with `CONTENT_SOURCE=sanity` on Cloudflare, `SITE_URL` set, noindex on; a Sanity webhook to a deploy hook so Publish rebuilds it (backlog item 11). A failed build keeps the previous site.
+  4. **Studio**: `SANITY_STUDIO_PREVIEW_URL` to the online preview, then `npm run studio:deploy` (not before). Consider "Edit on the page" as the first tool.
+  5. **Admin guide** (`docs/EDITING-GUIDE.md`) with the real addresses; remove the "not ready" notes and the local-only note on section 4a.
+  6. **Run through it** on desktop and phone; `npm run check` passes; update `SPEC.md` (P14, P15), `DECISIONS.md`, `ARCHITECTURE.md`, `SANITY-PORT-STATUS.md`, this backlog and the README checklist.
+- **Then Dávid** invites her (sanity.io/manage > Members) and sends the guide and the two addresses.
+
+**Not this task:** the domain, Wix, launch; polish B-G (after her review).
+
+---
+
+## Click-to-edit polish (after the admin's review; item A may come first)
+
+**Why (2026-11-18, evening).** Dávid tried click-to-edit on his computer (`npm run preview:edit` + local Studio, "Edit on the page") and found it works "pretty awesome"; he also created a community page in the Studio without help. Verdict on S8: **continue with Sanity**. He wants it as polished as Sanity allows. Item A (no reload) may be done before the review if Dávid wants; the rest after her feedback.
 
 **State to start from:** `DECISIONS.md` S9 (how the preview is built), `SPEC.md` 11.7 (P18-P22), `ARCHITECTURE.md` "Click-to-edit preview". Code: `src/lib/preview-client.ts` (browser script), `src/middleware.ts`, `src/lib/source.ts` (`loadPreviewDocuments`, marker filter), `src/lib/content.ts` (`useDocuments`, `editAttr`), `studio/sanity.config.ts` (`presentationTool`). Pinned: `@sanity/visual-editing` 6.2.1, `@sanity/client` 8.16.0, `sanity` 6.23.0; read the README of the installed version in `node_modules` before using an API. Our site is plain Astro (no React in the page), so features documented only for React must be tried before they are promised.
 
@@ -35,13 +53,6 @@ Already built into the Studio, nothing to do: the phone-size switch above the pa
 
 **Done when:** each item works on Dávid's computer; `npm run check` passes and [7] still proves public builds carry none of it (extend it for any new attribute); `SPEC.md` 11.7, `DECISIONS.md` S9 (or a new S10), `ARCHITECTURE.md` and the admin guide section 4a describe the result; this table is ticked.
 
-### Then: online for a demo (backlog items 9, 10)
-
-1. Host: recommended Cloudflare free plan, for the preview and probably the public site (Dávid to confirm and create the account; nothing decided yet, item 9).
-2. Hosted preview with access protection (S9 "Access": `@sanity/preview-url-secret` or the host's access control), `SANITY_VIEWER_TOKEN` in the host's secrets, an adapter for on-request rendering (`@astrojs/cloudflare` is installed).
-3. Set `SANITY_STUDIO_PREVIEW_URL`, consider making "Edit on the page" the first tool, then `npm run studio:deploy`. **Not before**: the deployed Studio would point the admin at `localhost`.
-4. Optional for the demo: rebuild on publish (item 11).
-
 ### Also raised by Dávid (2026-11-18)
 
 - **Community menu: Events, Contact, About Us** next to the Festival link. Contact and About Us are ordinary community pages, made in the Studio without code (Content > Community pages > +; Dávid made one). **Events** is either a hand-written page (no code) or a real events list (one entry per event with date, place, link; sorted by date; past events hidden), which needs a new document type and block: ask the admin what an event holds and how often they change first (item 26).
@@ -57,8 +68,8 @@ Already built into the Studio, nothing to do: the phone-size switch above the pa
 | Sanity decisions S1-S4 | Confirmed 2026-11-16 |
 | Sanity proof of concept: schemas, site reading Sanity documents, migration, admin guide | **Built and tested offline** (S5-S7). Not yet run against the real Sanity project |
 | Studio online, content imported | **Done** 2026-11-18 (Dávid), photos repaired with `npm run sanity:import-replace` the same day |
-| Click-to-edit | **Built, local, approved by Dávid** 2026-11-18 ("pretty awesome"; continue with Sanity). **Next: polish** (A-G above) |
-| Hosting, rebuild on publish | Not started; after the polish, for a live demo |
+| Click-to-edit | **Built, local, approved by Dávid** 2026-11-18 ("pretty awesome"; continue with Sanity). Polish A-G planned, mostly after the admin's review |
+| Online for the admin's review (hosting, preview lock, rebuild on publish) | **Next task** (top). Waiting for Dávid's account steps |
 | Real content, admin trial, launch | Not started |
 
 ## P0: finish the Sanity port
@@ -74,7 +85,7 @@ Already built into the Studio, nothing to do: the phone-size switch above the pa
 | 7 | ✅ **Done 2026-11-17.** Sanity read layer (`CONTENT_SOURCE`); routes, fallback, safe links, metadata, ordering, warnings kept; parity proven by `npm run check` [5]. Still to do: switch the default to `sanity` after item 6 | M | | |
 | 8 | ✅ **Done 2026-11-17.** All ten blocks and Sanity photos with crop and focus point, tested by `npm run check` [6] and in a browser | M | | |
 | 9 | Decide hosting: Cloudflare for preview only, or for the public site as well. After item 10 | D | Decision recorded in `DECISIONS.md` | 1, 10 |
-| 10 | Click-to-edit preview. **Local part built and approved 2026-11-18** (S9). Next: polish A-G (top), then host it with access protection, `SANITY_STUDIO_PREVIEW_URL`, redeploy the Studio | M | The admin can click to edit on the host; Dávid can demo it | 9 |
+| 10 | Click-to-edit preview. **Local part built and approved 2026-11-18** (S9). **Next (top):** host it with the preview lock, `SANITY_STUDIO_PREVIEW_URL`, redeploy the Studio. Polish A-G after the review | M | The admin can click to edit on the host | 9 |
 | 11 | Publish rebuild: choose provider and webhook; secrets only in provider settings | D + M | One publish triggers one rebuild; a failed build keeps the last good site; rollback tested | 7, 9 |
 | 12 | Document the real environment variables, secret names, commands and rollback in `README.md` / `ARCHITECTURE.md` | M | Docs match what was built | 10, 11 |
 

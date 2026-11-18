@@ -33,8 +33,9 @@ Not verified: invited-editor sign-in, the editor's look and wording against the 
 
 ## Next steps, in order
 
-1. **Polish click-to-edit** (A-G at the top of `BACKLOG.md`): no reload after edits, whole-block outlines, everything clickable, a working Published/Drafts switch, locations for people and settings; try the right-click menu and drag to reorder. Dávid tries each on his computer: in two terminals, `npm run preview:edit` and `npm run studio`, then `http://localhost:3333` > **Edit on the page**. Also read Sanity's current Free plan once (seats, roles, dataset visibility) and note it in `DECISIONS.md` (backlog item 1).
+1. **Go live for the admin's review** (Dávid's checklist: root `README.md`; agent's brief: top of `BACKLOG.md`). Dávid: Sanity free-plan check, Cloudflare account, preview protection, invite test, whether polish item A comes first. Agent: preview on Cloudflare (no file reads in preview), preview lock, test site rebuilt on Publish, Studio pointed at the online preview and redeployed, guide finished.
 2. **Do not run `npm run studio:deploy` again until the preview is hosted**: the deployed Studio would get an "Edit on the page" tab pointing at `localhost`, which cannot load for the admin.
+3. **After her review:** click-to-edit polish B-G (`BACKLOG.md`), her design corrections, real content.
 3. **Check the editor against the guide.** Open the hosted Studio, walk through `docs/EDITING-GUIDE.md`, fix wording or steps that differ, and edit one thing to see it in `CONTENT_SOURCE=sanity npm run dev`.
 4. **Choose hosting and build the rebuild on publish** (backlog items 9 and 11). Cloudflare Pages (free) can build on a Sanity webhook (a deploy hook URL) and host the preview later. Secrets go only into the provider's settings.
 5. **Move the preview to the chosen host**, with the protection in S9 ("Access"), set `SANITY_STUDIO_PREVIEW_URL` for the Studio build, then deploy the Studio.

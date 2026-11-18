@@ -20,6 +20,8 @@ This checklist is for replacing the Pages CMS proof of concept only after the Sa
 
 ## 3. Finish the port on `feature/sanity`
 
+**Update 2026-11-18:** Studio deployed, content imported, click-to-edit built locally and approved. The next step, putting it online for the admin's review, is a checklist in the root `README.md` ("Next step: go live for the admin's review"); the text below is the earlier plan.
+
 **Done 2026-11-17 (offline):** schema audit and corrections (S5), idempotent import (S7), Sanity data access and image handling (S6), static build from Sanity. **Still to do:** verify Free-plan fit, deploy the Studio with `npm run studio:deploy`, run `npm run sanity:import`, then the SSR preview and the publish-triggered rebuild. Preserve existing routes and behavior unless Dávid approves a change. The detailed sequence and current gaps are in `SANITY-PORT-STATUS.md`.
 
 **Maintainer/agent:** document actual environment variables, secret names, local commands, deployment provider settings, and rollback steps in `README.md`/`ARCHITECTURE.md` once they are known. Do not add credentials to example files.
