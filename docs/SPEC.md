@@ -276,6 +276,7 @@ A block of an unknown kind is skipped with a warning. Two-language fields fall b
 
 ### 11.6 Requirements still to build
 
+- **P23. Click-to-edit polish** (planned 2026-11-18, `BACKLOG.md` A-G): no page reload after an edit (scroll position kept); whole blocks outlined and clickable; right-click menu and drag to reorder if they work without React; links, e-mail and band colours clickable, fixed wording marked as not editable; the Studio's Published/Drafts switch honoured; people and site settings list where they appear.
 - **P14. Hosted visual editing.** The click-to-edit preview (11.7) on a host, so the admin can use it; protected so only signed-in Studio users see drafts (`DECISIONS.md` S9). Public output stays static; drafts and credentials stay out of it.
 - **P15. Publish rebuild.** Publishing in Sanity rebuilds and deploys the public site; a failed build keeps the previous one.
 - **P16. Admin acceptance.** The admin signs in herself, edits, publishes and confirms the result on phone and desktop before the Sanity version replaces the current site.
@@ -300,8 +301,8 @@ A block of an unknown kind is skipped with a warning. Two-language fields fall b
 | AC21 | The JSON-based site looks as before at 390 and 1280 px | M | done 2026-11-17, side by side with the previous build: same layout; the festival home's closing band and the location gallery sit slightly closer to the text |
 | AC22 | Studio builds and the schema validates | A (`npm run studio:build`, `npx sanity schema validate`) | passes |
 | AC23 | Studio deployed; maintainer and an invited editor can sign in | M | not done |
-| AC24 | Import into `production`; the site built with `CONTENT_SOURCE=sanity` matches | M | imported by Dávid 2026-11-18 (20 documents, 6 photos); the build passes and shows the photos from Sanity, with a warning until `npm run sanity:import-replace` fixes the photo shape (`DECISIONS.md` S9). Side-by-side look not compared yet |
+| AC24 | Import into `production`; the site built with `CONTENT_SOURCE=sanity` matches | M | imported by Dávid 2026-11-18 (20 documents, 6 photos), photos repaired with `npm run sanity:import-replace`; the build passes with photos from Sanity. Side-by-side look not compared yet |
 | AC25 | P14 to P16 | M | not done |
 | AC26 | Public builds carry no click-to-edit parts (P22); the import file puts upload instructions on the photo; a photo within a photo still shows | A [5] [6] [7] | passes |
 | AC27 | Preview against the real project: every page renders, texts carry markers (also through rich text), every photo has a click target, the editing script finds them | M | done 2026-11-18 with published content (`PREVIEW_PERSPECTIVE=published`); drafts with Dávid's token not yet tried |
-| AC28 | Dávid clicks a text and a photo in **Edit on the page**, edits, sees the change without publishing, and judges whether it is clearly better than forms (S8) | M | waiting for Dávid |
+| AC28 | Dávid clicks a text and a photo in **Edit on the page**, edits, sees the change without publishing, and judges whether it is clearly better than forms (S8) | M | done 2026-11-18 in Safari with drafts: approved ("pretty awesome") |

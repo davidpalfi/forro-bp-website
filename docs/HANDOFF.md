@@ -4,9 +4,11 @@ If you are picking this project up with no other context, read this file and `SA
 
 ## Current handoff (2026-11-18, evening)
 
-- **Click-to-edit is built and waiting for Dávid's verdict** (`DECISIONS.md` S8, S9; `SPEC.md` 11.7). It runs on his computer: `npm run preview:edit` plus the local Studio's "Edit on the page". If he finds it clearly better than forms, the next task is hosting the preview and the publish rebuild ([BACKLOG.md](BACKLOG.md)); if not, reconsider the editor with him.
-- Confirmed against the real project on 2026-11-18: Dávid is signed in, the content is imported (20 documents, 6 photos), the Studio is deployed, the dataset can be read without a token, and `CONTENT_SOURCE=sanity npm run build` passes.
-- **Photos need one re-import**: the first import stored them as a photo within a photo (fixed in the import file; S9). Dávid runs `npm run sanity:import-replace` once.
+- **Next task: polish click-to-edit (items A-G), then host it for a live demo.** The full brief is at the top of [BACKLOG.md](BACKLOG.md).
+- **Click-to-edit is built and approved.** Dávid tried it on his computer on 2026-11-18 (`npm run preview:edit` plus the local Studio's "Edit on the page") and found it "pretty awesome"; Sanity stays (`DECISIONS.md` S8 outcome, S9; `SPEC.md` 11.7).
+- Confirmed against the real project on 2026-11-18: Dávid is signed in, the content is imported and the photos repaired, the Studio is deployed (without "Edit on the page"; do not redeploy before the preview is hosted), the dataset can be read without a token, and `CONTENT_SOURCE=sanity npm run build` passes. Dávid has also published one community page himself.
+- Dávid's `.env` holds his Viewer token for the preview. Never read it out, print it or ask for it.
+- Run `npm run` commands from the project folder; Dávid's terminal often starts in `~`.
 
 - **Read [SANITY-PORT-STATUS.md](SANITY-PORT-STATUS.md) first.** It has the state, what was and was not verified, and the exact next commands.
 - The Sanity proof of concept is on branch `feature/sanity`: refined Studio schemas, the site rendering Sanity documents (from Sanity, or from the JSON files converted to the same documents), a repeatable import file and command, a wider `npm run check`, and the admin guide [EDITING-GUIDE.md](EDITING-GUIDE.md). Decisions S5-S7 in `DECISIONS.md`; behaviour in `SPEC.md` section 11; code map in `ARCHITECTURE.md`.

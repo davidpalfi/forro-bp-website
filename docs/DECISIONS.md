@@ -6,7 +6,7 @@ Last full revision: 2026-11-11, after a design review and a look at every page o
 
 ## Current port status (2026-11-18)
 
-This file's numbered decisions describe the original Pages CMS/GitHub Pages proof of concept. A Sanity port was proposed after Pages CMS was connected and found unintuitive. The direction is Sanity with an Astro visual-editing preview. On `feature/sanity` the Studio, the migration and the site's Sanity read path are built (S5 to S7); the content is imported and the Studio deployed (2026-11-18). Click-to-edit works as a local preview on the maintainer's computer (S9); hosting it and the publish rebuild are not built. Do not apply the old decisions below as instructions for the port without checking this status and the brief.
+This file's numbered decisions describe the original Pages CMS/GitHub Pages proof of concept. A Sanity port was proposed after Pages CMS was connected and found unintuitive. The direction is Sanity with an Astro visual-editing preview. On `feature/sanity` the Studio, the migration and the site's Sanity read path are built (S5 to S7); the content is imported and the Studio deployed (2026-11-18). Click-to-edit works as a local preview on the maintainer's computer (S9) and Dávid approved it (S8 outcome); polishing it, hosting it and the publish rebuild are next. Do not apply the old decisions below as instructions for the port without checking this status and the brief.
 
 | Area | Original PoC | Sanity port status |
 |---|---|---|
@@ -64,6 +64,7 @@ Text that the old editor saved as Markdown is converted to Sanity rich text. An 
 
 ### S8. Click-to-edit before hosting (Dávid, 2026-11-18)
 After seeing the Sanity editor, Dávid found it still "just forms", like Pages CMS. Gains so far (page builder, photo cropping, drafts and history, a tidier editor) do not answer the original complaint (USER-NEEDS N9). So click-to-edit is built next, first on his computer, before hosting or the publish rebuild: it is the cheapest test of whether Sanity solves the problem. If it does not feel clearly better, reconsider the editor before investing further. Click-to-edit is a computer workflow; on a phone she uses the forms.
+**Outcome (2026-11-18, evening):** Dávid tried it on his computer, clicked texts and photos, edited, and made a community page in the Studio unaided: "works pretty awesome". **Sanity stays.** He wants it polished as far as Sanity allows, then hosted for a live demo; the polish list (A-G) is at the top of `BACKLOG.md`.
 
 ### S9. How click-to-edit is built (Claude, 2026-11-18, for Dávid to review)
 - **A separate preview mode, not a change to the public build.** `npm run preview:edit` runs Astro's dev server with `PREVIEW=1` on its own port, 4322 (Astro 7 otherwise reuses an already running `npm run dev` without telling); only then is `astro.config.mjs` switched to on-request rendering (`output: 'server'`), the `.env` file read and the editing script added. The public `npm run build` is byte-for-byte the same as before (compared on 2026-11-18) and `npm run check` [6] [7] proves it carries no script, click targets or markers. Locally no adapter is needed; a hosted preview will need one (`@astrojs/cloudflare` is installed).
@@ -211,6 +212,8 @@ See `HANDOFF.md`, "Status", for the current test record. In short: the build, th
 - Who receives build-failure emails.
 
 ## History
+
+**2026-11-18, evening: click-to-edit approved; polish next.** Dávid ran the photo repair (`npm run sanity:import-replace`; all photos now stored correctly) and tried click-to-edit with drafts: approved (S8 outcome). Next: polish A-G, then a hosted preview for a demo (`BACKLOG.md`). He also asked for Events, Contact and About Us on the community level (backlog item 26).
 
 **2026-11-18, click-to-edit built (local).** Preview mode, Studio "Edit on the page", photo click targets, checks that public builds carry none of it (S9). Found and fixed the photo shape of the import file. Confirmed against the real project: content imported (20 documents, 6 photos), Studio deployed, dataset readable without a token, `CONTENT_SOURCE=sanity npm run build` passes. Waiting for Dávid's verdict on click-to-edit (S8).
 
