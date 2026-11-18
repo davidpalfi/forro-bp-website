@@ -76,10 +76,14 @@ After seeing the Sanity editor, Dávid found it still "just forms", like Pages C
 - **Studio:** a second tool, "Edit on the page" (Presentation), next to "Content", which stays first so a deployed Studio opens on the familiar lists. Its address comes from `SANITY_STUDIO_PREVIEW_URL` (default `http://localhost:4322`). Until the preview is hosted, use the local Studio (`npm run studio`, `http://localhost:3333`, already allowed by the project's CORS settings); deploying this Studio now would give the admin a tab that cannot load.
 - **Photo import fix.** The first import (2026-11-18) stored every photo as a photo within a photo: the import file put the upload marker inside `asset` instead of on the photo. `make-sanity-import.mjs` is fixed and checked ([5]); the site still shows the old shape, with a `[content-warning]`. `npm run sanity:import-replace` re-imports the 20 documents with the fixed file. On 2026-11-18 no published document had been changed since the import, so nothing is lost; drafts are not touched.
 
+### S10. Sanity plan and the admin's role (Dávid, 2026-11-18)
+Stay on Sanity's **Free plan**. The admin gets the **Administrator** role; Dávid stays Administrator too, so either can recover access. Why: on Free the only roles are Administrator and Viewer (no Editor; Editor starts on Growth at about $15 per seat per month), and she is the owner of the site, so full rights are right for her. Mistakes are undone with Sanity's document history. Considered: Growth for an Editor-only role (a subscription, against the no-subscription constraint). Later: possibly move ownership/billing of the Sanity organization to her.
+Source: web search of sanity.io/pricing and the roles docs on 2026-11-18 (Free: 20 seats, Viewers do not use a seat, roles Administrator and Viewer; custom roles Enterprise only). The page itself could not be opened from the agent's session; Dávid to confirm the Free column on his phone. The organization was on a Growth trial on that date: check what it falls back to when the trial ends.
+
 ### Still open for the port
 - Whether Cloudflare hosts only the click-to-edit preview or the public site too, and how the hosted preview is protected (S9).
 - The rebuild mechanism when she publishes (webhook and provider).
-- Sanity's current free-plan limits, dataset visibility, seats and roles, and the invited-editor sign-in: verify before relying on them.
+- Sanity's dataset visibility, the trial's end and fallback, and the invited-editor sign-in (seats and roles: S10).
 - The admin's own trial of the editor; click-to-edit is expected to be a desktop workflow.
 
 ## Context and priorities
