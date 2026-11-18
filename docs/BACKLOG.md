@@ -122,6 +122,7 @@ Already built into the Studio, nothing to do: the phone-size switch above the pa
 
 ## Open decisions to collect
 
+- **The real domain: forrobudapest.com or forrobudapest.hu (or both)?** The docs assume .com (where the Wix site was read on 2026-11-11); Dávid wrote .hu on 2026-11-18. Ask before any launch or redirect work (20, 21, 24). Until launch the test addresses are free Cloudflare ones (`*.pages.dev` or `*.workers.dev`) and `forro-budapest.sanity.studio`.
 - Hosting for preview and production (9)
 - Rebuild provider and webhook (11)
 - Launch practicalities (20)
