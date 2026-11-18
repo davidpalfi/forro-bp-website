@@ -13,7 +13,8 @@ import { createImageUrlBuilder } from '@sanity/image-url';
 import { marked } from 'marked';
 import { text, flag, num } from './schema.ts';
 import { isLang, tr, LANGS, type Lang } from './i18n.ts';
-import { loadDocuments, SANITY } from './source.ts';
+import { createDataAttribute } from '@sanity/visual-editing/create-data-attribute';
+import { loadDocuments, isPreview, SANITY, STUDIO_URL } from './source.ts';
 
 /* ---------- Warnings ---------- */
 
@@ -29,8 +30,7 @@ export const warnOnce = (msg: string) => {
 type Obj = Record<string, unknown>;
 const loaded = await loadDocuments(warnOnce);
 export const contentSource = loaded.source;
-const byId = new Map<string, Obj>();
-for (const d of loaded.docs) if (d && typeof d === 'object' && typeof d._id === 'string') byId.set(d._id, d);
+let byId = new Map<string, Obj>();
 const ofType = (type: string) => [...byId.values()].filter((d) => d._type === type);
 const asObj = (v: unknown): Obj => (v && typeof v === 'object' && !Array.isArray(v) ? (v as Obj) : {});
 const str = (v: unknown) => text.parse(v);
@@ -186,21 +186,23 @@ export function trFirst(obj: Obj | null | undefined, fields: string[], lang: Lan
 const GROUPS = { teacher: 'teacher', artist: 'artist' } as const;
 export type Group = keyof typeof GROUPS;
 
-const allPeople = ofType('person')
-  .map((d) => {
-    const g = str(d.group).toLowerCase();
-    if (!(g in GROUPS)) warnOnce(`person "${d._id}" has no group (Teacher or Artist) and is shown with the teachers`);
-    return {
-      ...d,
-      id: d._id as string,
-      name: str(d.name) || String(d._id).replace(/^person-/, ''),
-      group: (g in GROUPS ? g : 'teacher') as Group,
-      instagram: str(d.instagram),
-      order: num.parse(d.order) ?? 100,
-    };
-  })
-  .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
-export type Person = (typeof allPeople)[number];
+const makePeople = () =>
+  ofType('person')
+    .map((d) => {
+      const g = str(d.group).toLowerCase();
+      if (!(g in GROUPS)) warnOnce(`person "${d._id}" has no group (Teacher or Artist) and is shown with the teachers`);
+      return {
+        ...d,
+        id: d._id as string,
+        name: str(d.name) || String(d._id).replace(/^person-/, ''),
+        group: (g in GROUPS ? g : 'teacher') as Group,
+        instagram: str(d.instagram),
+        order: num.parse(d.order) ?? 100,
+      };
+    })
+    .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+export type Person = ReturnType<typeof makePeople>[number];
+let allPeople: Person[] = [];
 
 export function getPeople(group?: Group) {
   return group ? allPeople.filter((p) => p.group === group) : allPeople;
@@ -222,7 +224,7 @@ export type Section = 'community' | 'festival';
 /** Addresses the site itself uses; a page with one of these is skipped. */
 export const RESERVED: Record<Section, string[]> = { festival: [], community: ['festival'] };
 
-const allPages = (() => {
+const makePages = () => {
   const seen = new Set<string>();
   const out = [];
   const sorted = ofType('page')
@@ -261,8 +263,9 @@ const allPages = (() => {
     });
   }
   return out;
-})();
-export type Page = (typeof allPages)[number];
+};
+export type Page = ReturnType<typeof makePages>[number];
+let allPages: Page[] = [];
 
 export function getPages(section: Section = 'festival') {
   return allPages.filter((p) => p.section === section);
@@ -372,11 +375,46 @@ export function getImage(image: unknown): ResolvedImage | undefined {
   if (typeof o._upload === 'string') return localImage(o._upload);
   const asset = asObj(o.asset);
   if (typeof asset._ref === 'string') return sanityImage(o, asset._ref);
+  // A photo within a photo, as the first import of 2026-11-18 made them: still shown, but the
+  // document should be imported again (npm run sanity:import-replace) or the photo chosen again.
+  const inner = asObj(asset.asset);
+  if (typeof inner._ref === 'string') {
+    warnOnce('some photos in Sanity are stored the wrong way (from the first import); run "npm run sanity:import-replace" once');
+    return sanityImage({ ...asset, ...o, asset: inner }, inner._ref);
+  }
   // An import file that has not been imported yet: image@file://./images/x.jpg is public/uploads/x.jpg
-  const pending = /^image@file:\/\/\.\/images\/(.+)$/.exec(str(asset._sanityAsset));
+  const pending = /^image@file:\/\/\.\/images\/(.+)$/.exec(str(o._sanityAsset));
   if (pending) return localImage(`/uploads/${pending[1]}`);
   return undefined;
 }
+
+/* ---------- Click-to-edit targets for photos (preview only) ---------- */
+
+// Texts carry invisible markers that say which field they come from; photos cannot, so in
+// the preview every photo object is noted with its document and field, and the <img> gets a
+// data-sanity attribute. Public builds note nothing and print no attribute.
+let photoTargets = new WeakMap<object, string>();
+
+function notePhotos(doc: Obj) {
+  const edit = createDataAttribute({ id: String(doc._id), type: String(doc._type), baseUrl: STUDIO_URL });
+  const walk = (value: unknown, path: (string | { _key: string })[]) => {
+    if (Array.isArray(value)) {
+      // Items without a key cannot be addressed reliably, so they get no click target.
+      for (const item of value) {
+        const key = item && typeof item === 'object' ? (item as Obj)._key : undefined;
+        if (typeof key === 'string') walk(item, [...path, { _key: key }]);
+      }
+    } else if (value && typeof value === 'object') {
+      const o = value as Obj;
+      if (path.length && o.asset && typeof o.asset === 'object') photoTargets.set(o, edit(path as never).toString());
+      for (const [k, v] of Object.entries(o)) if (!k.startsWith('_') && k !== 'asset') walk(v, [...path, k]);
+    }
+  };
+  walk(doc, []);
+}
+
+/** The data-sanity attribute that makes a photo clickable in the preview; nothing otherwise. */
+export const editAttr = (image: unknown) => (image && typeof image === 'object' ? photoTargets.get(image) : undefined);
 
 /** The description of a photo for screen readers, in the visitor's language. */
 export const altOf = (image: unknown, lang: Lang) => tr(asObj(image), 'alt', lang);
@@ -413,3 +451,22 @@ export function videoEmbed(url: unknown) {
   if (m) return `https://player.vimeo.com/video/${m[1]}?dnt=1`;
   return '';
 }
+
+/* ---------- Which documents are shown ---------- */
+
+/**
+ * Makes these documents the content every helper above reads. A build calls it once (below);
+ * the click-to-edit preview calls it on every request with the latest drafts
+ * (src/middleware.ts). Pages never notice the difference.
+ */
+export function useDocuments(docs: unknown[]) {
+  const next = new Map<string, Obj>();
+  for (const d of docs) if (d && typeof d === 'object' && typeof (d as Obj)._id === 'string') next.set((d as Obj)._id as string, d as Obj);
+  byId = next;
+  photoTargets = new WeakMap();
+  if (isPreview()) for (const d of next.values()) notePhotos(d);
+  allPeople = makePeople();
+  allPages = makePages();
+}
+
+useDocuments(loaded.docs);

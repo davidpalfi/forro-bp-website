@@ -74,3 +74,55 @@ export async function loadDocuments(warn: (msg: string) => void): Promise<Loaded
 
   throw new Error(`CONTENT_SOURCE="${setting}" is not understood. Use json, sanity or file:<path>.`);
 }
+
+/* ---------- Click-to-edit preview (PREVIEW=1 only) ---------- */
+
+export const isPreview = () => process.env.PREVIEW === '1';
+
+/** The Studio that "edit" links point to; inside the Presentation view the open Studio is used. */
+export const STUDIO_URL = process.env.SANITY_STUDIO_URL || 'http://localhost:3333';
+
+/**
+ * Only texts written by people carry the invisible click-to-edit markers ("stega"): fields
+ * ending in _en / _hu (and everything inside them, e.g. rich text) and names. Values the code
+ * compares or uses as addresses (tone, group, slug, links, e-mail) must stay clean.
+ */
+function stegaFilter(props: { sourcePath: (string | number | { _key: string })[] }) {
+  const keys = props.sourcePath.filter((s): s is string => typeof s === 'string');
+  if (keys.some((k) => /_(en|hu)$/.test(k))) return true;
+  return keys.length === 1 && keys[0] === 'name';
+}
+
+/**
+ * The drafts (unpublished changes) of every document, read fresh on each request for the
+ * preview, with stega markers so a click on a text opens its field. Needs a Viewer token in
+ * SANITY_VIEWER_TOKEN (the git-ignored .env file locally); never used by a public build.
+ */
+export async function loadPreviewDocuments(): Promise<Doc[]> {
+  const token = process.env.SANITY_VIEWER_TOKEN?.trim();
+  // PREVIEW_PERSPECTIVE=published shows published content without a token (to test the
+  // preview itself); the default, drafts, is what editors need.
+  const perspective = process.env.PREVIEW_PERSPECTIVE === 'published' ? 'published' : 'drafts';
+  if (!token && perspective === 'drafts') {
+    throw new Error('The preview needs SANITY_VIEWER_TOKEN in the .env file (a Viewer token from sanity.io/manage > API > Tokens).');
+  }
+  const { createClient } = await import('@sanity/client');
+  const client = createClient({
+    projectId: SANITY.projectId,
+    dataset: SANITY.dataset,
+    apiVersion: SANITY.apiVersion,
+    token: token || undefined,
+    useCdn: false,
+    perspective,
+    stega: { enabled: true, studioUrl: STUDIO_URL, filter: stegaFilter as never },
+  });
+  let docs: Doc[];
+  try {
+    docs = await client.fetch<Doc[]>(QUERY, { types: DOCUMENT_TYPES });
+  } catch (e) {
+    const status = (e as { statusCode?: number }).statusCode;
+    const hint = status === 401 || status === 403 ? '\n\nSanity did not accept SANITY_VIEWER_TOKEN in .env: copy the whole token again, or make a new Viewer token.' : '';
+    throw new Error(`${(e as Error).message}${hint}`);
+  }
+  return Array.isArray(docs) ? docs : [];
+}

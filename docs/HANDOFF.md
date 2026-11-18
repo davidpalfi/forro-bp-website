@@ -2,15 +2,16 @@
 
 If you are picking this project up with no other context, read this file and `SANITY-PORT-STATUS.md` first, then `USER-NEEDS.md` (who it is for and how little is verified), `DECISIONS.md` (why), `SPEC.md` (what the site does) and `ARCHITECTURE.md` (how the code is organised). `CLAUDE.md` has the rules for a Claude session working in the repo. The root-level [EDITING-GUIDE.md](../EDITING-GUIDE.md) is for the old Pages CMS PoC; [docs/EDITING-GUIDE.md](EDITING-GUIDE.md) is the admin guide for Sanity; check it against the deployed Studio before sending it.
 
-## Current handoff (2026-11-18)
+## Current handoff (2026-11-18, evening)
 
-- **Next task: click-to-edit** (`DECISIONS.md` S8). The full brief for the next agent is at the top of [BACKLOG.md](BACKLOG.md).
+- **Click-to-edit is built and waiting for Dávid's verdict** (`DECISIONS.md` S8, S9; `SPEC.md` 11.7). It runs on his computer: `npm run preview:edit` plus the local Studio's "Edit on the page". If he finds it clearly better than forms, the next task is hosting the preview and the publish rebuild ([BACKLOG.md](BACKLOG.md)); if not, reconsider the editor with him.
+- Confirmed against the real project on 2026-11-18: Dávid is signed in, the content is imported (20 documents, 6 photos), the Studio is deployed, the dataset can be read without a token, and `CONTENT_SOURCE=sanity npm run build` passes.
+- **Photos need one re-import**: the first import stored them as a photo within a photo (fixed in the import file; S9). Dávid runs `npm run sanity:import-replace` once.
 
 - **Read [SANITY-PORT-STATUS.md](SANITY-PORT-STATUS.md) first.** It has the state, what was and was not verified, and the exact next commands.
 - The Sanity proof of concept is on branch `feature/sanity`: refined Studio schemas, the site rendering Sanity documents (from Sanity, or from the JSON files converted to the same documents), a repeatable import file and command, a wider `npm run check`, and the admin guide [EDITING-GUIDE.md](EDITING-GUIDE.md). Decisions S5-S7 in `DECISIONS.md`; behaviour in `SPEC.md` section 11; code map in `ARCHITECTURE.md`.
-- Nothing has touched the real Sanity project yet: the Studio is not deployed and the content is not imported. Dávid does both with three commands on his computer.
 - The default build still reads the JSON files and looks the same as the live proof of concept. `main`, its GitHub Pages site and `.pages.yml` are unchanged.
-- Not built: click-to-edit preview, rebuild on publish, hosting choice. See [BACKLOG.md](BACKLOG.md).
+- Not built: hosted preview, rebuild on publish, hosting choice. See [BACKLOG.md](BACKLOG.md).
 - The sections below document the original Pages CMS proof of concept.
 
 ## Original Pages CMS PoC (2026-11-11)
@@ -95,7 +96,9 @@ npm run studio:deploy  # deploy to Sanity hosting; requires account access
 npm run sanity:login   # sign in to Sanity on this computer (once)
 npm run sanity:import-file  # write sanity-import/ from src/content; sends nothing
 npm run sanity:import  # write it and import missing documents into Sanity
+npm run sanity:import-replace  # overwrite the imported documents with the import file (before the admin starts only)
 CONTENT_SOURCE=sanity npm run build   # build from the published content in Sanity
+npm run preview:edit   # click-to-edit preview at http://localhost:4322 (drafts; needs .env, see .env.example)
 ```
 
 Needs Node 22.23.4 or newer. Build for a sub-path locally: `SITE_URL=https://x.github.io SITE_BASE=/repo npm run build`.

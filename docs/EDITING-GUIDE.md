@@ -2,7 +2,7 @@
 
 A guide for the person who updates the site. You need no technical knowledge, and nothing you do here can break the website.
 
-> **For the maintainer, before sending this guide:** it describes the editor as configured in `studio/` on 2026-11-17. Before sending it, deploy the editor, import the content, test every step below yourself, and replace anything that differs. Automatic publishing (step "Publish") and the click-to-edit preview are not built yet; until they are, tell her that changes appear on the site after you rebuild it. See `docs/SANITY-PORT-STATUS.md`.
+> **For the maintainer, before sending this guide:** it describes the editor as configured in `studio/` on 2026-11-17. Before sending it, deploy the editor, import the content, test every step below yourself, and replace anything that differs. Automatic publishing (step "Publish") is not built yet; until it is, tell her that changes appear on the site after you rebuild it. Section 4a (editing on the page) only works on the maintainer's computer until the preview is hosted: leave it out of the copy you send until then. See `docs/SANITY-PORT-STATUS.md`.
 
 ---
 
@@ -44,6 +44,18 @@ Most texts have two boxes next to each other: **English** and **Magyar**.
 - When you are happy, click **Publish** (green button, bottom right). The website updates a few minutes later.
 - To throw away changes you have not published yet, open the menu next to **Publish** and choose **Discard changes**.
 - Made a mistake you already published? Click the clock icon (**History**) at the top of the document, pick an earlier version and restore it, then publish.
+
+## 4a. Editing on the page (on a computer)
+
+Instead of looking for the right form, you can edit the website where you see it.
+
+1. At the top of the editor, click **Edit on the page**. The website appears, with your unpublished changes already in it.
+2. Move the mouse over the page: texts and photos get a thin outline. **Click** one, and its field opens beside the page.
+3. Type, or choose another photo. The page shows the change a moment later. Visitors do not see it yet.
+4. Use the website's menu inside the view to go to another page, or the language switch for the Hungarian version.
+5. When you are happy, click **Publish**, as in section 4.
+
+The outlines only appear inside the editor; they are not on the real website. On a phone, use the lists in section 2 instead.
 
 ## 5. Common tasks
 

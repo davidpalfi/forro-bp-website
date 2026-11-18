@@ -11,6 +11,10 @@ Owner: **D** = Dávid (accounts, decisions), **M** = maintainer/agent (code), **
 
 ## ▶ Next task for the next agent: click-to-edit, first on Dávid's computer
 
+> **Status 2026-11-18 (evening): built, waiting for Dávid's verdict.** Everything below the line was the brief; it is done as described in `DECISIONS.md` S9 and `SPEC.md` 11.7, except the try itself. Dávid's steps are in `SANITY-PORT-STATUS.md`, "Next steps". If he says click-to-edit is clearly better than forms: next is item 9 and hosting the preview (item 10, second half). If not: reconsider the editor with him (S8).
+
+---
+
 **Why this is next (2026-11-18).** Dávid looked at the Sanity editor and found it still feels like the Pages CMS forms, which is true: the reason for moving to Sanity (USER-NEEDS N9, "detached forms are unintuitive") is only answered by **click-to-edit** (Sanity's Presentation tool: the real page beside the editor; click a text or photo on the page to edit it). Dávid agreed to build that **before** hosting, publish rebuild or anything else, as a cheap test of whether Sanity is worth it (`DECISIONS.md` S8). If it does not feel clearly better than forms, stop and reconsider the editor with Dávid.
 
 **Goal:** Dávid runs two commands on his computer, opens the Studio's Presentation view, sees the site, clicks a heading/text/photo, edits it, and the preview updates without publishing. Public builds stay static and never contain drafts.
@@ -37,8 +41,8 @@ Owner: **D** = Dávid (accounts, decisions), **M** = maintainer/agent (code), **
 | Pages CMS proof of concept (`main`) | Done and live at davidpalfi.github.io/forro-bp-website |
 | Sanity decisions S1-S4 | Confirmed 2026-11-16 |
 | Sanity proof of concept: schemas, site reading Sanity documents, migration, admin guide | **Built and tested offline** (S5-S7). Not yet run against the real Sanity project |
-| Studio online, content imported | Dávid started 2026-11-18 (`npm ci` done); login, deploy and import not confirmed yet |
-| Click-to-edit | **Next task** (above). Dávid found the editor still "just forms"; click-to-edit is what should change that |
+| Studio online, content imported | **Done** 2026-11-18 (Dávid). Photos need one `npm run sanity:import-replace` (S9) |
+| Click-to-edit | **Built, local** (S9). Waiting for Dávid to try it and judge it |
 | Hosting, rebuild on publish | Not started; after click-to-edit |
 | Real content, admin trial, launch | Not started |
 
@@ -47,15 +51,15 @@ Owner: **D** = Dávid (accounts, decisions), **M** = maintainer/agent (code), **
 | # | Item | Owner | Done when | Depends on |
 |---|---|---|---|---|
 | 1 | Check Sanity Free-plan limits (seats, roles, dataset visibility, Studio hosting, image usage) and record the findings with a date in `DECISIONS.md` | D | Findings recorded; no feature used needs Growth | none |
-| 2 | Deploy the Studio (`npm run studio:deploy`) and open the hosted URL. **Ready to run**: address set to forro-budapest | D | Studio opens at `*.sanity.studio` with the maintainer's account | 1 |
+| 2 | ✅ **Done 2026-11-18** (Dávid). Deploy the Studio. Do not redeploy until the preview is hosted (S9) | D | | |
 | 3 | Test the invited-editor sign-in with a test invite | D | A non-developer account can sign in, on a phone too | 2 |
 | 4 | ✅ **Done 2026-11-17.** Audit schema coverage: every JSON field mapped (`SPEC.md` 11.2), gaps fixed (S5), checked automatically by `npm run check` [0] | M | | |
 | 5 | ✅ **Done 2026-11-17** (offline). Import file + `npm run sanity:import --missing`: fixed ids, repeatable, report, photo upload, order kept, never deletes (S7). Not yet tried against a real dataset | M | | |
-| 6 | Run `npm run sanity:import` into `production` | D | 20 documents and 6 photos in Sanity; `CONTENT_SOURCE=sanity npm run build` passes and looks the same | 1, 2 |
+| 6 | ✅ **Done 2026-11-18** (Dávid): 20 documents, 6 photos; `CONTENT_SOURCE=sanity npm run build` passes. **Still to do:** `npm run sanity:import-replace` once to fix the photo shape (S9), then compare the look side by side | D | | |
 | 7 | ✅ **Done 2026-11-17.** Sanity read layer (`CONTENT_SOURCE`); routes, fallback, safe links, metadata, ordering, warnings kept; parity proven by `npm run check` [5]. Still to do: switch the default to `sanity` after item 6 | M | | |
 | 8 | ✅ **Done 2026-11-17.** All ten blocks and Sanity photos with crop and focus point, tested by `npm run check` [6] and in a browser | M | | |
 | 9 | Decide hosting: Cloudflare for preview only, or for the public site as well. After item 10 | D | Decision recorded in `DECISIONS.md` | 1, 10 |
-| 10 | **Next (see top).** Click-to-edit preview, first locally on Dávid's computer, later on the chosen host: SSR preview only, secrets server-side, drafts never in public builds | M | Dávid can click to edit on his computer; public build shows no drafts | 2, 6 |
+| 10 | Click-to-edit preview. **Local part built 2026-11-18** (S9), checked by `npm run check` [7]; Dávid's try pending. Still to do: host it with access protection, `SANITY_STUDIO_PREVIEW_URL`, redeploy the Studio | M | Dávid can click to edit on his computer (pending); the admin can on the host | 9 |
 | 11 | Publish rebuild: choose provider and webhook; secrets only in provider settings | D + M | One publish triggers one rebuild; a failed build keeps the last good site; rollback tested | 7, 9 |
 | 12 | Document the real environment variables, secret names, commands and rollback in `README.md` / `ARCHITECTURE.md` | M | Docs match what was built | 10, 11 |
 

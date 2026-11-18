@@ -66,6 +66,27 @@ function htmlFiles(dir) {
   return out;
 }
 
+/**
+ * Signs of the click-to-edit preview in a public build: the editing script (or its bundle),
+ * click targets on photos, or the invisible markers that tie texts to their fields.
+ */
+function previewTraces(dir) {
+  const found = [];
+  const walk = (d) => {
+    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) walk(p);
+      else if (/\.(html|js|css)$/.test(e.name)) {
+        const t = fs.readFileSync(p, 'utf8');
+        if (/enableVisualEditing|@sanity\/visual-editing|preview-client|data-sanity=/.test(t)) found.push(`${e.name} (editing script or click target)`);
+        else if (/[\u200b-\u200d\ufeff]{4,}/.test(t)) found.push(`${e.name} (invisible markers)`);
+      }
+    }
+  };
+  walk(path.join(dir, 'dist'));
+  return found;
+}
+
 /** Every local link, image and srcset URL in the built HTML must point at a file that exists. */
 function brokenReferences(dir, base = '') {
   const missing = new Set();
@@ -242,6 +263,7 @@ console.log('\n[5] Built from the Sanity import file (what npm run sanity:import
   const people = jsonFiles('src/content/people').length;
   check(lines.filter((d) => d._type === 'person').length === people, `all ${people} people are in the import file`);
   check(!JSON.stringify(lines).includes('_upload'), 'every photo is either an upload instruction or left out');
+  check(JSON.stringify(lines).includes('"_sanityAsset"') && !JSON.stringify(lines).includes('"asset":{"_sanityAsset"'), 'upload instructions sit on the photo itself, not inside its asset (which made a photo within a photo)');
   const made2 = spawnSync(process.execPath, ['scripts/make-sanity-import.mjs'], { cwd: dir, encoding: 'utf8' });
   const again = fs.readFileSync(path.join(dir, 'sanity-import/data.ndjson'), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
   check(made2.status === 0 && JSON.stringify(again) === JSON.stringify(lines), 'making the import file twice gives exactly the same file (safe to repeat)');
@@ -262,6 +284,10 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
   const dir = copyProject('sanity');
   const { makeFixture } = await import('./lib/sanity-fixture.mjs');
   const docs = makeFixture(path.join(dir, 'src/content'));
+  // One photo stored as the first import of 2026-11-18 stored them: a photo within a photo.
+  const nested = docs.find((d) => d._type === 'person' && d.photo?.asset?._ref);
+  const nestedRef = nested.photo.asset._ref;
+  nested.photo = { _type: 'imageWithAlt', asset: { _type: 'image', asset: nested.photo.asset } };
   fs.writeFileSync(path.join(dir, 'fixture.ndjson'), docs.map((d) => JSON.stringify(d)).join('\n'));
   const { code, output } = build(dir, { CONTENT_SOURCE: 'file:fixture.ndjson' });
   check(code === 0, 'build passes');
@@ -274,6 +300,7 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
     ['not a YouTube or Vimeo address', 'a video from another site'],
     ['person-musician" has no group', 'a person in an unknown group'],
     ['"javascript:alert(1)" is not a usable address', 'an unsafe button link'],
+    ['photos in Sanity are stored the wrong way', 'a photo within a photo (first import)'],
   ]) check(output.includes(text), `warning: ${what}`);
   if (code === 0) {
     const page = read(dir, 'en/festival/everything/index.html');
@@ -297,9 +324,27 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
     const hosts = new Set([...everything.matchAll(/(?:src|srcset)="(https?:\/\/[^/"]+)/g)].map((m) => m[1]));
     const allowed = ['https://cdn.sanity.io', 'https://www.youtube-nocookie.com'];
     check([...hosts].every((h) => allowed.includes(h)), `outside files come only from Sanity's image service and YouTube without cookies${[...hosts].filter((h) => !allowed.includes(h)).map((h) => ': ' + h).join('')}`);
+    check(everything.includes(nestedRef.replace(/^image-/, '').replace(/-([a-z0-9]+)$/, '.$1')), 'a photo within a photo (first import) is still shown');
     const broken = brokenReferences(dir);
     check(broken.length === 0, `no broken local links${broken.length ? ': ' + broken.join(', ') : ''}`);
+    const traces = previewTraces(dir);
+    check(traces.length === 0, `no click-to-edit script, click targets or text markers in a public build from Sanity${traces.length ? ': ' + traces.join(', ') : ''}`);
   }
+}
+
+/* ------------------------------------------------------------------ */
+console.log('\n[7] Click-to-edit preview stays out of the public site');
+{
+  if (realDir) {
+    const traces = previewTraces(realDir);
+    check(traces.length === 0, `no click-to-edit script, click targets or text markers in the public build${traces.length ? ': ' + traces.join(', ') : ''}`);
+  }
+  const config = fs.readFileSync(path.join(ROOT, 'astro.config.mjs'), 'utf8');
+  check(/const preview = process\.env\.PREVIEW === '1'/.test(config) && /\.\.\.\(preview\s*\?/.test(config), 'server rendering and the editing script are switched on only by PREVIEW=1');
+  const layout = fs.readFileSync(path.join(ROOT, 'src/layouts/Base.astro'), 'utf8');
+  check(!/visual-editing|preview-client/.test(layout), 'the page layout itself never loads the editing script');
+  const ignored = spawnSync('git', ['check-ignore', '-q', '.env'], { cwd: ROOT });
+  check(ignored.status === 0, 'the .env file (preview token) is ignored by git');
 }
 
 /* ------------------------------------------------------------------ */

@@ -1,7 +1,7 @@
 ---
 // The big banner: photo behind, then logo or name, ticket button and date line.
 // An optional second photo is used on phones (the Wix site shows a taller picture there).
-import { getImage } from '../lib/content';
+import { getImage, editAttr } from '../lib/content';
 
 interface Props {
   image?: unknown;
@@ -37,6 +37,7 @@ const logoImg = getImage(logo);
           style={wide.position ? `object-position: ${wide.position}` : undefined}
           loading="eager"
           fetchpriority="high"
+          data-sanity={editAttr(main ? image : imagePhone)}
         />
       </picture>
     )
@@ -45,7 +46,7 @@ const logoImg = getImage(logo);
     <h1 class="hero-title">
       {
         logoImg ? (
-          <img src={logoImg.src} srcset={logoImg.srcset} sizes="(min-width: 720px) 420px, 70vw" alt={title} />
+          <img src={logoImg.src} srcset={logoImg.srcset} sizes="(min-width: 720px) 420px, 70vw" alt={title} data-sanity={editAttr(logo)} />
         ) : (
           title
         )

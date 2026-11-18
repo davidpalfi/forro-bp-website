@@ -2,9 +2,9 @@
 
 How the code is organised and how to change it safely. For what the site does, see `SPEC.md`; for why it is built this way, see `DECISIONS.md`.
 
-## Current state (2026-11-17, `feature/sanity`)
+## Current state (2026-11-18, `feature/sanity`)
 
-The site renders **Sanity documents**. They come from Sanity, or from the JSON files in `src/content` converted to the same documents; `CONTENT_SOURCE` chooses (`SPEC.md` 11.1). The default is still the JSON files, so the site builds and is tested without Sanity access. The hosted Studio is configured in `studio/` but not deployed. Not built yet: the click-to-edit preview and the rebuild on publish.
+The site renders **Sanity documents**. They come from Sanity, or from the JSON files in `src/content` converted to the same documents; `CONTENT_SOURCE` chooses (`SPEC.md` 11.1). The default is still the JSON files, so the site builds and is tested without Sanity access. The content is imported and the Studio deployed (2026-11-18). Click-to-edit runs as a local preview (below, `SPEC.md` 11.7, `DECISIONS.md` S9). Not built yet: hosting the preview and the rebuild on publish.
 
 ```text
 Admin -> hosted Sanity Studio -> published documents in Sanity ---------+
@@ -14,8 +14,25 @@ src/content/*.json --(src/lib/from-json.ts)--> the same documents -------+  (def
         +--> npm run sanity:import-file -> sanity-import/ -> npm run sanity:import (Dávid, signed in)
                                                                          v
                                               npm run build -> dist/ (static) -> host (not chosen)
-Planned: SSR preview for click-to-edit; Sanity webhook -> rebuild.
+Click-to-edit (local): Studio "Edit on the page" <-> npm run preview:edit (drafts, per request)
+Planned: hosted preview; Sanity webhook -> rebuild.
 ```
+
+## Click-to-edit preview (`npm run preview:edit`)
+
+```
+Studio (npm run studio, localhost:3333)          tool "Edit on the page" (Presentation)
+   |  shows in a frame, talks to the page script, opens the clicked field
+   v
+astro dev with PREVIEW=1 (localhost:4322)        astro.config.mjs: output 'server', reads .env,
+   |                                             injects src/lib/preview-client.ts on every page
+   +- src/middleware.ts      each page request: loadPreviewDocuments() -> useDocuments(docs)
+   +- src/lib/source.ts      drafts perspective, SANITY_VIEWER_TOKEN, stega markers (filter)
+   +- src/lib/content.ts     same helpers; photos noted -> editAttr() -> data-sanity on <img>
+   +- src/lib/preview-client.ts   @sanity/visual-editing: outlines, clicks, reload after edits
+```
+
+Without `PREVIEW=1` none of this exists in the output (`npm run check` [7]).
 
 ## Data flow of a build
 
@@ -38,12 +55,14 @@ Nothing runs on a server. Browser JavaScript is two small inline scripts: the me
 
 | Path | Responsibility |
 |---|---|
-| `studio/sanity.config.ts` | The Studio: menu (structure), fixed settings documents, new-document templates |
+| `studio/sanity.config.ts` | The Studio: menu (structure), "Edit on the page" (preview address, which address opens which document), fixed settings documents, new-document templates |
 | `studio/sanity.cli.ts` | Project `8hc671sk`, dataset `production`, Studio address `forro-budapest` |
 | `studio/schemaTypes/documents.ts` | Settings, page and person documents |
 | `studio/schemaTypes/blocks.ts` | The page blocks and `BLOCK_TYPES` |
 | `studio/schemaTypes/shared.ts` | Two-language field pairs, block style fields, rich text, image with alt text, link rule |
-| `src/lib/source.ts` | Loads the documents: JSON, Sanity HTTP API, or an `.ndjson` file |
+| `src/lib/source.ts` | Loads the documents: JSON, Sanity HTTP API, or an `.ndjson` file; in preview, the drafts with stega markers (`loadPreviewDocuments`, the marker filter) |
+| `src/middleware.ts` | Preview only: loads the latest drafts before every page; does nothing in a build |
+| `src/lib/preview-client.ts` | Preview only: the click-to-edit script in the page (reload after edits, address sync with the Studio) |
 | `src/lib/from-json.ts` | JSON files -> Sanity documents. Used by the site and the import file; runs in plain Node too |
 | `src/lib/content.ts` | The only place pages get content from: `getSite`, `getFestival`, `getCommunity`, `getPages`, `getPeople`, `peopleForBlock`, `blockLink`, `groupBlocks`, `renderRich`, `getImage`, `href`, `withBase`, `safeUrl`, `trFirst`, `warnOnce` |
 | `src/lib/schema.ts` | Forgiving field types: `text`, `flag`, `num`, `textList` |
@@ -60,11 +79,12 @@ Nothing runs on a server. Browser JavaScript is two small inline scripts: the me
 | `public/uploads/` | Photos of the JSON content. `public/_img/` is generated; never edit it |
 | `src/styles/global.css` | All styling; colours and fonts at the top; page blocks at the end |
 | `scripts/make-sanity-import.mjs` | `npm run sanity:import-file`: writes `sanity-import/` (ignored by Git) |
-| `scripts/check.mjs` | `npm run check`: schema check and six test builds |
+| `scripts/check.mjs` | `npm run check`: schema check, six test builds, and that the preview stays out of public builds [7] |
 | `scripts/check-schema.mjs`, `scripts/lib/` | Documents vs Studio schema; Node loader for Studio files; Sanity-shaped test content |
 | `scripts/optimize-images.mjs`, `scripts/ci-build.mjs` | Photo resizing; the build as run on GitHub |
 | `.pages.yml`, `.github/workflows/` | The Pages CMS forms and GitHub Pages deploy of the old proof of concept. They still match the JSON files |
-| `astro.config.mjs` | Reads `SITE_URL` and `SITE_BASE`; trailing slashes |
+| `astro.config.mjs` | Reads `SITE_URL` and `SITE_BASE`; trailing slashes. With `PREVIEW=1`: on-request rendering, `.env`, the editing script |
+| `.env.example` | Names the preview's setting (`SANITY_VIEWER_TOKEN`); the real `.env` is git-ignored |
 
 ## Rules the code follows
 
@@ -79,7 +99,8 @@ Nothing runs on a server. Browser JavaScript is two small inline scripts: the me
 
 ## Astro 7 specifics (this repo uses Astro 7.4)
 
-- No content collections: `src/lib/source.ts` loads all documents once with a top-level `await`, and `content.ts` reads from that. `z` comes from `astro/zod`.
+- No content collections: `src/lib/source.ts` loads all documents once with a top-level `await`, and `content.ts` reads from that through `useDocuments()`; the preview calls it again on every request. `z` comes from `astro/zod`.
+- Page routes look their page up by address (`getPages(...).find`) instead of receiving it from `getStaticPaths`, because in preview `getStaticPaths` is not used.
 - `from-json.ts`, `schema.ts` and `i18n.ts` also run in plain Node (Node strips the types). Import between them with the `.ts` ending, and use no Astro-only modules there.
 - `getStaticPaths` is hoisted; it cannot use variables declared outside it. Imports are fine.
 - Astro 7 needs Node 22.23.4 or newer.
@@ -94,6 +115,9 @@ Nothing runs on a server. Browser JavaScript is two small inline scripts: the me
 - The one-row desktop header starts at 1180 px because the menu does not fit below that. Adding a menu entry or a longer word means re-testing 1180 px in both languages and raising the breakpoint if it overflows.
 - A page's address (`slug`) is its address in both languages. Changing it breaks saved links; the Studio says so.
 - Sanity document ids must not contain dots: dotted ids are hidden from public reads.
+- In preview, texts end in invisible marker characters. Never compare or parse a text field (`_en`/`_hu`, names) in code; if a new field holds a value the code compares or uses as an address, check it is not caught by the marker filter in `source.ts`.
+- A component with a `<script>` imported by `Base.astro` is bundled into every build even when not rendered. Preview-only browser code goes through the integration in `astro.config.mjs`.
+- In an import file the upload instruction `_sanityAsset` belongs on the photo object, not inside `asset`.
 - In `.pages.yml`, `{primary}` in a file name pattern is the primary field's value; how it treats accented letters is unverified.
 - Pages CMS's stored value formats were assumed from its docs, not observed. See the assumptions table in `DECISIONS.md`.
 

@@ -4,15 +4,15 @@ Read this before changing the structure of the site. When you change or add a de
 
 Last full revision: 2026-11-11, after a design review and a look at every page of the current Wix site. What changed in that revision is listed under "History" at the end.
 
-## Current port status (2026-11-17)
+## Current port status (2026-11-18)
 
-This file's numbered decisions describe the original Pages CMS/GitHub Pages proof of concept. A Sanity port was proposed after Pages CMS was connected and found unintuitive. The direction is Sanity with an Astro visual-editing preview. On `feature/sanity` the Studio, the migration and the site's Sanity read path are built and tested offline (S5 to S7); preview and publish rebuild are not. Do not apply the old decisions below as instructions for the port without checking this status and the brief.
+This file's numbered decisions describe the original Pages CMS/GitHub Pages proof of concept. A Sanity port was proposed after Pages CMS was connected and found unintuitive. The direction is Sanity with an Astro visual-editing preview. On `feature/sanity` the Studio, the migration and the site's Sanity read path are built (S5 to S7); the content is imported and the Studio deployed (2026-11-18). Click-to-edit works as a local preview on the maintainer's computer (S9); hosting it and the publish rebuild are not built. Do not apply the old decisions below as instructions for the port without checking this status and the brief.
 
 | Area | Original PoC | Sanity port status |
 |---|---|---|
-| Content/editor | JSON in GitHub, Pages CMS forms | Sanity, Studio hosted by Sanity (S3); schemas refined (S5); import file and command built (S7), not yet run against Sanity |
+| Content/editor | JSON in GitHub, Pages CMS forms | Sanity, Studio hosted by Sanity (S3); schemas refined (S5); content imported by Dávid 2026-11-18 (S7; photos need one re-import, S9) |
 | Public site | Static Astro on GitHub Pages | Static; built from Sanity documents, from Sanity or from the JSON files (S6); hosting not finalized |
-| Visual editing | None | SSR preview on Cloudflare proposed; not implemented |
+| Visual editing | None | Local click-to-edit preview built (S9): `npm run preview:edit` + the Studio's "Edit on the page". Not hosted yet |
 | Languages | English and Hungarian side by side, with fallback | **Confirmed 2026-11-16:** kept (S1 below) |
 | Page content | Fixed fields and Markdown/HTML JSON bodies | **Confirmed 2026-11-16:** full page builder (S2 below) |
 | Images | Local uploads resized at build time | **Confirmed 2026-11-16:** Sanity image service (S4 below) |
@@ -65,8 +65,18 @@ Text that the old editor saved as Markdown is converted to Sanity rich text. An 
 ### S8. Click-to-edit before hosting (Dávid, 2026-11-18)
 After seeing the Sanity editor, Dávid found it still "just forms", like Pages CMS. Gains so far (page builder, photo cropping, drafts and history, a tidier editor) do not answer the original complaint (USER-NEEDS N9). So click-to-edit is built next, first on his computer, before hosting or the publish rebuild: it is the cheapest test of whether Sanity solves the problem. If it does not feel clearly better, reconsider the editor before investing further. Click-to-edit is a computer workflow; on a phone she uses the forms.
 
+### S9. How click-to-edit is built (Claude, 2026-11-18, for Dávid to review)
+- **A separate preview mode, not a change to the public build.** `npm run preview:edit` runs Astro's dev server with `PREVIEW=1` on its own port, 4322 (Astro 7 otherwise reuses an already running `npm run dev` without telling); only then is `astro.config.mjs` switched to on-request rendering (`output: 'server'`), the `.env` file read and the editing script added. The public `npm run build` is byte-for-byte the same as before (compared on 2026-11-18) and `npm run check` [6] [7] proves it carries no script, click targets or markers. Locally no adapter is needed; a hosted preview will need one (`@astrojs/cloudflare` is installed).
+- **Fresh drafts on every request.** `src/middleware.ts` loads all documents with the `drafts` perspective (drafts over published) for each page request and hands them to `useDocuments()` in `content.ts`, which rebuilds the lists every helper reads. Pages are unchanged; the two page routes look their page up by address instead of taking it from `getStaticPaths`. The documents are swapped for the whole module, not per request: every request loads the complete set, so a request running alongside another can only see the same or newer content. About 20 documents load in well under a second.
+- **How a click finds its field.** Texts carry Sanity's invisible "stega" markers (`@sanity/client`, now a declared dependency, pinned to the 8.16.0 that was already installed). Only fields ending in `_en`/`_hu` (and their rich text) and names get markers; values the code compares or uses as addresses (tone, group, section, slug, links, e-mail) never do, or the site would break. Photos cannot carry markers, so in preview each photo object is noted with its document and field, and its `<img>` gets a `data-sanity` attribute. Markers survive the Markdown step of rich text (checked on the Location page).
+- **The editing script** is `@sanity/visual-editing`, bundled by Astro and served by the preview itself (no outside request), added by a small integration in `astro.config.mjs` that exists only in preview. Putting it in `Base.astro`, even behind a condition, made the public build bundle it into `dist/_astro`, so it was moved out.
+- **After an edit the page reloads** (`refresh` in `src/lib/preview-client.ts`). Simple and always correct; live updating without reload (Sanity's loaders) is possible later if the reload feels slow.
+- **Access.** The preview shows drafts to anyone who can open it. Acceptable only on the maintainer's computer: the dev server listens on `localhost` only, and the Viewer token sits in the git-ignored `.env`. **Before the preview is hosted**, protect it: Sanity's preview secret (`@sanity/preview-url-secret`, installed, so only a signed-in Studio user can turn on drafts), or the host's access control.
+- **Studio:** a second tool, "Edit on the page" (Presentation), next to "Content", which stays first so a deployed Studio opens on the familiar lists. Its address comes from `SANITY_STUDIO_PREVIEW_URL` (default `http://localhost:4322`). Until the preview is hosted, use the local Studio (`npm run studio`, `http://localhost:3333`, already allowed by the project's CORS settings); deploying this Studio now would give the admin a tab that cannot load.
+- **Photo import fix.** The first import (2026-11-18) stored every photo as a photo within a photo: the import file put the upload marker inside `asset` instead of on the photo. `make-sanity-import.mjs` is fixed and checked ([5]); the site still shows the old shape, with a `[content-warning]`. `npm run sanity:import-replace` re-imports the 20 documents with the fixed file. On 2026-11-18 no published document had been changed since the import, so nothing is lost; drafts are not touched.
+
 ### Still open for the port
-- Whether Cloudflare hosts only the click-to-edit preview or the public site too.
+- Whether Cloudflare hosts only the click-to-edit preview or the public site too, and how the hosted preview is protected (S9).
 - The rebuild mechanism when she publishes (webhook and provider).
 - Sanity's current free-plan limits, dataset visibility, seats and roles, and the invited-editor sign-in: verify before relying on them.
 - The admin's own trial of the editor; click-to-edit is expected to be a desktop workflow.
@@ -201,6 +211,8 @@ See `HANDOFF.md`, "Status", for the current test record. In short: the build, th
 - Who receives build-failure emails.
 
 ## History
+
+**2026-11-18, click-to-edit built (local).** Preview mode, Studio "Edit on the page", photo click targets, checks that public builds carry none of it (S9). Found and fixed the photo shape of the import file. Confirmed against the real project: content imported (20 documents, 6 photos), Studio deployed, dataset readable without a token, `CONTENT_SOURCE=sanity npm run build` passes. Waiting for Dávid's verdict on click-to-edit (S8).
 
 **2026-11-18, click-to-edit first.** Dávid's review of the editor; S8. Backlog reordered.
 

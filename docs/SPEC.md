@@ -215,7 +215,7 @@ Sections 1 to 10 describe the Pages CMS proof of concept. This section describes
 - **P1.** The site is built from a set of Sanity documents: `siteSettings`, `communitySettings`, `festivalSettings` (one each, fixed ids), `page` and `person`. The schemas are in `studio/schemaTypes/`.
 - **P2.** `CONTENT_SOURCE` chooses where they come from: unset or `json` = the JSON files in `src/content`, converted by `src/lib/from-json.ts`; `sanity` = the published documents in Sanity project `8hc671sk`, dataset `production`, read at build time; `file:<path>` = an `.ndjson` file of documents. Drafts (`drafts.*`) are never used.
 - **P3.** With `sanity`, a failed request, an authorisation error or a dataset with no festival settings and no pages **fails the build** on purpose, so the host keeps the previous site. Every other content problem is a `[content-warning]`, as before.
-- **P4.** `npm run sanity:import-file` writes `sanity-import/data.ndjson` and copies the photos it uses to `sanity-import/images/`. Document ids are fixed (`person-<file name>`, `page-<file name>`, `page-program`, ...), contain no dots, and the file is identical on every run. `npm run sanity:import` writes the file and imports it with `--missing`: only documents that do not exist yet are created. Nothing is ever deleted.
+- **P4.** `npm run sanity:import-file` writes `sanity-import/data.ndjson` and copies the photos it uses to `sanity-import/images/`. Document ids are fixed (`person-<file name>`, `page-<file name>`, `page-program`, ...), contain no dots, and the file is identical on every run. `npm run sanity:import` writes the file and imports it with `--missing`: only documents that do not exist yet are created. Nothing is ever deleted. `npm run sanity:import-replace` overwrites the published documents in the file with it (drafts are untouched); only for before the admin starts editing. In the file, a photo carries its upload instruction (`_sanityAsset`) on the photo object itself.
 
 ### 11.2 Mapping from the JSON files
 
@@ -276,12 +276,20 @@ A block of an unknown kind is skipped with a warning. Two-language fields fall b
 
 ### 11.6 Requirements still to build
 
-- **P14. Visual editing.** A server-rendered preview for click-to-edit, expected on Cloudflare; public output stays static and drafts and credentials stay out of it.
+- **P14. Hosted visual editing.** The click-to-edit preview (11.7) on a host, so the admin can use it; protected so only signed-in Studio users see drafts (`DECISIONS.md` S9). Public output stays static; drafts and credentials stay out of it.
 - **P15. Publish rebuild.** Publishing in Sanity rebuilds and deploys the public site; a failed build keeps the previous one.
 - **P16. Admin acceptance.** The admin signs in herself, edits, publishes and confirms the result on phone and desktop before the Sanity version replaces the current site.
 - **P17. Security and privacy.** Tokens only in provider secret stores, never in the repository or chat. No private care-team contact details in the repository or the dataset.
 
-### 11.7 Acceptance state (2026-11-17)
+### 11.7 Click-to-edit preview (built 2026-11-18, local only)
+
+- **P18. Preview mode.** `npm run preview:edit` (environment `PREVIEW=1`) serves the site at `http://localhost:4322` (beside `npm run dev` on 4321), rendering every page on request from the newest **drafts** in Sanity (drafts over published). It needs `SANITY_VIEWER_TOKEN` in the git-ignored `.env` file; without it every page explains what is missing. `PREVIEW_PERSPECTIVE=published` shows published content without a token, for testing. Responses are `no-store` and `noindex`.
+- **P19. Click targets.** Texts from fields ending in `_en`/`_hu` (including rich text) and names carry invisible markers; every photo has a `data-sanity` attribute. In the Studio's **Edit on the page** view, hovering outlines them and a click opens that field. Other values (tone, group, section, address, links, e-mail) never carry markers.
+- **P20. After an edit** in the Studio the preview page reloads and shows the draft. Nothing is published by editing.
+- **P21. Studio.** The tool **Edit on the page** (Presentation) shows the preview at `SANITY_STUDIO_PREVIEW_URL` (default `http://localhost:4322`), starting at `/en/festival/`. An address opens its document: `/<lang>/festival/` the festival home page, `/<lang>/festival/<address>/` that festival page, `/<lang>/` the community home page, `/<lang>/<address>/` that community page. Festival and community home pages and every page list where they appear on the site, in both languages. People are edited by clicking them on the page that shows them.
+- **P22. Public builds are untouched.** Without `PREVIEW=1` the build is static and identical to a build without this feature: no editing script (not even bundled), no `data-sanity` attributes, no markers, no drafts.
+
+### 11.8 Acceptance state (2026-11-18)
 
 | ID | Criterion | How | State |
 |---|---|---|---|
@@ -292,5 +300,8 @@ A block of an unknown kind is skipped with a warning. Two-language fields fall b
 | AC21 | The JSON-based site looks as before at 390 and 1280 px | M | done 2026-11-17, side by side with the previous build: same layout; the festival home's closing band and the location gallery sit slightly closer to the text |
 | AC22 | Studio builds and the schema validates | A (`npm run studio:build`, `npx sanity schema validate`) | passes |
 | AC23 | Studio deployed; maintainer and an invited editor can sign in | M | not done |
-| AC24 | Import into `production`; the site built with `CONTENT_SOURCE=sanity` matches | M | not done (needs Sanity access) |
+| AC24 | Import into `production`; the site built with `CONTENT_SOURCE=sanity` matches | M | imported by Dávid 2026-11-18 (20 documents, 6 photos); the build passes and shows the photos from Sanity, with a warning until `npm run sanity:import-replace` fixes the photo shape (`DECISIONS.md` S9). Side-by-side look not compared yet |
 | AC25 | P14 to P16 | M | not done |
+| AC26 | Public builds carry no click-to-edit parts (P22); the import file puts upload instructions on the photo; a photo within a photo still shows | A [5] [6] [7] | passes |
+| AC27 | Preview against the real project: every page renders, texts carry markers (also through rich text), every photo has a click target, the editing script finds them | M | done 2026-11-18 with published content (`PREVIEW_PERSPECTIVE=published`); drafts with Dávid's token not yet tried |
+| AC28 | Dávid clicks a text and a photo in **Edit on the page**, edits, sees the change without publishing, and judges whether it is clearly better than forms (S8) | M | waiting for Dávid |

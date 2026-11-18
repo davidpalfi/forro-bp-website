@@ -2,7 +2,7 @@
 // A photo: from Sanity's image service, or from public/uploads with web-sized versions.
 // `image` is whatever the content holds (a Sanity image or an /uploads/ path).
 // The editor's focus point keeps the important part visible when the photo is cropped.
-import { getImage, altOf } from '../lib/content';
+import { getImage, altOf, editAttr } from '../lib/content';
 import type { Lang } from '../lib/i18n';
 
 interface Props {
@@ -33,6 +33,7 @@ const description = alt ?? (lang ? altOf(image, lang) : '');
       style={img.position ? `object-position: ${img.position}` : undefined}
       loading={eager ? 'eager' : 'lazy'}
       decoding="async"
+      data-sanity={editAttr(image)}
     />
   )
 }

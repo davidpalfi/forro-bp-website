@@ -7,11 +7,11 @@ Status as of 2026-11-18. The progress record for the Sanity version. Update it a
 | Part | State |
 |---|---|
 | Decisions S1-S4 (languages side by side, page builder, hosted Studio, Sanity photos) | Confirmed by Dávid 2026-11-16 |
-| Studio and schemas (`studio/`) | Built, refined in S5, validated, builds. **Not deployed** |
+| Studio and schemas (`studio/`) | Built, refined in S5, validated. **Deployed** by Dávid 2026-11-18 (before "Edit on the page" was added) |
 | Site reads Sanity documents (`src/lib/source.ts`, `content.ts`, `Blocks.astro`) | Built and tested. Default source is still the JSON files |
-| Migration (`npm run sanity:import-file`, `npm run sanity:import`) | Built and tested offline. **Not run** against the real project |
+| Migration (`npm run sanity:import-file`, `npm run sanity:import`) | **Run** by Dávid 2026-11-18: 20 documents, 6 photos. Photos were stored the wrong way; import file fixed, re-import with `npm run sanity:import-replace` pending |
 | Admin guide (`docs/EDITING-GUIDE.md`) | Written from the configured Studio; to be checked against the deployed one |
-| Click-to-edit preview (SSR) | **Next task** (S8). Brief: `BACKLOG.md`, "Next task for the next agent" |
+| Click-to-edit preview | **Built, local only** (S9, `SPEC.md` 11.7). Tested against published content; Dávid's try with drafts pending |
 | Rebuild on publish, hosting | Not started; host not chosen |
 | Admin trial and sign-off | Not started |
 
@@ -21,27 +21,21 @@ What was verified on 2026-11-17, all without access to Sanity (the session's net
 - `npm run studio:build` and `npx sanity schema validate` (0 errors, 0 warnings).
 - Browser, 390 and 1280 px: the JSON-built site side by side with the previous build looks the same; a page with every block type has no horizontal scrolling and no console errors.
 
-Not verified: anything that needs the real Sanity project: deployment, sign-in, the import itself, reading from the API (`CONTENT_SOURCE=sanity`), the image service URLs loading, the editor's look and wording.
+Verified on 2026-11-18 on Dávid's computer, with network access to Sanity:
+
+- Signed in; the content is in `production` (26 documents including the 6 photos); the dataset is readable without a token; the Studio address forwards to the deployed Studio.
+- `CONTENT_SOURCE=sanity npm run build` passes and takes photos from `cdn.sanity.io`, with one warning: the photos' stored shape (fixed by the re-import).
+- The click-to-edit preview with `PREVIEW_PERSPECTIVE=published`: every page renders; texts carry markers, also through rich text; every photo has a click target; Sanity's editing script outlines all of them. The public build is byte-for-byte the same as before.
+
+Not verified: the preview with drafts (needs Dávid's Viewer token), clicking inside the Studio (needs his sign-in in a browser), invited-editor sign-in, the editor's look and wording against the guide.
 
 ## Next steps, in order
 
-On 2026-11-18 the branch was pushed and Dávid ran `npm ci` (it reported 37 npm audit warnings in build tooling: harmless for the static site, backlog item 33). Whether he ran login, deploy and import is not confirmed: ask him.
-
-1. **Dávid, on his computer (about 15 minutes):**
-   ```
-   git fetch && git checkout feature/sanity && git pull
-   npm ci
-   npm run sanity:login          # opens the browser; sign in to Sanity
-   npm run studio:deploy         # puts the editor online at forro-budapest.sanity.studio
-   npm run sanity:import         # creates the content in Sanity (only missing documents)
-   CONTENT_SOURCE=sanity npm run dev    # the site, now read from Sanity, at localhost:4321
-   ```
-   If `studio:deploy` says the name is taken, change `studioHost` in `studio/sanity.cli.ts`. If the build with `CONTENT_SOURCE=sanity` reports 401/403, the dataset is private: either make it public in sanity.io/manage (content is public on the site anyway) or create a read token and set `SANITY_READ_TOKEN`.
-   Before that, read Sanity's current Free plan once (seats, roles, dataset visibility) and note it in `DECISIONS.md`.
-2. **Click-to-edit on Dávid's computer** (S8): the full brief is at the top of `BACKLOG.md`. Dávid's first impression of the plain editor was "this is just forms again", so this decides whether Sanity stays.
+1. **Dávid tries click-to-edit** (S8, S9). One-time: put a Viewer token in `.env` (see `.env.example`) and run `npm run sanity:import-replace` to fix the photos. Then, in two terminals, `npm run preview:edit` and `npm run studio`; open `http://localhost:3333`, choose **Edit on the page**, click a text or photo, edit, and watch the page update without publishing. His verdict decides whether Sanity stays. Read Sanity's current Free plan once (seats, roles, dataset visibility) and note it in `DECISIONS.md` (backlog item 1).
+2. **Do not run `npm run studio:deploy` again until the preview is hosted**: the deployed Studio would get an "Edit on the page" tab pointing at `localhost`, which cannot load for the admin.
 3. **Check the editor against the guide.** Open the hosted Studio, walk through `docs/EDITING-GUIDE.md`, fix wording or steps that differ, and edit one thing to see it in `CONTENT_SOURCE=sanity npm run dev`.
 4. **Choose hosting and build the rebuild on publish** (backlog items 9 and 11). Cloudflare Pages (free) can build on a Sanity webhook (a deploy hook URL) and host the preview later. Secrets go only into the provider's settings.
-5. **Move the preview to the chosen host.**
+5. **Move the preview to the chosen host**, with the protection in S9 ("Access"), set `SANITY_STUDIO_PREVIEW_URL` for the Studio build, then deploy the Studio.
 6. **Admin trial** with the guide (backlog item 13), then real content and launch per `GO-LIVE-CHECKLIST.md`.
 
 ## Rules for whoever continues

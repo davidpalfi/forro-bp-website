@@ -1,7 +1,20 @@
 import { defineConfig } from 'sanity'
 import { structureTool, type StructureBuilder } from 'sanity/structure'
+import { presentationTool, defineDocuments, defineLocations } from 'sanity/presentation'
 import { schemaTypes } from './schemaTypes'
 import { SINGLETONS } from './schemaTypes/documents'
+
+// The site preview shown in "Edit on the page" (click-to-edit). For now it runs on the
+// maintainer's computer with `npm run preview:edit`; change SANITY_STUDIO_PREVIEW_URL when the
+// preview moves to a host.
+const PREVIEW_URL = (process.env.SANITY_STUDIO_PREVIEW_URL || 'http://localhost:4322').replace(/\/+$/, '')
+
+// Where each document is seen on the site, both languages.
+const both = (path: string) => [
+  { title: 'English', href: `/en${path}` },
+  { title: 'Magyar', href: `/hu${path}` },
+]
+const pageAddress = (section?: string, slug?: string) => (section === 'community' ? `/${slug}/` : `/festival/${slug}/`)
 
 const singleton = (S: StructureBuilder, id: string, title: string) =>
   S.listItem()
@@ -60,6 +73,31 @@ export default defineConfig({
             S.documentTypeListItem('person').title('Everyone (teachers and artists)'),
             singleton(S, 'siteSettings', 'Site settings'),
           ]),
+    }),
+    presentationTool({
+      title: 'Edit on the page',
+      previewUrl: { initial: `${PREVIEW_URL}/en/festival/` },
+      resolve: {
+        // Which document an address shows, so opening a page also opens its document.
+        mainDocuments: defineDocuments([
+          { route: '/:lang/festival/', filter: '_type == "festivalSettings"' },
+          { route: '/:lang/festival/:slug/', filter: '_type == "page" && section == "festival" && slug.current == $slug' },
+          { route: '/:lang/', filter: '_type == "communitySettings"' },
+          { route: '/:lang/:slug/', filter: '_type == "page" && section == "community" && slug.current == $slug' },
+        ]),
+        // "Used on these pages" links shown above a document in the editor.
+        locations: {
+          festivalSettings: defineLocations({ message: 'The festival home page', locations: both('/festival/') }),
+          communitySettings: defineLocations({ message: 'The community home page', locations: both('/') }),
+          page: defineLocations({
+            select: { title: 'title_en', slug: 'slug.current', section: 'section' },
+            resolve: (doc) =>
+              doc?.slug
+                ? { locations: both(pageAddress(doc.section, doc.slug)).map((l) => ({ ...l, title: `${doc.title || doc.slug} (${l.title})` })) }
+                : null,
+          }),
+        },
+      },
     }),
   ],
   schema: {

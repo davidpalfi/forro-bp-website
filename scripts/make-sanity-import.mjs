@@ -54,7 +54,9 @@ function withAssets(value) {
       fs.copyFileSync(src, path.join(IMAGES, name));
       copied.set(local, `images/${name}`);
     }
-    return { ...rest, asset: { _sanityAsset: `image@file://./${copied.get(local)}` } };
+    // The marker goes on the photo object itself; the importer uploads the file and sets
+    // `asset` from it. (Inside `asset` it would make a photo within a photo: fixed 2026-11-18.)
+    return { ...rest, _sanityAsset: `image@file://./${copied.get(local)}` };
   }
   const out = {};
   for (const [k, v] of Object.entries(value)) {

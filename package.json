@@ -13,7 +13,9 @@
     "studio:deploy": "cd studio && sanity deploy",
     "sanity:import-file": "node scripts/make-sanity-import.mjs",
     "sanity:import": "npm run sanity:import-file && cd studio && sanity datasets import ../sanity-import/data.ndjson --dataset production --missing",
-    "sanity:login": "cd studio && sanity login"
+    "sanity:import-replace": "npm run sanity:import-file && cd studio && sanity datasets import ../sanity-import/data.ndjson --dataset production --replace",
+    "sanity:login": "cd studio && sanity login",
+    "preview:edit": "node scripts/optimize-images.mjs && PREVIEW=1 astro dev --ignore-lock"
   },
   "dependencies": {
     "@astrojs/cloudflare": "14.4.8",
@@ -24,6 +26,7 @@
     "@portabletext/astro": "0.2.0",
     "@portabletext/markdown": "2.9.4",
     "@sanity/astro": "3.6.2",
+    "@sanity/client": "8.16.0",
     "@sanity/image-url": "2.1.1",
     "@sanity/preview-url-secret": "4.1.5",
     "@sanity/visual-editing": "6.2.1",
