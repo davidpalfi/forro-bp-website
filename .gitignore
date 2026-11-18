@@ -11,3 +11,8 @@ public/_img/
 .env
 .env.*
 !.env.example
+# Not secret: the address of the click-to-edit preview on Cloudflare, for the deployed Studio.
+!studio/.env.production
+# Cloudflare (wrangler) local files and secrets
+.wrangler/
+.dev.vars*

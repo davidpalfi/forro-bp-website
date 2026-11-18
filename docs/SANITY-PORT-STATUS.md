@@ -11,8 +11,8 @@ Status as of 2026-11-18. The progress record for the Sanity version. Update it a
 | Site reads Sanity documents (`src/lib/source.ts`, `content.ts`, `Blocks.astro`) | Built and tested. Default source is still the JSON files |
 | Migration (`npm run sanity:import-file`, `npm run sanity:import`) | **Run** by Dávid 2026-11-18: 20 documents, 6 photos. Photos were stored the wrong way; import file fixed and photos repaired with `npm run sanity:import-replace` the same day |
 | Admin guide (`docs/EDITING-GUIDE.md`) | Written from the configured Studio; to be checked against the deployed one |
-| Click-to-edit preview | **Built, local only, approved by Dávid** 2026-11-18 (S8 outcome, S9, `SPEC.md` 11.7). Next: polish A-G (`BACKLOG.md`), then host |
-| Rebuild on publish, hosting | Not started; host not chosen |
+| Click-to-edit preview | **Built, approved by Dávid** 2026-11-18 (S8 outcome, S9). **Ready for Cloudflare** with the preview lock and no reload after an edit (S11, `SPEC.md` P14, P20); not online until Dávid creates the Workers (`HOSTING.md`). Polish B-G after the admin's review |
+| Rebuild on publish, hosting | **Built** 2026-11-18 (S11): Cloudflare Workers, test site rebuilt by a Sanity webhook through a deploy hook. Waiting for Dávid's setup (`HOSTING.md`) |
 | Admin trial and sign-off | Not started |
 
 What was verified on 2026-11-17, all without access to Sanity (the session's network blocked it):
@@ -25,14 +25,17 @@ Verified on 2026-11-18 on Dávid's computer, with network access to Sanity:
 
 - Signed in; the content is in `production` (26 documents including the 6 photos); the dataset is readable without a token; the Studio address forwards to the deployed Studio.
 - `CONTENT_SOURCE=sanity npm run build` passes and takes photos from `cdn.sanity.io`, with one warning: the photos' stored shape (fixed by the re-import).
-- The click-to-edit preview with `PREVIEW_PERSPECTIVE=published`: every page renders; texts carry markers, also through rich text; every photo has a click target; Sanity's editing script outlines all of them. The public build is byte-for-byte the same as before.
+- The click-to-edit preview with published content: every page renders; texts carry markers, also through rich text; every photo has a click target; Sanity's editing script outlines all of them. The public build is byte-for-byte the same as before.
 
 Then Dávid, the same evening: set up his Viewer token in `.env`, repaired the photos, and in Safari clicked texts and photos in "Edit on the page", edited drafts and saw them in the page; created and published a community page from Content > Community pages.
 
 Not verified: invited-editor sign-in, the editor's look and wording against the guide, other browsers than Safari for the Studio.
 
+Built and verified on 2026-11-18 (late evening, cloud session, no access to Sanity or Cloudflare): the preview built for Cloudflare and run in Cloudflare's local runtime against a stand-in for Sanity (`npm run check` [8]: lock, drafts, parallel requests, every page, 404s, update without reload in Chromium); the test site's Worker config serves the static build with 404 page and trailing-slash redirects; the public build is byte-for-byte unchanged; `npm run studio:build` passes. Not verified: the real Studio handshake and the cookie inside the Studio's frame (Safari especially), Workers Builds, the deploy hook, the Sanity webhook on Free.
+
 ## Next steps, in order
 
+0. **Dávid: create the two Workers and the webhook** (`HOSTING.md`, about 20 minutes), send the agent the two addresses. Agent: put the preview address in `studio/.env.production`, the test address in the admin guide; Dávid: `npm run studio:deploy`, then try Edit on the page and Publish in the deployed Studio.
 1. **Go live for the admin's review** (Dávid's checklist: root `README.md`; agent's brief: top of `BACKLOG.md`). Dávid: Sanity free-plan check, Cloudflare account, preview protection, invite test, whether polish item A comes first. Agent: preview on Cloudflare (no file reads in preview), preview lock, test site rebuilt on Publish, Studio pointed at the online preview and redeployed, guide finished.
 2. **Do not run `npm run studio:deploy` again until the preview is hosted**: the deployed Studio would get an "Edit on the page" tab pointing at `localhost`, which cannot load for the admin.
 3. **After her review:** click-to-edit polish B-G (`BACKLOG.md`), her design corrections, real content.

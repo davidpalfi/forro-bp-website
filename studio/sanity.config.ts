@@ -4,9 +4,9 @@ import { presentationTool, defineDocuments, defineLocations } from 'sanity/prese
 import { schemaTypes } from './schemaTypes'
 import { SINGLETONS } from './schemaTypes/documents'
 
-// The site preview shown in "Edit on the page" (click-to-edit). For now it runs on the
-// maintainer's computer with `npm run preview:edit`; change SANITY_STUDIO_PREVIEW_URL when the
-// preview moves to a host.
+// The site preview shown in "Edit on the page" (click-to-edit). The deployed Studio uses the
+// preview on Cloudflare, whose address is in studio/.env.production (SANITY_STUDIO_PREVIEW_URL);
+// `npm run studio` on a computer uses `npm run preview:edit` at localhost:4322.
 const PREVIEW_URL = (process.env.SANITY_STUDIO_PREVIEW_URL || 'http://localhost:4322').replace(/\/+$/, '')
 
 // Where each document is seen on the site, both languages.
@@ -76,7 +76,12 @@ export default defineConfig({
     }),
     presentationTool({
       title: 'Edit on the page',
-      previewUrl: { initial: `${PREVIEW_URL}/en/festival/` },
+      previewUrl: {
+        initial: `${PREVIEW_URL}/en/festival/`,
+        // The preview lock: the Studio first opens this address with a one-hour secret, and
+        // only then does the preview show drafts (src/lib/preview-lock.ts).
+        previewMode: { enable: '/preview/enable/' },
+      },
       resolve: {
         // Which document an address shows, so opening a page also opens its document.
         mainDocuments: defineDocuments([

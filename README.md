@@ -9,7 +9,7 @@ One website for the Forró Budapest community, with the Budapest Forró Festival
 | Branch | What it is |
 |---|---|
 | `main` | The first proof of concept (Pages CMS forms, GitHub Pages), live at davidpalfi.github.io/forro-bp-website. Kept unchanged as the fallback |
-| `feature/sanity` | **The current work.** Content in Sanity, edited in Sanity Studio, including **click-to-edit**: the real page next to the editor, click a text or photo to edit it. Works on Dávid's computer and he approved it. **Not online yet** |
+| `feature/sanity` | **The current work.** Content in Sanity, edited in Sanity Studio, including **click-to-edit**: the real page next to the editor, click a text or photo to edit it. Approved by Dávid. Ready for Cloudflare; **online once Dávid does [docs/HOSTING.md](docs/HOSTING.md)** |
 
 The live forrobudapest.com is still Wix. Nothing here changes it until the domain is moved at launch.
 
@@ -33,15 +33,17 @@ Goal: the admin signs in, edits the real content herself (on the page on a compu
 **1. Dávid: accounts and decisions (about 30 minutes)**
 - [x] Check Sanity's free plan in sanity.io/manage: how many members and which roles are free. She needs a role that can edit and publish. Done 2026-11-18: Free plan, both Administrators (`docs/DECISIONS.md` S10).
 - [x] Create a free Cloudflare account (done 2026-11-18, signed in with GitHub) (recommended host for the preview and the test site). Connect it to the GitHub repository when the agent asks.
-- [ ] Agree how the preview is protected. Recommended: Sanity's preview lock, so only people signed in to the Studio can see drafts, with nothing extra to log into.
+- [x] Agree how the preview is protected: Sanity's preview lock (chosen 2026-11-18).
 - [ ] (Moved to step 3, just before sending) Test the invite on yourself: invite a second e-mail address of yours, sign in on a phone, and check it is simple enough for her.
-- [ ] Decide whether to do polish item A first (no page reload after each edit, about 1-2 hours; `docs/BACKLOG.md`). Recommended: it makes a better first impression.
+- [x] Polish item A first: yes (chosen 2026-11-18; built).
+- [ ] **Create the two Cloudflare Workers and the Sanity webhook: [docs/HOSTING.md](docs/HOSTING.md)** (about 20 minutes, on a computer). Send the agent the two addresses.
 
-**2. Agent / maintainer: code (roughly a day, mostly the first item)**
-- [ ] Make the preview run on Cloudflare. The main work: Cloudflare's servers cannot read project files the way a laptop can, so in preview everything must come from Sanity (today `src/lib/content.ts` and `src/lib/from-json.ts` read files with `node:fs`).
-- [ ] Add the preview lock (`@sanity/preview-url-secret` is installed) and put the Viewer token in Cloudflare's secret settings, never in the repository.
-- [ ] Test site: build from Sanity (`CONTENT_SOURCE=sanity`) on Cloudflare, plus a Sanity webhook so **Publish** rebuilds it. "Hide from Google" stays on.
-- [ ] Point the Studio at the online preview (`SANITY_STUDIO_PREVIEW_URL`) and deploy it again (`npm run studio:deploy`). **Only then**: before that, the deployed Studio would point her at `localhost`.
+**2. Agent / maintainer: code** (done 2026-11-18 except the last three items, which need the addresses)
+- [x] Make the preview run on Cloudflare. The main work: Cloudflare's servers cannot read project files the way a laptop can, so in preview everything must come from Sanity (today `src/lib/content.ts` and `src/lib/from-json.ts` read files with `node:fs`).
+- [x] Add the preview lock. The Viewer token goes in Cloudflare's secret settings (`docs/HOSTING.md` step 1), never in the repository.
+- [x] No page reload after an edit (polish A).
+- [x] Test site: build from Sanity on Cloudflare, plus a Sanity webhook so **Publish** rebuilds it. "Hide from Google" stays on.
+- [ ] Point the Studio at the online preview (address in `studio/.env.production`), then Dávid deploys it again (`npm run studio:deploy`; it refuses to run without the address).
 - [ ] Finish the admin guide (`docs/EDITING-GUIDE.md`) with the real addresses; remove the "not ready" notes.
 - [ ] Run through it: sign in, edit on the page, publish, see the test site update, on desktop and phone. `npm run check` passes.
 
@@ -67,6 +69,7 @@ CONTENT_SOURCE=sanity npm run build   # the site from the published content in S
 npm run check             # the test suite; must pass after any code change
 
 npm run preview:edit      # click-to-edit preview from Sanity drafts, http://localhost:4322
+npm run preview:build     # the same preview built for Cloudflare (Cloudflare runs this itself)
 npm run studio            # Sanity Studio on this computer, http://localhost:3333
 ```
 
@@ -86,6 +89,7 @@ Sanity commands (need `npm run sanity:login` once): `npm run studio:deploy`, `np
 | `docs/ARCHITECTURE.md` | Anyone changing code | Code map, the preview, rules, recipes |
 | `docs/USER-NEEDS.md` | Anyone judging whether the design fits | Who the users are, what is known versus assumed |
 | `docs/EDITING-GUIDE.md` | The admin (Sanity) | Plain-language how-to; finish before sending |
+| `docs/HOSTING.md` | Dávid | Click by click: the Cloudflare preview, test site and rebuild on Publish |
 | `docs/GO-LIVE-CHECKLIST.md` | Dávid and the maintainer | Steps up to replacing Wix |
 | `EDITING-GUIDE.md` | The old Pages CMS proof of concept | Historical |
 | `CLAUDE.md` | Claude sessions in this repo | Rules for safe changes |
@@ -122,7 +126,7 @@ Sanity commands (need `npm run sanity:login` once): `npm run studio:deploy`, `np
 | Piece | Role | Cost |
 |---|---|---|
 | Sanity | Content and the editor (Studio hosted by Sanity) | Free plan; check its limits (step 1 above) |
-| Cloudflare (planned) | Online preview and the public site | Free plan |
+| Cloudflare | Online preview and the test site (`docs/HOSTING.md`) | Free plan |
 | GitHub | Stores the code | Free |
 | npm packages (Astro, Sanity, sharp, fonts, ...) | Build tools, editor, fonts, pinned to exact versions | Free |
 | Domain | forrobudapest.com | Around 10-15 EUR a year |

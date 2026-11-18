@@ -6,6 +6,7 @@
 // made of blocks, people), loaded once per build by source.ts: from Sanity itself, or from
 // the JSON files converted by from-json.ts. Either way the pages see the same shapes.
 
+import { AsyncLocalStorage } from 'node:async_hooks';
 import fs from 'node:fs';
 import path from 'node:path';
 import { portableTextToMarkdown } from '@portabletext/markdown';
@@ -28,10 +29,19 @@ export const warnOnce = (msg: string) => {
 /* ---------- Loading ---------- */
 
 type Obj = Record<string, unknown>;
-const loaded = await loadDocuments(warnOnce);
+// The click-to-edit preview loads its own documents on each request and starts with none.
+const loaded = isPreview() ? { source: 'sanity' as const, docs: [] } : await loadDocuments(warnOnce);
 export const contentSource = loaded.source;
-let byId = new Map<string, Obj>();
-const ofType = (type: string) => [...byId.values()].filter((d) => d._type === type);
+
+/** The documents being shown, and the lists made from them (see useDocuments at the end). */
+type State = { byId: Map<string, Obj>; people: Person[]; pages: Page[]; photoTargets: WeakMap<object, string> };
+const emptyState = (): State => ({ byId: new Map(), people: [], pages: [], photoTargets: new WeakMap() });
+let shared: State = emptyState();
+// In the preview each request renders with its own documents, so two requests running at the
+// same time (one with drafts, one without) can never see each other's content.
+const perRequest = new AsyncLocalStorage<State>();
+const S = () => perRequest.getStore() ?? shared;
+const ofType = (type: string, byId = S().byId) => [...byId.values()].filter((d) => d._type === type);
 const asObj = (v: unknown): Obj => (v && typeof v === 'object' && !Array.isArray(v) ? (v as Obj) : {});
 const str = (v: unknown) => text.parse(v);
 const list = (v: unknown): Obj[] => (Array.isArray(v) ? v.filter((x) => x && typeof x === 'object') : []) as Obj[];
@@ -39,7 +49,7 @@ const list = (v: unknown): Obj[] => (Array.isArray(v) ? v.filter((x) => x && typ
 /* ---------- Settings ---------- */
 
 export function getSite() {
-  const s = asObj(byId.get('siteSettings'));
+  const s = asObj(S().byId.get('siteSettings'));
   const lang = str(s.defaultLang);
   const defaultLang: Lang = isLang(lang) ? lang : 'en';
   return {
@@ -54,12 +64,12 @@ export function getSite() {
 }
 
 export function getCommunity() {
-  const c = asObj(byId.get('communitySettings'));
+  const c = asObj(S().byId.get('communitySettings'));
   return { ...c, heroImage: c.heroImage, homeBlocks: list(c.homeBlocks) };
 }
 
 export function getFestival() {
-  const f = asObj(byId.get('festivalSettings'));
+  const f = asObj(S().byId.get('festivalSettings'));
   return {
     ...f,
     name: str(f.name) || 'Festival',
@@ -186,8 +196,8 @@ export function trFirst(obj: Obj | null | undefined, fields: string[], lang: Lan
 const GROUPS = { teacher: 'teacher', artist: 'artist' } as const;
 export type Group = keyof typeof GROUPS;
 
-const makePeople = () =>
-  ofType('person')
+const makePeople = (byId: Map<string, Obj>) =>
+  ofType('person', byId)
     .map((d) => {
       const g = str(d.group).toLowerCase();
       if (!(g in GROUPS)) warnOnce(`person "${d._id}" has no group (Teacher or Artist) and is shown with the teachers`);
@@ -202,20 +212,19 @@ const makePeople = () =>
     })
     .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
 export type Person = ReturnType<typeof makePeople>[number];
-let allPeople: Person[] = [];
 
 export function getPeople(group?: Group) {
-  return group ? allPeople.filter((p) => p.group === group) : allPeople;
+  return group ? S().people.filter((p) => p.group === group) : S().people;
 }
 
 /** The people a "People" block shows: the chosen ones in their order, or everyone in the group. */
 export function peopleForBlock(block: Obj) {
   const g = str(block.group).toLowerCase();
   const chosen = list(block.people)
-    .map((r) => allPeople.find((p) => p.id === r._ref))
+    .map((r) => S().people.find((p) => p.id === r._ref))
     .filter((p): p is Person => Boolean(p));
   if (chosen.length) return chosen;
-  return g in GROUPS ? getPeople(g as Group) : allPeople;
+  return g in GROUPS ? getPeople(g as Group) : S().people;
 }
 
 /* ---------- Pages ---------- */
@@ -224,10 +233,10 @@ export type Section = 'community' | 'festival';
 /** Addresses the site itself uses; a page with one of these is skipped. */
 export const RESERVED: Record<Section, string[]> = { festival: [], community: ['festival'] };
 
-const makePages = () => {
+const makePages = (byId: Map<string, Obj>) => {
   const seen = new Set<string>();
   const out = [];
-  const sorted = ofType('page')
+  const sorted = ofType('page', byId)
     .map((d) => ({ d, order: num.parse(d.order) ?? 100 }))
     .sort((a, b) => a.order - b.order || String(a.d._id).localeCompare(String(b.d._id)));
   for (const { d, order } of sorted) {
@@ -265,17 +274,16 @@ const makePages = () => {
   return out;
 };
 export type Page = ReturnType<typeof makePages>[number];
-let allPages: Page[] = [];
 
 export function getPages(section: Section = 'festival') {
-  return allPages.filter((p) => p.section === section);
+  return S().pages.filter((p) => p.section === section);
 }
 
 /** Where a button or banner leads: the chosen page in the visitor's language, else its address. */
 export function blockLink(block: Obj, lang: Lang) {
   const ref = str(asObj(block.page)._ref);
   if (ref) {
-    const target = allPages.find((p) => p.id === ref);
+    const target = S().pages.find((p) => p.id === ref);
     if (target) return { url: href(lang, target.path), label: trFirst(target, ['menuLabel', 'title'], lang), external: false };
     warnOnce(`a button points to a page that is not published (${ref})`);
   }
@@ -314,6 +322,8 @@ function localImage(src: string): ResolvedImage | undefined {
     /* keep as is */
   }
   const local = '/' + clean.replace(/^\/+/, '');
+  // The hosted preview has no project files to look in (Cloudflare): show the address as it is.
+  if (isPreview()) return /^https?:\/\//i.test(src) ? { src } : { src: withBase(local) };
   const found = loadManifest()[local];
   if (!found || found.variants.length === 0) {
     if (/^https?:\/\//i.test(src)) return { src };
@@ -393,9 +403,7 @@ export function getImage(image: unknown): ResolvedImage | undefined {
 // Texts carry invisible markers that say which field they come from; photos cannot, so in
 // the preview every photo object is noted with its document and field, and the <img> gets a
 // data-sanity attribute. Public builds note nothing and print no attribute.
-let photoTargets = new WeakMap<object, string>();
-
-function notePhotos(doc: Obj) {
+function notePhotos(doc: Obj, photoTargets: WeakMap<object, string>) {
   const edit = createDataAttribute({ id: String(doc._id), type: String(doc._type), baseUrl: STUDIO_URL });
   const walk = (value: unknown, path: (string | { _key: string })[]) => {
     if (Array.isArray(value)) {
@@ -414,7 +422,7 @@ function notePhotos(doc: Obj) {
 }
 
 /** The data-sanity attribute that makes a photo clickable in the preview; nothing otherwise. */
-export const editAttr = (image: unknown) => (image && typeof image === 'object' ? photoTargets.get(image) : undefined);
+export const editAttr = (image: unknown) => (image && typeof image === 'object' ? S().photoTargets.get(image) : undefined);
 
 /** The description of a photo for screen readers, in the visitor's language. */
 export const altOf = (image: unknown, lang: Lang) => tr(asObj(image), 'alt', lang);
@@ -454,19 +462,27 @@ export function videoEmbed(url: unknown) {
 
 /* ---------- Which documents are shown ---------- */
 
-/**
- * Makes these documents the content every helper above reads. A build calls it once (below);
- * the click-to-edit preview calls it on every request with the latest drafts
- * (src/middleware.ts). Pages never notice the difference.
- */
+function makeState(docs: unknown[]): State {
+  const st = emptyState();
+  for (const d of docs) if (d && typeof d === 'object' && typeof (d as Obj)._id === 'string') st.byId.set((d as Obj)._id as string, d as Obj);
+  if (isPreview()) for (const d of st.byId.values()) notePhotos(d, st.photoTargets);
+  st.people = makePeople(st.byId);
+  st.pages = makePages(st.byId);
+  return st;
+}
+
+/** Makes these documents the content every helper above reads. A build calls it once (below). */
 export function useDocuments(docs: unknown[]) {
-  const next = new Map<string, Obj>();
-  for (const d of docs) if (d && typeof d === 'object' && typeof (d as Obj)._id === 'string') next.set((d as Obj)._id as string, d as Obj);
-  byId = next;
-  photoTargets = new WeakMap();
-  if (isPreview()) for (const d of next.values()) notePhotos(d);
-  allPeople = makePeople();
-  allPages = makePages();
+  shared = makeState(docs);
+}
+
+/**
+ * Runs `render` with these documents as the content, for this request only: the click-to-edit
+ * preview (src/middleware.ts) calls it on every request with the documents it just loaded.
+ * Pages never notice the difference.
+ */
+export function withDocuments<T>(docs: unknown[], render: () => Promise<T>): Promise<T> {
+  return perRequest.run(makeState(docs), render);
 }
 
 useDocuments(loaded.docs);

@@ -11,6 +11,8 @@ Owner: **D** = Dávid (accounts, decisions), **M** = maintainer/agent (code), **
 
 ## ▶ Next task for the next agent: go live for the admin's review
 
+**Status 2026-11-18, late evening: code done (S11).** Dávid chose the preview lock and polish A first; both built. Preview on Cloudflare, lock, test site and rebuild on Publish are ready and tested locally (`npm run check` [8]). **Waiting for Dávid** to create the two Workers and the Sanity webhook (`HOSTING.md`). Then: preview address into `studio/.env.production`, test address into `docs/EDITING-GUIDE.md` (replace ‹test site address›, remove the maintainer note), Dávid runs `npm run studio:deploy` and tries it in the deployed Studio (Safari: the cookie in the frame is the part least certain), invite test, send. The items below are kept for the record.
+
 **Why (2026-11-18, late evening).** Dávid tried click-to-edit and approved it (S8 outcome: Sanity stays). Next he wants **the current version online so he can send it to the admin for review** and collect her input, before further polish. The full checklist (who does what) is in the root [README.md](../README.md), "Next step: go live for the admin's review". In short:
 
 - **Dávid first: done except decisions** (2026-11-18, late evening): Free plan with both as Administrators (`DECISIONS.md` S10); Cloudflare account created (GitHub sign-in, nothing connected yet); invite test moved to just before sending. **Still ask him:** the preview lock (recommended), whether polish item A comes first (recommended; explained to him, undecided), the domain (launch only).
@@ -33,13 +35,13 @@ Owner: **D** = Dávid (accounts, decisions), **M** = maintainer/agent (code), **
 
 **State to start from:** `DECISIONS.md` S9 (how the preview is built), `SPEC.md` 11.7 (P18-P22), `ARCHITECTURE.md` "Click-to-edit preview". Code: `src/lib/preview-client.ts` (browser script), `src/middleware.ts`, `src/lib/source.ts` (`loadPreviewDocuments`, marker filter), `src/lib/content.ts` (`useDocuments`, `editAttr`), `studio/sanity.config.ts` (`presentationTool`). Pinned: `@sanity/visual-editing` 6.2.1, `@sanity/client` 8.16.0, `sanity` 6.23.0; read the README of the installed version in `node_modules` before using an API. Our site is plain Astro (no React in the page), so features documented only for React must be tried before they are promised.
 
-**How to test:** Dávid's `.env` holds `SANITY_VIEWER_TOKEN` (never read it out or ask for it). Without it, `PREVIEW_PERSPECTIVE=published npm run preview:edit` shows published content with markers. Clicking inside the Studio needs a signed-in browser, so Dávid does the final try. Astro 7 runs one dev server per project unless `--ignore-lock`; the preview uses port 4322 for that reason; stop stray ones with `lsof -ti:4322 | xargs kill`.
+**How to test:** Dávid's `.env` holds `SANITY_VIEWER_TOKEN` (never read it out or ask for it). Without it, `npm run preview:edit` shows published content with markers (drafts need the Studio to open the preview: the lock). `npm run check` [8] tests the preview with a stand-in for Sanity. Clicking inside the Studio needs a signed-in browser, so Dávid does the final try. Astro 7 runs one dev server per project unless `--ignore-lock`; the preview uses port 4322 for that reason; stop stray ones with `lsof -ti:4322 | xargs kill`.
 
 ### Polish, in this order
 
 | # | What | Now | After | Effort | Notes |
 |---|---|---|---|---|---|
-| A | **No reload after an edit** (biggest gain) | Each save reloads the whole page: white flash, back to the top | The script fetches the page's new HTML in the background and swaps only what changed; no flash, scroll position kept | ~1-2 h | In `refresh` of `preview-client.ts`. Not letter by letter: Sanity saves after a short pause, so about a second after typing stops. Letter-by-letter would need the site rebuilt as a JavaScript app; not worth it. After a swap the overlays must find the new elements (check). |
+| A ✅ done 2026-11-18 (S11) | **No reload after an edit** (biggest gain) | Each save reloads the whole page: white flash, back to the top | The script fetches the page's new HTML in the background and swaps only what changed; no flash, scroll position kept | ~1-2 h | In `refresh` of `preview-client.ts`. Not letter by letter: Sanity saves after a short pause, so about a second after typing stops. Letter-by-letter would need the site rebuilt as a JavaScript app; not worth it. After a swap the overlays must find the new elements (check). |
 | B | **Click a whole block** | Only texts and photos have outlines; background, alignment, deleting a block need the form | Every block (text, gallery, button, people grid, ...) has an outline; clicking its edge opens the whole block with its Style tab | small | `data-sanity` on each block element in `Blocks.astro` with path `blocks:<key>` (or `homeBlocks:<key>`), preview only, like `editAttr`. Blocks need to know their document id and field. |
 | C | **Right-click menu on blocks: insert before/after, duplicate, move up/down, remove** | none | Wix-like menu on the page | small if supported | **Test first**: offered by `@sanity/visual-editing`, documented mainly for React. Needs B. Drop it if it does not work and say so. |
 | D | **Drag to reorder** blocks, gallery photos, people in a people grid | none | Drag on the page | small-medium | **Test first**, as C. Without React the page refreshes after the drop instead of moving smoothly; acceptable if A is done. |
@@ -69,7 +71,7 @@ Already built into the Studio, nothing to do: the phone-size switch above the pa
 | Sanity proof of concept: schemas, site reading Sanity documents, migration, admin guide | **Built and tested offline** (S5-S7). Not yet run against the real Sanity project |
 | Studio online, content imported | **Done** 2026-11-18 (Dávid), photos repaired with `npm run sanity:import-replace` the same day |
 | Click-to-edit | **Built, local, approved by Dávid** 2026-11-18 ("pretty awesome"; continue with Sanity). Polish A-G planned, mostly after the admin's review |
-| Online for the admin's review (hosting, preview lock, rebuild on publish) | **Next task** (top). Waiting for Dávid's account steps |
+| Online for the admin's review (hosting, preview lock, rebuild on publish) | **Code done** 2026-11-18 (S11); waiting for Dávid's Cloudflare setup (`HOSTING.md`) |
 | Real content, admin trial, launch | Not started |
 
 ## P0: finish the Sanity port

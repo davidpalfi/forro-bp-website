@@ -18,21 +18,39 @@ Click-to-edit (local): Studio "Edit on the page" <-> npm run preview:edit (draft
 Planned: hosted preview; Sanity webhook -> rebuild.
 ```
 
-## Click-to-edit preview (`npm run preview:edit`)
+## Click-to-edit preview (`npm run preview:edit` locally, `npm run preview:build` for Cloudflare)
 
 ```
-Studio (npm run studio, localhost:3333)          tool "Edit on the page" (Presentation)
-   |  shows in a frame, talks to the page script, opens the clicked field
+Studio (forro-budapest.sanity.studio, or npm run studio at localhost:3333)
+   |  tool "Edit on the page" (Presentation): opens /preview/enable/?sanity-preview-secret=...
+   |  first, then shows the page in a frame, talks to the page script, opens the clicked field
    v
-astro dev with PREVIEW=1 (localhost:4322)        astro.config.mjs: output 'server', reads .env,
-   |                                             injects src/lib/preview-client.ts on every page
-   +- src/middleware.ts      each page request: loadPreviewDocuments() -> useDocuments(docs)
-   +- src/lib/source.ts      drafts perspective, SANITY_VIEWER_TOKEN, stega markers (filter)
-   +- src/lib/content.ts     same helpers; photos noted -> editAttr() -> data-sanity on <img>
-   +- src/lib/preview-client.ts   @sanity/visual-editing: outlines, clicks, reload after edits
+the preview: PREVIEW=1, output 'server'             astro.config.mjs; injects preview-client.ts
+   locally   astro dev, localhost:4322, reads .env  and the route /preview/enable/
+   online    Cloudflare Worker forro-budapest-preview (wrangler.jsonc, @astrojs/cloudflare;
+             SANITY_VIEWER_TOKEN is a Cloudflare secret; no file reads)
+   |
+   +- src/preview/enable.ts     -> preview-lock.ts enablePreview(): checks the Studio secret with
+   |                               Sanity, sets the signed cookie fb-preview, redirects to the page
+   +- src/middleware.ts         each page: previewUnlocked()? drafts : published
+   |                            -> loadPreviewDocuments() -> withDocuments(docs, render the page)
+   +- src/lib/source.ts         client, Viewer token (drafts only), stega markers (filter)
+   +- src/lib/content.ts        same helpers; per-request documents (AsyncLocalStorage);
+   |                            photos noted -> editAttr() -> data-sanity on <img>
+   +- src/lib/preview-client.ts @sanity/visual-editing: outlines, clicks; after an edit fetches
+                                the page again and swaps <body> content (no reload)
 ```
 
-Without `PREVIEW=1` none of this exists in the output (`npm run check` [7]).
+Without `PREVIEW=1` none of this exists in the output (`npm run check` [7]); [8] builds the Cloudflare version and runs it in `wrangler dev` against a stand-in for Sanity (`scripts/lib/fake-sanity.mjs`; `SANITY_API_HOST` points the preview at it, for tests only).
+
+## Hosting (`docs/HOSTING.md`, `DECISIONS.md` S11)
+
+| Worker | Config | Build command | Deploy command | Settings in Cloudflare |
+|---|---|---|---|---|
+| `forro-budapest-preview` | `wrangler.jsonc` | `npm run preview:build` | `npx wrangler deploy` | secret `SANITY_VIEWER_TOKEN` |
+| `forro-budapest-test` | `wrangler.site.jsonc` | `CONTENT_SOURCE=sanity npm run build` | `npx wrangler deploy --config wrangler.site.jsonc` | build variable `SITE_URL`; deploy hook called by the Sanity webhook |
+
+The Studio's preview address: `studio/.env.production` (`SANITY_STUDIO_PREVIEW_URL`, not secret); `npm run studio:deploy` checks it first. Rollback: the Worker > Deployments > Rollback. `npm run preview:local` builds the Cloudflare preview and runs it at localhost:4323 (wrangler reads `SANITY_VIEWER_TOKEN` from the git-ignored `.env`).
 
 ## Data flow of a build
 

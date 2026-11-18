@@ -2,7 +2,7 @@
 
 A guide for the person who updates the site. You need no technical knowledge, and nothing you do here can break the website.
 
-> **For the maintainer, before sending this guide:** it describes the editor as configured in `studio/` on 2026-11-17. Before sending it, deploy the editor, import the content, test every step below yourself, and replace anything that differs. Automatic publishing (step "Publish") is not built yet; until it is, tell her that changes appear on the site after you rebuild it. Section 4a (editing on the page) only works on the maintainer's computer until the preview is hosted: leave it out of the copy you send until then. See `docs/SANITY-PORT-STATUS.md`.
+> **For the maintainer, before sending this guide** (updated 2026-11-18): publishing and editing on the page are built and work once the preview and test site are online (`docs/HOSTING.md`). Before sending: replace ‹test site address› below with the real address (twice), redeploy the Studio (`npm run studio:deploy`), test every step yourself in the deployed Studio on a computer and a phone, and fix anything that differs. Then delete this note.
 
 ---
 
@@ -41,7 +41,7 @@ Most texts have two boxes next to each other: **English** and **Magyar**.
 ## 4. Saving and publishing
 
 - **Everything you type is saved automatically** as a draft. Visitors do not see drafts.
-- When you are happy, click **Publish** (green button, bottom right). The website updates a few minutes later.
+- When you are happy, click **Publish** (green button, bottom right). The test website, **‹test site address›**, shows it 2 to 5 minutes later. (The real forrobudapest.com stays as it is until the new site goes live.)
 - To throw away changes you have not published yet, open the menu next to **Publish** and choose **Discard changes**.
 - Made a mistake you already published? Click the clock icon (**History**) at the top of the document, pick an earlier version and restore it, then publish.
 
@@ -51,11 +51,13 @@ Instead of looking for the right form, you can edit the website where you see it
 
 1. At the top of the editor, click **Edit on the page**. The website appears, with your unpublished changes already in it.
 2. Move the mouse over the page: texts and photos get a thin outline. **Click** one, and its field opens beside the page.
-3. Type, or choose another photo. The page shows the change a moment later. Visitors do not see it yet.
+3. Type, or choose another photo. About a second after you stop typing, the page shows the change. Visitors do not see it yet.
 4. Use the website's menu inside the view to go to another page, or the language switch for the Hungarian version.
 5. When you are happy, click **Publish**, as in section 4.
 
 The outlines only appear inside the editor; they are not on the real website. On a phone, use the lists in section 2 instead.
+
+If a dark strip at the bottom says "unpublished changes are hidden", the page was opened outside the editor (or your browser blocked it): close it and click **Edit on the page** in the editor again. Unpublished changes are only ever shown to people signed in to the editor.
 
 ## 5. Common tasks
 
