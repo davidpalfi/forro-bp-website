@@ -7,7 +7,7 @@ If you are picking this project up with no other context, read this file and `SA
 - **Next task: click-to-edit** (`DECISIONS.md` S8). The full brief for the next agent is at the top of [BACKLOG.md](BACKLOG.md).
 
 - **Read [SANITY-PORT-STATUS.md](SANITY-PORT-STATUS.md) first.** It has the state, what was and was not verified, and the exact next commands.
-- The Sanity proof of concept is built on branch `claude/site-progress-backlog-k1rq9i` (from `feature/sanity`): refined Studio schemas, the site rendering Sanity documents (from Sanity, or from the JSON files converted to the same documents), a repeatable import file and command, a wider `npm run check`, and the admin guide [EDITING-GUIDE.md](EDITING-GUIDE.md). Decisions S5-S7 in `DECISIONS.md`; behaviour in `SPEC.md` section 11; code map in `ARCHITECTURE.md`.
+- The Sanity proof of concept is on branch `feature/sanity`: refined Studio schemas, the site rendering Sanity documents (from Sanity, or from the JSON files converted to the same documents), a repeatable import file and command, a wider `npm run check`, and the admin guide [EDITING-GUIDE.md](EDITING-GUIDE.md). Decisions S5-S7 in `DECISIONS.md`; behaviour in `SPEC.md` section 11; code map in `ARCHITECTURE.md`.
 - Nothing has touched the real Sanity project yet: the Studio is not deployed and the content is not imported. Dávid does both with three commands on his computer.
 - The default build still reads the JSON files and looks the same as the live proof of concept. `main`, its GitHub Pages site and `.pages.yml` are unchanged.
 - Not built: click-to-edit preview, rebuild on publish, hosting choice. See [BACKLOG.md](BACKLOG.md).

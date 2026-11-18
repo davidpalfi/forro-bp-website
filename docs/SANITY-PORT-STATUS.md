@@ -29,7 +29,7 @@ On 2026-11-18 the branch was pushed and Dávid ran `npm ci` (it reported 37 npm 
 
 1. **Dávid, on his computer (about 15 minutes):**
    ```
-   git fetch && git checkout claude/site-progress-backlog-k1rq9i   # or feature/sanity once merged
+   git fetch && git checkout feature/sanity && git pull
    npm ci
    npm run sanity:login          # opens the browser; sign in to Sanity
    npm run studio:deploy         # puts the editor online at forro-budapest.sanity.studio
