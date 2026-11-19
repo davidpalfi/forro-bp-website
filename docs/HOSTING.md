@@ -1,214 +1,211 @@
 # Putting it online (Cloudflare, free plan)
 
-For Dávid. About 30 minutes. **Use a computer**: the Cloudflare and Sanity dashboards are cramped on a phone. Nothing here touches forrobudapest.com, Wix or the `main` site, and nothing costs money.
+For Dávid. About 30 minutes. **Use a computer** (the dashboards are cramped on a phone). Nothing here touches forrobudapest.com, Wix or the `main` site, and nothing costs money.
 
-Written on 2026-11-19 from Cloudflare's and Sanity's documentation; the agent could not open the dashboards themselves. If a button has a slightly different name, look for the nearest match; if something is missing entirely, stop and tell the agent what you see.
+Every step starts with a link. Open it in the same browser where you are signed in to Cloudflare (with GitHub) or Sanity. Written 2026-11-19 from Cloudflare's and Sanity's documentation; the agent could not open the dashboards itself. If a button has a slightly different name, take the nearest match. If a link does not land where the step says, use the "or" route given with it. If something is missing entirely, stop and tell the agent what you see.
 
-## What you are making
+**Two secrets:** the Sanity token (part 2) and the deploy hook address (part 5). Paste them only into the boxes named in the steps: never into chat, e-mail or a file.
 
-Two "Workers" (Cloudflare's word for a site it hosts). Both are built from the GitHub repository `forro-bp-website`, branch `feature/sanity`:
-
-| Name | What it is | Its address |
-|---|---|---|
-| `forro-budapest-preview` | The click-to-edit preview the Studio shows in **Edit on the page**. Drafts appear only when it is opened from the signed-in Studio | `https://forro-budapest-preview.<your-subdomain>.workers.dev` |
-| `forro-budapest-test` | The test version of the public site. Rebuilt when someone clicks **Publish** | `https://forro-budapest-test.<your-subdomain>.workers.dev` |
-
-`<your-subdomain>` is your account's own word, the same for both (for example `david-abc`).
-
-**Keep two things secret:** the Sanity token (part 2) and the deploy hook address (part 5). Paste them only into the boxes the steps name: never into chat, e-mail or a file. The two `workers.dev` addresses are not secret.
-
-Keep a note open (on paper or your phone) for: the preview address, the test address.
+**Keep a note** for two addresses you will collect (not secret): the *preview address* and the *test address*.
 
 ---
 
-## Part 1. The preview Worker (about 10 minutes)
+## Part 1. The preview site (10 minutes)
 
-### 1a. Create it
+**1.1** Open https://dash.cloudflare.com/?to=/:account/workers-and-pages/create
+(or: https://dash.cloudflare.com/?to=/:account/workers-and-pages and click the blue **Create** button, top right).
+If it asks which account, click yours.
 
-1. Open **https://dash.cloudflare.com** and sign in (you signed in with GitHub before).
-2. If Cloudflare asks which account, choose yours.
-3. In the left menu, click **Compute (Workers)** > **Workers & Pages**. (On some screens it is just **Workers & Pages**.)
-4. Click the blue **Create** button (top right; it may say **Create application**).
-5. You see tabs or tiles. Choose **Import a repository** and click **Get started** next to it.
-   - If this is the first time: Cloudflare asks to connect GitHub. Click **Connect GitHub**, then on GitHub's page choose **Only select repositories** > `forro-bp-website` > **Install & Authorize**. You come back to Cloudflare.
-6. In the list of repositories, click `forro-bp-website` > **Begin setup** (or **Next**).
-7. Fill in the form:
+**1.2** You see a few choices. Find **Import a repository** and click **Get started** next to it.
 
-   | Field | Type exactly |
-   |---|---|
-   | **Project name** | `forro-budapest-preview` |
-   | **Build command** | `npm run preview:build` |
-   | **Deploy command** | `npx wrangler deploy` |
+**1.3** Only the first time: a **Connect GitHub** button. Click it. GitHub opens:
+- choose **Only select repositories**,
+- in the drop-down pick **forro-bp-website**,
+- click **Install & Authorize** (GitHub may ask for your password).
+You land back in Cloudflare.
 
-   Leave everything else as it is (path `/`, no variables yet). If the form shows a **Branch** or **Production branch** field, choose `feature/sanity`; if it does not, part 1b fixes it.
-8. Click **Create and deploy** (or **Save and Deploy**).
-9. If Cloudflare asks you to choose a **workers.dev subdomain**, pick something short, e.g. your name. This becomes `<your-subdomain>` for both Workers.
+**1.4** A list of your repositories. Click **forro-bp-website**, then **Begin setup** (or **Next**).
 
-### 1b. Make it build the right branch
+**1.5** A form. Fill in exactly (copy and paste):
 
-The first build may use the repository's main branch (`main`), which has no preview yet, so it **fails**. That is expected and harmless.
+| Field | Value |
+|---|---|
+| Project name | `forro-budapest-preview` |
+| Build command | `npm run preview:build` |
+| Deploy command | `npx wrangler deploy` |
 
-1. Open the Worker: **Workers & Pages** > `forro-budapest-preview`.
-2. Click the **Settings** tab, then **Build** in the list on the left (or scroll to the **Build** section).
-3. Find **Branch control**. Click the pencil/edit icon.
-   - **Production branch**: choose `feature/sanity`.
-   - **Builds for non-production branches**: **untick** it (otherwise every work-in-progress branch would start a build).
-   - **Save**.
-4. Go to the **Deployments** tab. Click **Retry build** on the failed one, or the **⋯** menu > **Retry build**. If there is no such button, tell the agent: it will push a small change, which starts a build.
-5. Wait 2-4 minutes. The build shows a green tick (**Success**).
+Leave all other fields alone. If you see a **Branch** / **Production branch** field, choose `feature/sanity`.
 
-### 1c. Write down its address
+**1.6** Click **Create and deploy** (or **Save and Deploy**).
 
-On the Worker's main page (**Overview**, or top right of **Deployments**) you see **Domains & Routes** or a link ending in `workers.dev`. Write it down as **preview address**, e.g. `https://forro-budapest-preview.david-abc.workers.dev`.
+**1.7** If it asks you to choose a **workers.dev subdomain**: type something short, e.g. `davidpalfi`, and confirm. This word appears in both addresses.
 
-Open it in a new tab. You should see the festival home page **with a dark strip at the bottom**: "Preview: unpublished changes are hidden ...". That strip is the lock working. If you see an error page instead, wait for part 2, then check again.
+**1.8** You now see the build running. **It will probably fail** with a red cross, because Cloudflare builds the `main` branch first. That is expected. Go on.
 
----
+**1.9** Open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-budapest-preview/production/settings
+(or: https://dash.cloudflare.com/?to=/:account/workers-and-pages > click **forro-budapest-preview** > the **Settings** tab).
 
-## Part 2. Give the preview its Sanity token (about 5 minutes)
+**1.10** Scroll to the **Build** section. Find **Branch control** and click the pencil icon next to it.
+- **Production branch**: choose `feature/sanity`
+- **Builds for non-production branches**: remove the tick
+- Click **Save**.
 
-The preview needs a "Viewer" token to read drafts. Make a **new** one just for Cloudflare (do not reuse the one in your `.env`), so either can be revoked on its own.
+**1.11** Open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-budapest-preview/production/deployments
+(or: the **Deployments** tab at the top of the same page).
+Next to the failed build click **⋯** > **Retry build** (or a **Retry build** button). If there is none, tell the agent: it will start a build for you by pushing a small change.
 
-### 2a. Make the token in Sanity
+**1.12** Wait 2-4 minutes until the build has a green tick.
 
-1. Open **https://www.sanity.io/manage** and sign in.
-2. Click the project **Forró Budapest**.
-3. Click the **API** tab at the top.
-4. In the left list, click **Tokens**.
-5. Click **Add API token**.
-   - **Name**: `Cloudflare preview`
-   - **Permissions**: **Viewer**
-   - Click **Save**.
-6. A long code appears **once**. Click **Copy** next to it. Do not close this window until 2b is done.
+**1.13** At the top of the page (or on the **Settings** tab, section **Domains & Routes**) there is an address ending in `.workers.dev`, e.g. `https://forro-budapest-preview.davidpalfi.workers.dev`. Copy it into your note as **preview address**.
 
-### 2b. Put it in Cloudflare as a secret
-
-1. Back in Cloudflare: **Workers & Pages** > `forro-budapest-preview` > **Settings**.
-2. Find **Variables and Secrets** (this is the Worker's own settings, *not* the ones under Build). Click **Add** (or **+ Add**).
-3. Fill in:
-   - **Type**: **Secret** (important: not "Text")
-   - **Variable name**: `SANITY_VIEWER_TOKEN`
-   - **Value**: paste the token
-4. Click **Deploy** (or **Save and deploy**). It takes effect within a minute; no new build is needed.
-5. Now you can close the Sanity window. The token is no longer visible anywhere, which is how it should be.
-
-Check: the preview address should still show the page with the dark strip. That is right: drafts only appear when the Studio opens the page (part 6).
+**1.14** Open the preview address. You see the festival page with a **dark strip at the bottom**: "Preview: unpublished changes are hidden ...". Good: that is the lock.
 
 ---
 
-## Part 3. The test site Worker (about 10 minutes)
+## Part 2. The preview's Sanity token (5 minutes)
 
-### 3a. Create it
+**2.1** Open https://www.sanity.io/manage/project/8hc671sk/api
+(or: https://www.sanity.io/manage > click **Forró Budapest** > the **API** tab at the top).
 
-Same as part 1a, with different values:
+**2.2** Find the **Tokens** section (a heading on that page, or **Tokens** in the left list). Click **Add API token**.
 
-1. **Workers & Pages** > **Create** > **Import a repository** > **Get started** > `forro-bp-website` > **Begin setup**.
-2. Fill in:
+**2.3** Fill in:
+- **Name**: `Cloudflare preview`
+- **Permissions**: **Viewer**
+- Click **Save**.
 
-   | Field | Type exactly |
-   |---|---|
-   | **Project name** | `forro-budapest-test` |
-   | **Build command** | `CONTENT_SOURCE=sanity npm run build` |
-   | **Deploy command** | `npx wrangler deploy --config wrangler.site.jsonc` |
+**2.4** A long code appears, **only this once**. Click **Copy**. Keep this tab open.
 
-3. **Create and deploy**. The first build may fail again (wrong branch). Fine.
+**2.5** In a new tab open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-budapest-preview/production/settings
+(or: Workers & Pages > **forro-budapest-preview** > **Settings**).
 
-### 3b. Right branch, and its own address
+**2.6** Find the section **Variables and Secrets** (near the top; *not* the one inside the Build section). Click **+ Add**.
 
-1. `forro-budapest-test` > **Settings** > **Build** > **Branch control**: production branch `feature/sanity`, **untick** non-production builds, **Save**.
-2. Write down its address (part 1c) as **test address**, e.g. `https://forro-budapest-test.david-abc.workers.dev`.
-3. Still in **Settings** > **Build**, find **Variables and secrets** *under Build* (these are used while building; not the ones from part 2b). Click **Add**:
-   - **Type**: Text
-   - **Variable name**: `SITE_URL`
-   - **Value**: the test address, starting with `https://`, without anything after `.dev`
-   - **Save**.
-4. **Deployments** > **Retry build** (part 1b, step 4). Wait 2-4 minutes for the green tick.
-5. Open the test address. You see the site with the content from Sanity, and **no** dark strip (this is the public version).
+**2.7** Fill in:
+- **Type**: **Secret** (not Text)
+- **Variable name**: `SANITY_VIEWER_TOKEN`
+- **Value**: paste (Ctrl+V / Cmd+V)
+- Click **Deploy** (or **Save and deploy**).
+
+**2.8** Close the Sanity tab. The token is now stored only in Cloudflare, which is how it should be.
+
+**2.9** Open the preview address again: still the page with the dark strip. That is right; drafts show only when the Studio opens it (part 6).
 
 ---
 
-## Part 4. Check both
+## Part 3. The test site (10 minutes)
+
+**3.1** Open https://dash.cloudflare.com/?to=/:account/workers-and-pages/create again. **Import a repository** > **Get started** > **forro-bp-website** > **Begin setup**.
+
+**3.2** Fill in exactly:
+
+| Field | Value |
+|---|---|
+| Project name | `forro-budapest-test` |
+| Build command | `CONTENT_SOURCE=sanity npm run build` |
+| Deploy command | `npx wrangler deploy --config wrangler.site.jsonc` |
+
+**3.3** **Create and deploy**. The build may fail again (wrong branch). Go on.
+
+**3.4** Open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-budapest-test/production/settings
+(or: Workers & Pages > **forro-budapest-test** > **Settings**).
+
+**3.5** **Build** section > **Branch control** > pencil: production branch `feature/sanity`, remove the tick at non-production builds, **Save** (as in 1.10).
+
+**3.6** Find this Worker's address (as in 1.13), e.g. `https://forro-budapest-test.davidpalfi.workers.dev`. Copy it into your note as **test address**.
+
+**3.7** Still in the **Build** section, find **Variables and secrets** *inside Build* (build variables). Click **+ Add**:
+- **Type**: Text
+- **Variable name**: `SITE_URL`
+- **Value**: the test address, beginning with `https://` and ending with `.workers.dev`
+- **Save**.
+
+**3.8** Open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-budapest-test/production/deployments > **⋯** > **Retry build**. Wait for the green tick.
+
+**3.9** Open the test address: the site with the content from Sanity, **no** dark strip.
+
+---
+
+## Part 4. Check (2 minutes)
+
+Replace *preview* and *test* with your two addresses:
 
 | Open | You should see |
 |---|---|
-| preview address | the festival page, dark strip at the bottom |
-| preview address + `/hu/festival/` | the Hungarian festival page, dark strip |
-| test address | the festival page, no strip |
-| test address + `/en/festival/teachers/` | the teachers |
-| test address + `/en/nothing-here/` | the site's "page not found" |
-
-If one fails, see "If something goes wrong" at the end.
+| *preview address* | festival page, dark strip |
+| *preview address*`/hu/festival/` | Hungarian festival page, dark strip |
+| *test address* | festival page, no strip |
+| *test address*`/en/festival/teachers/` | the teachers |
+| *test address*`/en/nothing-here/` | the site's "page not found" |
 
 ---
 
-## Part 5. Rebuild the test site when someone clicks Publish (about 5 minutes)
+## Part 5. Rebuild when someone clicks Publish (5 minutes)
 
-### 5a. A deploy hook in Cloudflare
+**5.1** Open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-budapest-test/production/settings > **Build** section > **Deploy Hooks** > **+ Add** (or **Create deploy hook**).
+- **Name**: `Sanity publish`
+- **Branch**: `feature/sanity`
+- **Save**.
 
-1. `forro-budapest-test` > **Settings** > **Build** > **Deploy Hooks** > **Add deploy hook** (or **Create**).
-   - **Name**: `Sanity publish`
-   - **Branch**: `feature/sanity`
-   - **Save**.
-2. An address appears, starting with `https://api.cloudflare.com/client/v4/workers/builds/deploy_hooks/...`. **Copy** it. It is secret: anyone with it can start builds.
+**5.2** An address appears, starting with `https://api.cloudflare.com/client/v4/workers/builds/deploy_hooks/`. Click **Copy**. (Secret.)
 
-### 5b. A webhook in Sanity
+**5.3** Open https://www.sanity.io/manage/project/8hc671sk/api (as in 2.1). Find **Webhooks** (a heading or left-list item) > **Create webhook** (or **Add webhook**).
 
-1. **https://www.sanity.io/manage** > **Forró Budapest** > **API** > **Webhooks** (left list) > **Create webhook** (or **Add webhook**).
-2. Fill in:
+**5.4** Fill in:
 
-   | Field | Value |
-   |---|---|
-   | **Name** | `Rebuild test site` |
-   | **Description** | (empty) |
-   | **URL** | paste the deploy hook address |
-   | **Dataset** | `production` |
-   | **Trigger on** | tick **Create**, **Update** and **Delete** |
-   | **Filter** | `_type in ["siteSettings", "communitySettings", "festivalSettings", "page", "person"]` |
-   | **Projection** | (empty) |
-   | **Status** | Enabled |
-   | **Drafts** | off (unticked): only published changes rebuild |
-   | **Versions** | off (unticked) |
-   | **HTTP method** | `POST` |
-   | **HTTP headers**, **API version**, **Secret** | leave as they are / empty |
+| Field | Value |
+|---|---|
+| Name | `Rebuild test site` |
+| Description | leave empty |
+| URL | paste the deploy hook address |
+| Dataset | `production` |
+| Trigger on | tick **Create**, **Update**, **Delete** |
+| Filter | `_type in ["siteSettings", "communitySettings", "festivalSettings", "page", "person"]` |
+| Projection | leave empty |
+| Status | Enabled |
+| Drafts | **no** tick |
+| Versions | **no** tick |
+| HTTP method | `POST` |
+| HTTP headers, API version, Secret | leave as they are |
 
-3. **Save**.
+Click **Save**. If Sanity says webhooks are not available on your plan, stop and tell the agent (fallback: a rebuild every hour).
 
-If Sanity says webhooks are not available on your plan, stop here and tell the agent; the fallback is a rebuild every hour.
+**5.5** Test it. Open https://forro-budapest.sanity.studio > **Festival home page** > add a full stop somewhere, e.g. at the end of the Hungarian date line > **Publish**.
 
-### 5c. Try it
-
-1. Open the Studio: **https://forro-budapest.sanity.studio**.
-2. **Festival home page** > change one small thing (e.g. add a full stop to the Hungarian date line) > **Publish**.
-3. In Cloudflare: `forro-budapest-test` > **Deployments**. Within a minute a new build appears ("deploy hook"). Wait for the green tick.
-4. Reload the test address: the change is there. Undo the change in the Studio and publish again if you like.
+**5.6** Open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-budapest-test/production/deployments. Within a minute a new build appears. Wait for the green tick, then reload the test address: the full stop is there. Remove it in the Studio and publish again.
 
 ---
 
-## Part 6. Send the agent the two addresses; then deploy the Studio
+## Part 6. Send the agent the two addresses, then deploy the Studio
 
-1. Send the agent the **preview address** and the **test address** (both not secret).
-2. The agent puts the preview address into `studio/.env.production` and the test address into the admin guide, and pushes it.
-3. Then, on your computer, in the project folder (`cd ~/src/forro-budapest-site`):
+**6.1** Send the agent the **preview address** and the **test address**.
 
-   ```
-   git pull
-   npm ci
-   npm run studio:deploy
-   ```
+**6.2** The agent saves them in the project and tells you when it is pushed.
 
-   It prints `"Edit on the page" will open https://forro-budapest-preview...` and deploys. (`studio:deploy` refuses to run until the preview address is set, so the admin can never get a tab pointing at your computer.)
-4. Open **https://forro-budapest.sanity.studio** > **Edit on the page**. The page appears **without** the dark strip. Click a text, type a word: about a second later the page shows it, without flashing or jumping to the top. Do not publish if you do not want to.
-5. Please try this in **Safari** too: it is the browser most likely to block the preview's cookie. Tell the agent whether the strip disappears there.
+**6.3** On your computer, open Terminal and run, one line at a time:
+
+```
+cd ~/src/forro-budapest-site
+git pull
+npm ci
+npm run studio:deploy
+```
+
+It prints `"Edit on the page" will open https://forro-budapest-preview...` and deploys the Studio.
+
+**6.4** Open https://forro-budapest.sanity.studio > **Edit on the page** (top). The page appears **without** the dark strip. Click a text and type a word: about a second later the page shows it, without flashing or jumping to the top. Nothing is published unless you click Publish.
+
+**6.5** Do 6.4 in **Safari** too and tell the agent whether the dark strip is gone there (Safari is the browser most likely to block the preview's cookie).
 
 ---
 
 ## If something goes wrong
 
-- **A build fails** (red cross): the Worker > **Deployments** > click the failed build > **View build log** (or **Logs**). Scroll to the end. Send the agent the last 30 lines (they contain no secrets). Nothing is deployed when a build fails, so the previous version stays online.
-- **"Name mismatch" / "the name in your wrangler config does not match"**: the Worker's name in Cloudflare is not exactly `forro-budapest-preview` / `forro-budapest-test`. Tell the agent which name you used.
-- **The build used `main`**: branch control (part 1b / 3b) was not saved. Set it again and retry.
-- **The preview shows "could not load the content from Sanity"**: the token is wrong or not a Secret (part 2). Make a new Viewer token and replace the secret.
-- **Inside the Studio the dark strip stays**: the browser blocked the preview's cookie, or the Studio was deployed before part 6. Click **Open preview** (arrow icon above the page) once, then go back; tell the agent which browser.
-- **Undo a bad deployment**: the Worker > **Deployments** > an earlier, working one > **⋯** > **Rollback**.
-- **Stop it all**: the Worker > **Settings** > **Delete**. The site disappears; nothing else is affected.
-- **Costs**: the free plan allows 100,000 visits a day and 3,000 build minutes a month for the whole account (each build takes 2-4 minutes). Cloudflare charges nothing unless you add a payment method and upgrade.
+- **A build fails** (red cross): open the Worker's deployments link (1.11 or 3.8) > click the failed build > **View build log**. Scroll to the end, copy the last 30 lines, send them to the agent (no secrets in them). A failed build changes nothing online.
+- **"Name mismatch" / "does not match the name in your wrangler config"**: the Project name is not exactly `forro-budapest-preview` / `forro-budapest-test`. Tell the agent what you typed.
+- **The build log says it built `main`**: branch control was not saved; repeat 1.10 / 3.5 and retry.
+- **The preview says "could not load the content from Sanity"**: the token is wrong or saved as Text. Repeat part 2 with a new token.
+- **Inside the Studio the dark strip stays**: click **Open preview** (arrow icon above the page) once, then go back. Tell the agent which browser.
+- **Undo a bad deployment**: the deployments link > an earlier working one > **⋯** > **Rollback**.
+- **Remove everything**: the Worker's settings link > bottom of the page > **Delete**. Nothing else is affected.
+- **Costs**: free plan: 100,000 visits a day and 3,000 build minutes a month for the account (a build takes 2-4 minutes). Nothing is charged unless you add a payment method and upgrade.
