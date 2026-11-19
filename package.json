@@ -10,12 +10,14 @@
     "check": "node scripts/check.mjs",
     "studio": "cd studio && sanity dev",
     "studio:build": "cd studio && sanity build",
-    "studio:deploy": "cd studio && sanity deploy",
+    "studio:deploy": "node scripts/studio-deploy-check.mjs && cd studio && sanity deploy",
     "sanity:import-file": "node scripts/make-sanity-import.mjs",
     "sanity:import": "npm run sanity:import-file && cd studio && sanity datasets import ../sanity-import/data.ndjson --dataset production --missing",
     "sanity:import-replace": "npm run sanity:import-file && cd studio && sanity datasets import ../sanity-import/data.ndjson --dataset production --replace",
     "sanity:login": "cd studio && sanity login",
-    "preview:edit": "node scripts/optimize-images.mjs && PREVIEW=1 astro dev --ignore-lock"
+    "preview:edit": "node scripts/optimize-images.mjs && PREVIEW=1 astro dev --ignore-lock",
+    "preview:build": "node scripts/optimize-images.mjs && PREVIEW=1 astro build",
+    "preview:local": "npm run preview:build && wrangler dev --port 4323"
   },
   "dependencies": {
     "@astrojs/cloudflare": "14.4.8",
@@ -37,7 +39,8 @@
     "react-dom": "19.3.1",
     "sanity": "6.23.0",
     "sharp": "0.35.5",
-    "styled-components": "6.6.0"
+    "styled-components": "6.6.0",
+    "wrangler": "4.162.0"
   },
   "engines": {
     "node": ">=22.23.4"

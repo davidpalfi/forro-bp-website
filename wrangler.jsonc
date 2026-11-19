@@ -1,0 +1,20 @@
+// The click-to-edit preview on Cloudflare Workers (free plan). Built with
+// `npm run preview:build`; Cloudflare's "Workers Builds" runs that and then `npx wrangler deploy`
+// on every push to the branch it watches. The public test site is wrangler.site.jsonc.
+//
+// Secret (Cloudflare dashboard > this Worker > Settings > Variables and Secrets, type "Secret"):
+//   SANITY_VIEWER_TOKEN   a Viewer token from sanity.io/manage > API > Tokens. Never in a file.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "forro-budapest-preview",
+  "compatibility_date": "2026-11-10",
+  // Node's APIs (process.env, AsyncLocalStorage) inside the Worker.
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": { "enabled": true },
+  "vars": {
+    // Where a click on "edit" leads outside the Studio's own window.
+    "SANITY_STUDIO_URL": "https://forro-budapest.sanity.studio"
+  }
+}

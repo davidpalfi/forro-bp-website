@@ -1,0 +1,20 @@
+// The public test site on Cloudflare Workers (free plan): the static pages from
+// `CONTENT_SOURCE=sanity npm run build`, nothing running on a server. Cloudflare's
+// "Workers Builds" runs that build and then `npx wrangler deploy --config wrangler.site.jsonc`,
+// on every push and when Sanity's webhook calls the Worker's deploy hook (Publish).
+// A failed build deploys nothing, so the previous version stays online.
+// Build variable to set in Cloudflare: SITE_URL (the Worker's https://...workers.dev address).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "forro-budapest-test",
+  "compatibility_date": "2026-11-10",
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": {
+    "directory": "./dist",
+    // /en/festival/ is served from /en/festival/index.html; /en/festival is sent to /en/festival/.
+    "html_handling": "auto-trailing-slash",
+    // Unknown addresses get the site's own 404 page.
+    "not_found_handling": "404-page"
+  }
+}

@@ -2,7 +2,13 @@
 
 If you are picking this project up with no other context, read this file and `SANITY-PORT-STATUS.md` first, then `USER-NEEDS.md` (who it is for and how little is verified), `DECISIONS.md` (why), `SPEC.md` (what the site does) and `ARCHITECTURE.md` (how the code is organised). `CLAUDE.md` has the rules for a Claude session working in the repo. The root-level [EDITING-GUIDE.md](../EDITING-GUIDE.md) is for the old Pages CMS PoC; [docs/EDITING-GUIDE.md](EDITING-GUIDE.md) is the admin guide for Sanity; check it against the deployed Studio before sending it.
 
-## Current handoff (2026-11-18, late evening)
+## Current handoff (2026-11-18, night)
+
+- **Go-live code is done** (`DECISIONS.md` S11): preview on Cloudflare Workers with the preview lock (Dávid chose it), no reload after an edit (polish A, Dávid chose it first), test site rebuilt on Publish via a Sanity webhook and a Cloudflare deploy hook. `npm run check` [8] tests it in Cloudflare's local runtime with a stand-in for Sanity. Not tested against the real Studio, Sanity or Cloudflare (blocked from cloud sessions).
+- **Waiting for Dávid:** [HOSTING.md](HOSTING.md) (two Workers, the token as a Cloudflare secret, deploy hook, Sanity webhook). He sends the two `workers.dev` addresses (not secret). Then: preview address into `studio/.env.production` (`SANITY_STUDIO_PREVIEW_URL=https://...`), test address into `docs/EDITING-GUIDE.md`, he runs `npm run studio:deploy` and tries Edit on the page and Publish, especially in Safari (partitioned cookie in the Studio's frame). If drafts never show inside the Studio, the cookie is blocked: next step would be carrying the lock in the address instead (S11, considered).
+- Still open: the domain (launch only); polish B-G after her review.
+
+## Earlier handoff (2026-11-18, late evening)
 
 - **Next task: go live for the admin's review** (online preview with a lock, test site rebuilt on Publish, Studio redeployed, guide finished). Dávid's checklist is in the root [README.md](../README.md); the agent's brief is at the top of [BACKLOG.md](BACKLOG.md). Dávid's account steps are done (2026-11-18, late evening, from his phone): Sanity stays on the **Free plan** with both him and the admin as **Administrators** (`DECISIONS.md` S10; the Growth trial downgrades to Free by itself), and a **Cloudflare account exists** (he signed in with GitHub; no project created, repository not connected: tell him exactly what to click when the code is ready). The invite test was moved to just before he sends her the link. Click-to-edit polish A-G comes after her review (A possibly before).
 - **Still to ask Dávid before or while coding:** (1) the preview lock (Sanity's preview secret; recommended, not yet answered); (2) polish A first or not: it was explained to him in plain words (the page no longer reloads, flashes white and jumps to the top after each saved edit) but he did not decide; (3) the real domain (.com, .hu or both), only needed for launch. He works from his phone at times: keep instructions short, click by click.
@@ -103,6 +109,7 @@ npm run sanity:import  # write it and import missing documents into Sanity
 npm run sanity:import-replace  # overwrite the imported documents with the import file (before the admin starts only)
 CONTENT_SOURCE=sanity npm run build   # build from the published content in Sanity
 npm run preview:edit   # click-to-edit preview at http://localhost:4322 (drafts; needs .env, see .env.example)
+npm run preview:build  # the same preview built for Cloudflare (docs/HOSTING.md); preview:local runs it at :4323
 ```
 
 Needs Node 22.23.4 or newer. Build for a sub-path locally: `SITE_URL=https://x.github.io SITE_BASE=/repo npm run build`.

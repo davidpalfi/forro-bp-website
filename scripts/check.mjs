@@ -345,7 +345,21 @@ console.log('\n[7] Click-to-edit preview stays out of the public site');
   check(!/visual-editing|preview-client/.test(layout), 'the page layout itself never loads the editing script');
   const ignored = spawnSync('git', ['check-ignore', '-q', '.env'], { cwd: ROOT });
   check(ignored.status === 0, 'the .env file (preview token) is ignored by git');
+  check(/const hosted = preview &&/.test(config) && /hosted \? \(await import\('@astrojs\/cloudflare'\)\)/.test(config), 'the Cloudflare adapter is loaded only for the hosted preview');
+  if (realDir) {
+    const lockTraces = htmlFiles(realDir).filter((f) => /preview\/enable|fb-preview|unpublished changes are hidden/.test(fs.readFileSync(f, 'utf8')));
+    check(lockTraces.length === 0 && !fs.existsSync(dist(realDir, 'preview')), 'the public build has no preview lock or its address');
+    check(!fs.existsSync(dist(realDir, 'server')) && !fs.existsSync(dist(realDir, '_worker.js')), 'the public build is plain files, with no server code');
+  }
+  for (const f of ['wrangler.jsonc', 'wrangler.site.jsonc']) {
+    const t = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    check(!/SANITY_VIEWER_TOKEN"\s*:/.test(t) && !/sk[A-Za-z0-9]{40,}/.test(t), `${f} holds no token`);
+  }
 }
+
+/* ------------------------------------------------------------------ */
+console.log('\n[8] The hosted preview: Cloudflare runtime, preview lock, drafts, update without reload');
+failures += (await import('./check-preview.mjs')).default;
 
 /* ------------------------------------------------------------------ */
 for (const d of tmpDirs) {
