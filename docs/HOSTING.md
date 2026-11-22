@@ -45,14 +45,11 @@ Leave all other fields alone. If you see a **Branch** / **Production branch** fi
 **1.9** Open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-budapest-preview/production/settings
 (or: https://dash.cloudflare.com/?to=/:account/workers-and-pages > click **forro-budapest-preview** > the **Settings** tab).
 
-**1.10** Scroll to the **Build** section. Find **Branch control** and click the pencil icon next to it.
+**1.10** **Settings** > **Builds**. Switch off **Builds for Preview branches** (on the "Previews Base" view). Then choose **Production** next to the Builds heading, find **Branch control** and click the pencil icon next to it.
 - **Production branch**: choose `feature/sanity`
-- **Builds for non-production branches**: remove the tick
 - Click **Save**.
 
-**1.11** Open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-budapest-preview/production/deployments
-(or: the **Deployments** tab at the top of the same page).
-Next to the failed build click **⋯** > **Retry build** (or a **Retry build** button). If there is none, tell the agent: it will start a build for you by pushing a small change.
+**1.11** A **Retry build** would build `main` again, so do not use it. A new build starts by itself with the next change pushed to `feature/sanity`: tell the agent the branch is set, and it pushes one (2026-11-22: that is how the first good build was started). Then open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-budapest-preview/production/deployments and watch for a build on `feature/sanity`.
 
 **1.12** Wait 2-4 minutes until the build has a green tick.
 
@@ -120,7 +117,7 @@ Next to the failed build click **⋯** > **Retry build** (or a **Retry build** b
 - **Value**: the test address, beginning with `https://` and ending with `.workers.dev`
 - **Save**.
 
-**3.8** Open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-budapest-test/production/deployments > **⋯** > **Retry build**. Wait for the green tick.
+**3.8** Tell the agent the branch and `SITE_URL` are set; it pushes a change to start the build (not **Retry build**, which builds `main` again). Watch https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-budapest-test/production/deployments for the green tick.
 
 **3.9** Open the test address: the site with the content from Sanity, **no** dark strip.
 
