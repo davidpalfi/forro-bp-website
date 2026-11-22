@@ -2,7 +2,7 @@
 
 For Dávid. About 30 minutes. **Use a computer** (the dashboards are cramped on a phone). Nothing here touches forrobudapest.com, Wix or the `main` site, and nothing costs money.
 
-Every step starts with a link. Open it in the same browser where you are signed in to Cloudflare (with GitHub) or Sanity. Written 2026-11-19 from Cloudflare's and Sanity's documentation; the agent could not open the dashboards itself. If a button has a slightly different name, take the nearest match. If a link does not land where the step says, use the "or" route given with it. If something is missing entirely, stop and tell the agent what you see.
+Every step starts with a link. Open it in the same browser where you are signed in to Cloudflare (with GitHub) or Sanity. Written 2026-11-19 (step 1.2 corrected 2026-11-22 from Dávid's screenshot) from Cloudflare's and Sanity's documentation; the agent could not open the dashboards itself. If a button has a slightly different name, take the nearest match. If a link does not land where the step says, use the "or" route given with it. If something is missing entirely, stop and tell the agent what you see.
 
 **Two secrets:** the Sanity token (part 2) and the deploy hook address (part 5). Paste them only into the boxes named in the steps: never into chat, e-mail or a file.
 
@@ -16,9 +16,9 @@ Every step starts with a link. Open it in the same browser where you are signed 
 (or: https://dash.cloudflare.com/?to=/:account/workers-and-pages and click the blue **Create** button, top right).
 If it asks which account, click yours.
 
-**1.2** You see a few choices. Find **Import a repository** and click **Get started** next to it.
+**1.2** The page "Create an app / Make something new" shows tiles. Click **Connect GitHub** (top left tile). Not "Hello World", not "Upload your static files", not "Continue to Pages".
 
-**1.3** Only the first time: a **Connect GitHub** button. Click it. GitHub opens:
+**1.3** Only the first time, GitHub opens:
 - choose **Only select repositories**,
 - in the drop-down pick **forro-bp-website**,
 - click **Install & Authorize** (GitHub may ask for your password).
@@ -95,7 +95,7 @@ Next to the failed build click **⋯** > **Retry build** (or a **Retry build** b
 
 ## Part 3. The test site (10 minutes)
 
-**3.1** Open https://dash.cloudflare.com/?to=/:account/workers-and-pages/create again. **Import a repository** > **Get started** > **forro-bp-website** > **Begin setup**.
+**3.1** Open https://dash.cloudflare.com/?to=/:account/workers-and-pages/create again. Click **Connect GitHub** (or, once connected, the GitHub tile / your GitHub account) > **forro-bp-website** > **Begin setup**.
 
 **3.2** Fill in exactly:
 
