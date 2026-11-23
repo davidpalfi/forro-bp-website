@@ -9,7 +9,7 @@ One website for the Forró Budapest community, with the Budapest Forró Festival
 | Branch | What it is |
 |---|---|
 | `main` | The first proof of concept (Pages CMS forms, GitHub Pages), live at davidpalfi.github.io/forro-bp-website. Kept unchanged as the fallback |
-| `feature/sanity` | **The current work.** Content in Sanity, edited in Sanity Studio, including **click-to-edit**: the real page next to the editor, click a text or photo to edit it. Approved by Dávid. Ready for Cloudflare; **online once Dávid does [docs/HOSTING.md](docs/HOSTING.md)** |
+| `feature/sanity` | **The current work.** Content in Sanity, edited in Sanity Studio, including **click-to-edit**: the real page next to the editor, click a text or photo to edit it. Approved by Dávid. **Online** since 2026-11-23: preview https://forro-budapest-preview.pdavid92.workers.dev, test site https://forro-bp-website.pdavid92.workers.dev ([docs/HOSTING.md](docs/HOSTING.md)). Not yet sent to the admin |
 
 The live forrobudapest.com is still Wix. Nothing here changes it until the domain is moved at launch.
 
@@ -21,35 +21,38 @@ Admin -> Sanity Studio (forro-budapest.sanity.studio) -> content in Sanity
          (now: Dávid's computer; next: online)    (next: online, rebuilt on Publish)
 ```
 
-## Next step: go live for the admin's review
+## Next step: send it to the admin for review (online since 2026-11-23; sending on hold)
 
 Goal: the admin signs in, edits the real content herself (on the page on a computer, with the forms on her phone), publishes, sees the result on a test address, and sends her feedback. Everything goes on new, unlisted addresses with "hide from Google" on; Wix and the `main` site stay as they are.
 
 **What she will get**
 - The editor at `forro-budapest.sanity.studio`, with her own account.
 - **Edit on the page** working from her own computer, on the online preview.
-- A test version of the public site (for example `forro-budapest.pages.dev`) that updates a few minutes after she clicks **Publish**.
+- A test version of the public site, https://forro-bp-website.pdavid92.workers.dev, that updates a few minutes after she clicks **Publish**.
 
 **1. Dávid: accounts and decisions (about 30 minutes)**
 - [x] Check Sanity's free plan in sanity.io/manage: how many members and which roles are free. She needs a role that can edit and publish. Done 2026-11-18: Free plan, both Administrators (`docs/DECISIONS.md` S10).
 - [x] Create a free Cloudflare account (done 2026-11-18, signed in with GitHub) (recommended host for the preview and the test site). Connect it to the GitHub repository when the agent asks.
 - [x] Agree how the preview is protected: Sanity's preview lock (chosen 2026-11-18).
-- [ ] (Moved to step 3, just before sending) Test the invite on yourself: invite a second e-mail address of yours, sign in on a phone, and check it is simple enough for her.
+- [x] (Moved to step 3.) Test the invite on yourself.
 - [x] Polish item A first: yes (chosen 2026-11-18; built).
-- [ ] **Create the two Cloudflare Workers and the Sanity webhook: [docs/HOSTING.md](docs/HOSTING.md)** (about 20 minutes, on a computer). Send the agent the two addresses.
+- [x] Create the two Cloudflare Workers and the Sanity webhook ([docs/HOSTING.md](docs/HOSTING.md)). Done 2026-11-23.
 
-**2. Agent / maintainer: code** (done 2026-11-18 except the last three items, which need the addresses)
+**2. Agent / maintainer: code** (done)
 - [x] Make the preview run on Cloudflare. The main work: Cloudflare's servers cannot read project files the way a laptop can, so in preview everything must come from Sanity (today `src/lib/content.ts` and `src/lib/from-json.ts` read files with `node:fs`).
 - [x] Add the preview lock. The Viewer token goes in Cloudflare's secret settings (`docs/HOSTING.md` step 1), never in the repository.
 - [x] No page reload after an edit (polish A).
 - [x] Test site: build from Sanity on Cloudflare, plus a Sanity webhook so **Publish** rebuilds it. "Hide from Google" stays on.
-- [ ] Point the Studio at the online preview (address in `studio/.env.production`), then Dávid deploys it again (`npm run studio:deploy`; it refuses to run without the address).
-- [ ] Finish the admin guide (`docs/EDITING-GUIDE.md`) with the real addresses; remove the "not ready" notes.
-- [ ] Run through it: sign in, edit on the page, publish, see the test site update, on desktop and phone. `npm run check` passes.
+- [x] Point the Studio at the online preview (`studio/.env.production`) and deploy it (`npm run studio:deploy`). Done 2026-11-23.
+- [x] Admin guide (`docs/EDITING-GUIDE.md`) has the real addresses. Its short maintainer note at the top is removed in the copy sent to her.
+- [x] Run through it on a computer (Dávid, Safari, 2026-11-23): edit on the page (drafts show, no reload, 2-3 s delay), publish, test site rebuilds. `npm run check` passes.
 
-**3. Dávid: send it**
-- [ ] Invite her in sanity.io/manage > Members.
-- [ ] Send her the guide and the two addresses. Ask her to change things and write down what is unclear.
+**3. Dávid: send it, when you are ready** (on hold since 2026-11-23, Dávid's choice; backlog item 13a)
+- [ ] Try the forms on your phone once (sign in at forro-budapest.sanity.studio, change a text, publish).
+- [ ] Test the invite on yourself (second e-mail address, accept on a phone).
+- [ ] Ask the agent for a clean copy of the guide (without the maintainer note).
+- [ ] Invite her in sanity.io/manage > Members, role Administrator.
+- [ ] Send her the guide, https://forro-budapest.sanity.studio and https://forro-bp-website.pdavid92.workers.dev. Ask her to change things and write down what is unclear.
 
 **Good to know before sending**
 - Her edits are real: what she publishes is the actual content that launch will use. Nothing reaches forrobudapest.com until the domain is switched.

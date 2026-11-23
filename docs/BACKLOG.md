@@ -9,25 +9,16 @@ Priority:
 
 Owner: **D** = Dávid (accounts, decisions), **M** = maintainer/agent (code), **A** = admin.
 
-## ▶ Next task for the next agent: go live for the admin's review
+## ▶ Next: send it to the admin for review (on hold until Dávid is ready)
 
-**Status 2026-11-18, late evening: code done (S11).** Dávid chose the preview lock and polish A first; both built. Preview on Cloudflare, lock, test site and rebuild on Publish are ready and tested locally (`npm run check` [8]). **Waiting for Dávid** to create the two Workers and the Sanity webhook (`HOSTING.md`). Then: preview address into `studio/.env.production`, test address into `docs/EDITING-GUIDE.md` (replace ‹test site address›, remove the maintainer note), Dávid runs `npm run studio:deploy` and tries it in the deployed Studio (Safari: the cookie in the frame is the part least certain), invite test, send. The items below are kept for the record.
+**Go-live is done (2026-11-23, `DECISIONS.md` S11, `HOSTING.md`).** Preview https://forro-budapest-preview.pdavid92.workers.dev with the preview lock, test site https://forro-bp-website.pdavid92.workers.dev rebuilt on Publish, Studio deployed pointing at the preview. Verified by Dávid on a computer in Safari: drafts inside Edit on the page only, no reload after an edit (2-3 s delay, polish H), Publish rebuilds the test site.
 
-**Why (2026-11-18, late evening).** Dávid tried click-to-edit and approved it (S8 outcome: Sanity stays). Next he wants **the current version online so he can send it to the admin for review** and collect her input, before further polish. The full checklist (who does what) is in the root [README.md](../README.md), "Next step: go live for the admin's review". In short:
-
-- **Dávid first: done except decisions** (2026-11-18, late evening): Free plan with both as Administrators (`DECISIONS.md` S10); Cloudflare account created (GitHub sign-in, nothing connected yet); invite test moved to just before sending. **Still ask him:** the preview lock (recommended), whether polish item A comes first (recommended; explained to him, undecided), the domain (launch only).
-- **Agent:**
-  1. **Preview on Cloudflare** (the main work). Cloudflare Workers cannot read project files: in preview, `src/lib/content.ts` must not touch `node:fs` (the `public/_img` manifest, `localImage`) and the start-up load must not read the JSON files (`from-json.ts`). Everything in preview comes from Sanity. Use `@astrojs/cloudflare` (installed, 14.4.8) only in preview mode; the public build stays static and must stay byte-identical (`npm run check` [7]). Read the installed adapter's README and the current Cloudflare free-plan terms first.
-  2. **Preview lock**: `@sanity/preview-url-secret` (installed): Presentation's `previewMode.enable` route validates the secret and sets a cookie; without it the preview shows nothing unpublished. The Viewer token only in Cloudflare's secret settings. Record the result in `DECISIONS.md` S9 "Access".
-  3. **Test site**: static build with `CONTENT_SOURCE=sanity` on Cloudflare, `SITE_URL` set, noindex on; a Sanity webhook to a deploy hook so Publish rebuilds it (backlog item 11). A failed build keeps the previous site.
-  4. **Studio**: `SANITY_STUDIO_PREVIEW_URL` to the online preview, then `npm run studio:deploy` (not before). Consider "Edit on the page" as the first tool.
-  5. **Admin guide** (`docs/EDITING-GUIDE.md`) with the real addresses; remove the "not ready" notes and the local-only note on section 4a.
-  6. **Run through it** on desktop and phone; `npm run check` passes; update `SPEC.md` (P14, P15), `DECISIONS.md`, `ARCHITECTURE.md`, `SANITY-PORT-STATUS.md`, this backlog and the README checklist.
-- **Then Dávid** invites her (sanity.io/manage > Members) and sends the guide and the two addresses.
-
-**Not this task:** the domain, Wix, launch; polish B-G (after her review).
-
-**Status 2026-11-23:** both sites online, Publish rebuild tested by Dávid. Left: `npm run studio:deploy` on his computer, try it in the deployed Studio (Safari), invite test, send.
+**13a. Send it to the admin** (D; Dávid is not ready yet, 2026-11-23). When he is:
+1. Dávid tries the forms once on his phone (sign in, change a text, publish).
+2. Dávid tests the invite on himself: sanity.io/manage > project > Members > invite a second e-mail address, accept on a phone.
+3. Agent: a clean copy of `docs/EDITING-GUIDE.md` without the maintainer note at the top (as a file or shareable page, Dávid's choice); check it against the deployed Studio once more.
+4. Dávid invites her (role Administrator) and sends the guide, https://forro-budapest.sanity.studio and https://forro-bp-website.pdavid92.workers.dev, asking her to note what is unclear.
+5. Then backlog item 13 (her trial) and the polish below.
 
 **Agreed for after the review (Dávid, 2026-11-23): make `feature/sanity` the new `main`.** Keep the old proof of concept as branch `pages-cms-poc`; merge; switch off the GitHub Pages workflow (`.github/workflows/deploy.yml`) and disconnect Pages CMS; set both Cloudflare Workers' production branch to `main` (push a change to start the builds).
 
@@ -77,7 +68,7 @@ Already built into the Studio, nothing to do: the phone-size switch above the pa
 | Sanity proof of concept: schemas, site reading Sanity documents, migration, admin guide | **Built and tested offline** (S5-S7). Not yet run against the real Sanity project |
 | Studio online, content imported | **Done** 2026-11-18 (Dávid), photos repaired with `npm run sanity:import-replace` the same day |
 | Click-to-edit | **Built, local, approved by Dávid** 2026-11-18 ("pretty awesome"; continue with Sanity). Polish A-G planned, mostly after the admin's review |
-| Online for the admin's review (hosting, preview lock, rebuild on publish) | **Code done** 2026-11-18 (S11); waiting for Dávid's Cloudflare setup (`HOSTING.md`) |
+| Online for the admin's review (hosting, preview lock, rebuild on publish) | **Done** 2026-11-23 (S11, `HOSTING.md`). Sending to her on hold (13a) |
 | Real content, admin trial, launch | Not started |
 
 ## P0: finish the Sanity port
@@ -92,10 +83,10 @@ Already built into the Studio, nothing to do: the phone-size switch above the pa
 | 6 | ✅ **Done 2026-11-18** (Dávid): 20 documents, 6 photos; photos repaired with `npm run sanity:import-replace`; `CONTENT_SOURCE=sanity npm run build` passes. Still to do: compare the look side by side with the JSON build | D | | |
 | 7 | ✅ **Done 2026-11-17.** Sanity read layer (`CONTENT_SOURCE`); routes, fallback, safe links, metadata, ordering, warnings kept; parity proven by `npm run check` [5]. Still to do: switch the default to `sanity` after item 6 | M | | |
 | 8 | ✅ **Done 2026-11-17.** All ten blocks and Sanity photos with crop and focus point, tested by `npm run check` [6] and in a browser | M | | |
-| 9 | Decide hosting: Cloudflare for preview only, or for the public site as well. After item 10 | D | Decision recorded in `DECISIONS.md` | 1, 10 |
-| 10 | Click-to-edit preview. **Local part built and approved 2026-11-18** (S9). **Next (top):** host it with the preview lock, `SANITY_STUDIO_PREVIEW_URL`, redeploy the Studio. Polish A-G after the review | M | The admin can click to edit on the host | 9 |
-| 11 | Publish rebuild: choose provider and webhook; secrets only in provider settings | D + M | One publish triggers one rebuild; a failed build keeps the last good site; rollback tested | 7, 9 |
-| 12 | Document the real environment variables, secret names, commands and rollback in `README.md` / `ARCHITECTURE.md` | M | Docs match what was built | 10, 11 |
+| 9 | Decide hosting for launch: the preview and the test site are on Cloudflare (S11); still to decide for the real public site. After item 10 | D | Decision recorded in `DECISIONS.md` | 1, 10 |
+| 10 | ✅ **Done 2026-11-23.** Click-to-edit preview hosted on Cloudflare with the preview lock; Studio redeployed (S9, S11). Polish B-H after the review | M | The admin can click to edit on the host | 9 |
+| 11 | ✅ **Done 2026-11-23** (test site only; S11). Publish rebuild: choose provider and webhook; secrets only in provider settings. Rollback not yet tried | D + M | One publish triggers one rebuild; a failed build keeps the last good site; rollback tested | 7, 9 |
+| 12 | ✅ **Done 2026-11-23** (`HOSTING.md`, `ARCHITECTURE.md` "Hosting"). Document the real environment variables, secret names, commands and rollback in `README.md` / `ARCHITECTURE.md` | M | Docs match what was built | 10, 11 |
 
 ## P1: before launch
 

@@ -7,13 +7,13 @@ Status as of 2026-11-18. The progress record for the Sanity version. Update it a
 | Part | State |
 |---|---|
 | Decisions S1-S4 (languages side by side, page builder, hosted Studio, Sanity photos) | Confirmed by Dávid 2026-11-16 |
-| Studio and schemas (`studio/`) | Built, refined in S5, validated. **Deployed** by Dávid 2026-11-18 (before "Edit on the page" was added) |
+| Studio and schemas (`studio/`) | Built, refined in S5, validated. **Deployed** by Dávid, last on 2026-11-23 with "Edit on the page" pointing at the online preview |
 | Site reads Sanity documents (`src/lib/source.ts`, `content.ts`, `Blocks.astro`) | Built and tested. Default source is still the JSON files |
 | Migration (`npm run sanity:import-file`, `npm run sanity:import`) | **Run** by Dávid 2026-11-18: 20 documents, 6 photos. Photos were stored the wrong way; import file fixed and photos repaired with `npm run sanity:import-replace` the same day |
-| Admin guide (`docs/EDITING-GUIDE.md`) | Written from the configured Studio; to be checked against the deployed one |
-| Click-to-edit preview | **Built, approved by Dávid** 2026-11-18 (S8 outcome, S9). **Ready for Cloudflare** with the preview lock and no reload after an edit (S11, `SPEC.md` P14, P20); not online until Dávid creates the Workers (`HOSTING.md`). Polish B-G after the admin's review |
-| Rebuild on publish, hosting | **Built** 2026-11-18 (S11): Cloudflare Workers, test site rebuilt by a Sanity webhook through a deploy hook. Waiting for Dávid's setup (`HOSTING.md`) |
-| Admin trial and sign-off | Not started |
+| Admin guide (`docs/EDITING-GUIDE.md`) | Written; real addresses in since 2026-11-23. Send a copy without the maintainer note; check once more against the deployed Studio |
+| Click-to-edit preview | **Built, approved by Dávid** 2026-11-18 (S8 outcome, S9). **Online** since 2026-11-23 with the preview lock and no reload after an edit (S11, `SPEC.md` P14, P20); verified by Dávid in Safari. Polish B-H after the admin's review |
+| Rebuild on publish, hosting | **Online and tested** 2026-11-23 (S11): test site on Cloudflare, rebuilt by a Sanity webhook through a deploy hook (`HOSTING.md`) |
+| Admin trial and sign-off | Not started; sending to her on hold until Dávid is ready (`BACKLOG.md` 13a) |
 
 What was verified on 2026-11-17, all without access to Sanity (the session's network blocked it):
 
@@ -35,14 +35,12 @@ Built and verified on 2026-11-18 (late evening, cloud session, no access to Sani
 
 ## Next steps, in order
 
-0. ✅ **Done 2026-11-23** (preview and test site online, Publish rebuild tested; addresses in `HANDOFF.md`). **Dávid: create the two Workers and the webhook** (`HOSTING.md`, about 20 minutes), send the agent the two addresses. Agent: put the preview address in `studio/.env.production`, the test address in the admin guide; Dávid: `npm run studio:deploy`, then try Edit on the page and Publish in the deployed Studio.
-1. **Go live for the admin's review** (Dávid's checklist: root `README.md`; agent's brief: top of `BACKLOG.md`). Dávid: Sanity free-plan check, Cloudflare account, preview protection, invite test, whether polish item A comes first. Agent: preview on Cloudflare (no file reads in preview), preview lock, test site rebuilt on Publish, Studio pointed at the online preview and redeployed, guide finished.
-2. **Do not run `npm run studio:deploy` again until the preview is hosted**: the deployed Studio would get an "Edit on the page" tab pointing at `localhost`, which cannot load for the admin.
-3. **After her review:** click-to-edit polish B-G (`BACKLOG.md`), her design corrections, real content.
-3. **Check the editor against the guide.** Open the hosted Studio, walk through `docs/EDITING-GUIDE.md`, fix wording or steps that differ, and edit one thing to see it in `CONTENT_SOURCE=sanity npm run dev`.
-4. **Choose hosting and build the rebuild on publish** (backlog items 9 and 11). Cloudflare Pages (free) can build on a Sanity webhook (a deploy hook URL) and host the preview later. Secrets go only into the provider's settings.
-5. **Move the preview to the chosen host**, with the protection in S9 ("Access"), set `SANITY_STUDIO_PREVIEW_URL` for the Studio build, then deploy the Studio.
-6. **Admin trial** with the guide (backlog item 13), then real content and launch per `GO-LIVE-CHECKLIST.md`.
+1. **Send it to the admin when Dávid is ready** (`BACKLOG.md` 13a): his phone check of the forms, invite test, a clean copy of the guide, invite her, send.
+2. **Her trial** (`BACKLOG.md` 13), then polish B-H, her design corrections, real content.
+3. **Make `feature/sanity` the new `main`** (agreed 2026-11-23, after the review; steps in `BACKLOG.md`).
+4. **Launch** per `GO-LIVE-CHECKLIST.md`: hosting of the real site, domain, redirects, noindex off.
+
+Do not deploy the Studio from a computer whose `studio/.env.production` lacks the preview address (`npm run studio:deploy` refuses anyway).
 
 ## Rules for whoever continues
 
