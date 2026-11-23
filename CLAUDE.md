@@ -43,3 +43,7 @@ These apply to the JSON files (the import source and test content). Content on t
 2. For visible changes, look at the result in a browser at phone and desktop width (`docs/HANDOFF.md`, "How to check things").
 3. Tell the user in plain language what changed and what to look at on the live site.
 4. Code changes are pushed straight to `main` once `npm run check` passes (Dávid, 2026-11-23: revert if something breaks). Commit only when asked. Every push to `main` rebuilds both Cloudflare sites.
+
+## Commit messages
+
+Write commit messages as the maintainer would write them himself: plain and neutral, about what changed and why. Do not mention the maintainer or the admin in the third person ("Dávid asked", "Dávid's choice", "from Dávid"), and do not describe the conversation that led to the change. Example: "Language drop-down with flags", not "Language drop-down with flags, as Dávid asked".
