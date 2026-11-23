@@ -42,7 +42,7 @@ const menuPages = getPages(section)
   .map((p) => ({ path: p.path, label: trFirst(p, ['menuLabel', 'title'], lang), order: p.order }));
 const festivalOrder = typeof community.festivalMenuOrder === 'number' && Number.isFinite(community.festivalMenuOrder) ? community.festivalMenuOrder : 0;
 const nav = inFestival
-  ? [{ path: '/festival/', label: t.home }, ...menuPages, { path: '/', label: site.name }]
+  ? [{ path: '/festival/', label: t.home }, ...menuPages]
   : [{ path: '/festival/', label: trFirst(community, ['festivalMenuLabel'], lang) || festival.name, order: festivalOrder }, ...menuPages].sort(
       (a, b) => (a.order ?? 0) - (b.order ?? 0),
     );
@@ -149,7 +149,7 @@ const year = new Date().getFullYear();
     </main>
 
     <footer class="foot">
-      <p class="small foot-copy">© {year} {site.name}.</p>
+      <p class="small foot-copy">© {year} <a href={href(lang, '/')}>{site.name}</a>.</p>
       {
         site.email && (
           <p>
