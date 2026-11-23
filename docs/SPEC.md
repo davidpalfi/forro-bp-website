@@ -206,7 +206,7 @@ A = automated by `npm run check`. M = by hand (see `HANDOFF.md`).
 - Launch details: domain, redirects from old Wix addresses, private or public repository, failure notifications.
 - A sitemap, analytics, alt-text fields for photos.
 
-## 11. Sanity version (`feature/sanity`)
+## 11. Sanity version (`main` since 2026-11-23; built on `feature/sanity`)
 
 Sections 1 to 10 describe the Pages CMS proof of concept. This section describes the Sanity version as built on `feature/sanity` on 2026-11-17. Where it differs from sections 3 to 5, this section wins on that branch. Choices S1 to S7 are in `DECISIONS.md`.
 

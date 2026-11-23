@@ -201,8 +201,8 @@ It prints `"Edit on the page" will open https://forro-budapest-preview...` and d
 The Workers were first set up on `feature/sanity`. When that branch was merged into `main`:
 
 1. Both Workers > **Settings** > **Builds** > **Production** > **Branch control**: production branch `main`, **Save**.
-2. `forro-bp-website` > **Settings** > **Builds** > **Deploy Hooks**: delete `Sanity publish` (it builds `feature/sanity`), add a new one on branch `main`, copy its address.
-3. Sanity > API > **Webhooks** > `Rebuild test site` > edit: replace the URL with the new hook address, save.
+2. `forro-bp-website` > **Settings** > **Builds** > **Deploy Hooks**: edit `Sanity publish` and set its branch to `main` (done this way; the address stays the same). If editing is not offered: delete it, add a new one on `main`, and do step 3.
+3. Only for a new hook: Sanity > API > **Webhooks** > `Rebuild test site` > edit: replace the URL with the new hook address, save.
 4. The agent pushes a change to `main`; both Workers build it. Then a test Publish in the Studio.
 
 ## If something goes wrong

@@ -18,7 +18,7 @@ This checklist is for replacing the Pages CMS proof of concept only after the Sa
 
 **Dávid:** keep API tokens, webhook secrets, and provider credentials out of chat and source files. Enter them directly into the secret settings required by the implemented deployment. The exact secret names must be documented by the code when it exists; do not guess names now.
 
-## 3. Finish the port on `feature/sanity`
+## 3. Finish the port (built on `feature/sanity`, now `main`)
 
 **Update 2026-11-18:** Studio deployed, content imported, click-to-edit built locally and approved. The next step, putting it online for the admin's review, is a checklist in the root `README.md` ("Next step: go live for the admin's review"); the text below is the earlier plan.
 
