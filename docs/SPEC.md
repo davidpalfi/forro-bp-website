@@ -70,7 +70,7 @@ Heading (`programHeading`, else "Program"). The `programImages` in order, one un
 
 ### 4.5 Teachers and Artists
 
-Heading (`teachersHeading` / `artistsHeading`, else the menu word). Then each person of that group, by `order` (default 100) then name, as a dark card on the red page: photo (cropped to 4:3 on phones, square from 860 px), role (when set), name, bio paragraphs, and an "Instagram" link (new tab) at the bottom of the card when the link is safe. One card per row on phones, two side by side from 860 px. A person whose group is missing or unknown is shown with the teachers, with a warning.
+Heading (`teachersHeading` / `artistsHeading`, else the menu word). Then each person of that group, by `order` (default 100) then name, as a dark card on the red page: photo (cropped to 4:3 on phones, square from 860 px), role (when set), name, bio paragraphs, and the gold Instagram icon (`public/icons/instagram-gold.png`, linked in a new tab, read as "Instagram – name") at the bottom of the card when the link is safe. One card per row on phones, two side by side from 860 px. A person whose group is missing or unknown is shown with the teachers, with a warning.
 
 ### 4.6 Text pages
 

@@ -261,12 +261,9 @@ p { margin: 0 0 1em; }
 .prose p, .person-bio { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
 .align-center .prose p, .b-banner .prose p { text-align: center; }
 .align-right .prose p { text-align: right; }
-.person-link {
-  align-self: flex-start; margin-top: auto; padding: 0.55rem 1.1rem;
-  border: 2px solid var(--cream); text-decoration: none;
-  font-family: var(--sans); font-weight: 700;
-}
-.person-link:hover, .person-link:focus-visible { background: var(--cream); color: var(--dark); }
+.person-link { align-self: flex-start; margin-top: auto; display: block; }
+.person-link img { width: 2.25rem; height: 2.25rem; }
+.person-link:hover img, .person-link:focus-visible img { opacity: 0.8; }
 
 @media (min-width: 860px) {
   .people { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3rem 4.5rem; max-width: 60rem; margin-inline: auto; }
@@ -292,7 +289,7 @@ p { margin: 0 0 1em; }
 .foot .small { font-size: 0.9375rem; }
 
 @media (prefers-reduced-motion: no-preference) {
-  .ticket, .button, .person-link { transition: background-color 0.15s, color 0.15s; }
+  .ticket, .button { transition: background-color 0.15s, color 0.15s; }
 }
 .foot-social { display: flex; justify-content: center; align-items: center; gap: 1.5rem; }
 .foot-icon img { width: 2.25rem; height: 2.25rem; }

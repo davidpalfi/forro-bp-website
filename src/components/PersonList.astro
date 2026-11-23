@@ -1,7 +1,7 @@
 ---
 // The people cards: photo, role, name, bio, Instagram link. Used by the "People" block.
 import Picture from './Picture.astro';
-import { paragraphs, safeUrl, type Person } from '../lib/content';
+import { paragraphs, safeUrl, withBase, type Person } from '../lib/content';
 import { UI, tr, type Lang } from '../lib/i18n';
 
 interface Props {
@@ -29,8 +29,7 @@ const { people, lang } = Astro.props;
             ))}
             {ig && (
               <a class="person-link" href={ig} target="_blank" rel="noopener">
-                {UI[lang].instagram}
-                <span class="sr-only"> – {p.name}</span>
+                <img src={withBase('/icons/instagram-gold.png')} width="39" height="39" alt={`${UI[lang].instagram} – ${p.name}`} />
               </a>
             )}
           </div>
