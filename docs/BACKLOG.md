@@ -143,6 +143,7 @@ Already built into the Studio, nothing to do: the phone-size switch above the pa
 | 31 | Sitemap | M | Not specified yet |
 | 32 | ✅ Done 2026-11-23: Pages CMS PoC retired, kept as tag `pages-cms-poc` (S12) | D | |
 | 33 | Upgrade Astro and Sanity packages: `npm ci` reports 37 audit warnings (2026-11-18), all in build and editor tooling (file matching, YAML, dev server), none in the published static pages. Do not run `npm audit fix --force`; upgrade the pinned versions deliberately and run `npm run check` | M | Not urgent; do before launch |
+| 34 | **New row after a person** in the people grid, as on the Wix Teachers page (Felipe alone in his row, 2026-11-23). Plan: a checkbox "Start a new row after this person" on `person` (schema, `from-json.ts`, `PersonList.astro` inserts an empty full-width grid item after that card from 860 px, `SPEC.md`, admin guide), then a Studio redeploy. About half an hour. Workaround without code: two People blocks with chosen people (new people then do not appear by themselves) | M | Dávid: not sure it is worth it; do when asked |
 
 ## Open decisions to collect
 
