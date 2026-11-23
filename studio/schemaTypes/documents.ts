@@ -35,7 +35,7 @@ const siteSettings = defineType({
     }),
     ...tagline.fields,
     defineField({ name: 'email', title: 'Contact email', type: 'string' }),
-    defineField({ name: 'instagram', title: 'Instagram address', type: 'url' }),
+    defineField({ name: 'instagram', title: 'Instagram address', description: 'The community\'s Instagram, linked from the footer of the community pages, e.g. https://www.instagram.com/forrobudapest/. Festival pages use the festival\'s own address (Festival home page).', type: 'url' }),
     defineField({ name: 'facebook', title: 'Facebook address', type: 'url' }),
     ...footerNote.fields,
     defineField({
