@@ -122,23 +122,21 @@ export function safeUrl(u: unknown, lang?: Lang) {
 
 /* ---------- Text ---------- */
 
-/** Plain multi-line text: each blank-line-separated block is a paragraph. */
+/**
+ * Plain multi-line text: each blank-line-separated block is a paragraph; a single line break
+ * stays inside its paragraph. A line holding only invisible characters (zero-width spaces and
+ * the like, which text copied from another site often carries) counts as blank.
+ */
+const INVISIBLE = '\\s\\u200B-\\u200D\\u2060\\uFEFF';
+const BLANK_LINE = new RegExp(`\\n[${INVISIBLE}]*\\n`);
+const EDGES = new RegExp(`^[${INVISIBLE}]+|[${INVISIBLE}]+$`, 'g');
 export function paragraphs(s: unknown) {
   return str(s)
-    .split(/\n\s*\n/)
+    .replace(/\r\n?|\u2028/g, '\n')
+    .replace(/\u2029/g, '\n\n')
+    .split(BLANK_LINE)
     .map((p) => p.trim())
-    .filter(Boolean);
-}
-
-/**
- * A bio as paragraphs: every line break starts one, so pressing Enter once works as well as
- * an empty line, and so does text pasted from another site (which may use other break characters).
- */
-export function lineParagraphs(s: unknown) {
-  return str(s)
-    .split(/[\r\n\u2028\u2029]+/)
-    .map((p) => p.trim())
-    .filter(Boolean);
+    .filter((p) => p.replace(EDGES, ''));
 }
 
 /** A text (Markdown or HTML) as finished HTML. */

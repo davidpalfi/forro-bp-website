@@ -79,7 +79,7 @@ The dates also appear in the header on wide screens.
 3. **Display order**: smaller numbers come first. Give the new person a number between the people they should sit between (e.g. 2.5 between 2 and 3).
 4. **Publish**. The person appears on the Teachers or Artists page by themselves.
 
-In the biography, press Enter to start a new paragraph (an empty line between paragraphs works too).
+In the biography, an empty line starts a new paragraph.
 
 ### Remove a person
 Open the person, click the **⋯** menu next to **Publish** and choose **Unpublish** (hides them; you can publish again later) or **Delete** (removes them for good).

@@ -288,9 +288,9 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
   const nested = docs.find((d) => d._type === 'person' && d.photo?.asset?._ref);
   const nestedRef = nested.photo.asset._ref;
   nested.photo = { _type: 'imageWithAlt', asset: { _type: 'image', asset: nested.photo.asset } };
-  // A bio with single line breaks, as typed with one Enter or pasted from another site.
+  // A bio pasted from another site: an "empty" line holding a zero-width space, and a single line break.
   const linePerson = docs.find((d) => d._type === 'person' && d.name === 'Gisa');
-  linePerson.bio_en = 'First line of the bio.\nSecond line of the bio.\u2028Third line of the bio.';
+  linePerson.bio_en = 'First paragraph.\n\u200b\nSecond paragraph,\nsame paragraph.';
   // Two logos: the big one on the banner, the small one in the top bar.
   const festivalDoc = docs.find((d) => d._type === 'festivalSettings');
   festivalDoc.logo = { _type: 'image', asset: { _type: 'reference', _ref: 'image-' + 'a'.repeat(40) + '-800x400-png' } };
@@ -323,7 +323,7 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
     check(['A small heading', 'Banner title', 'Banner button', 'Column three', 'A caption', 'b-divider', 'b-space', 'A statement line'].every((t) => page.includes(t)), 'every kind of block is shown');
     check(page.indexOf('>Gisa<') > -1 && page.indexOf('>Gisa<') < page.indexOf('>Dóri Czakó<'), 'a People block with chosen people shows them in the chosen order');
     check(/<main id="main" class="tone-dark"/.test(page), 'the page colour is used');
-    check(['First', 'Second', 'Third'].every((w) => everything.includes(`<p class="person-bio">${w} line of the bio.</p>`)), 'every line break in a bio starts a new paragraph');
+    check(everything.includes('<p class="person-bio">First paragraph.</p>') && /<p class="person-bio">Second paragraph,\s+same paragraph\.<\/p>/.test(everything), 'in a bio an empty line (even one with an invisible character) starts a paragraph, a single line break does not');
     {
       const home = read(dir, 'en/festival/index.html');
       const brand = /<img[^>]*class="brand-logo"[^>]*>/.exec(home)?.[0] ?? '';
