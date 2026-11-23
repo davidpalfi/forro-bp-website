@@ -44,7 +44,7 @@ Do not deploy the Studio from a computer whose `studio/.env.production` lacks th
 
 ## Rules for whoever continues
 
-- Work on a branch from `main` and open a pull request into `main` (since 2026-11-23, S12). The old proof of concept is the tag `pages-cms-poc`.
+- Push straight to `main` (Dávid, 2026-11-23: "push to main and we revert if something breaks"), after `npm run check` passes. Every push rebuilds both Cloudflare sites; undo a bad change with `git revert`. The old proof of concept is the tag `pages-cms-poc`.
 - Never request or commit tokens. Project id and dataset name are configuration, not secrets.
 - Keep `npm run check` passing; when the model changes, update `from-json.ts`, the schema, `SPEC.md` 11 and the admin guide together.
 - Keep this file current.

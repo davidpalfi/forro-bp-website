@@ -48,7 +48,7 @@ Out of scope: content for the community level (not designed), a structured (text
   - Brand: in the festival, the small festival logo (`headerLogo`; without it the big banner logo; the festival name as text when neither is uploaded), linking to the festival home. On the community level, the community name, linking to the community home.
   - Language switch: `EN` and `HU`; each links to the same page in that language; the current one is marked.
   - Festival menu, in order: Home (the festival home), Program, Teachers, Artists, text pages with `showInMenu` (by `order`, then title; shown with their `menuLabel` when set), the community name (link up to the community home), and a cream "Tickets" button (new tab) when `ticketUrl` is a safe link. Community menu: one link to the festival.
-  - From 1240 px the festival's date line (the same `dateLine` as on the banner) is also shown next to the brand, slightly smaller until 1400 px so the row fits in both languages.
+  - From 1180 px (the one-row header) the festival's date line (the same `dateLine` as on the banner) is also shown next to the brand.
   - The current page has `aria-current="page"`.
   - Below 1180 px the menu is behind a button and opens as a full-screen panel; Escape closes it. From 1180 px everything sits in one row, in capitals. Without JavaScript the menu is always visible instead.
 - **R8. Footer.** "© year community name", contact email (`mailto:`), Instagram link (the festival's inside the festival, else the community's) and Facebook link when set, and the footer note. Each part is left out when empty. Stacked and centred on phones; in one row from 860 px (copyright left, the rest right).
@@ -173,7 +173,7 @@ Menu words, "Skip to content", the ticket-button fallback, "Instagram" and the 4
 
 - **Performance and privacy.** No requests to third parties: fonts are served from the site, no trackers, no embeds, no cookies, so no consent banner.
 - **Accessibility.** Semantic headings, skip link, visible keyboard focus, current-page and current-language markers, a labelled menu button with `aria-expanded`, link texts that name the person on Instagram links, reduced motion respected. Known gaps: people photos have empty alt text (the name is next to them); the program is images, so its content is not available to screen readers unless the optional text is filled in; no formal audit.
-- **Responsive.** Phone first; breakpoints at 720, 860, 900, 1180, 1240 and 1400 px. No horizontal scrolling from 320 px up.
+- **Responsive.** Phone first; breakpoints at 720, 860, 900, 1180 and 1400 px. No horizontal scrolling from 320 px up.
 - **Without JavaScript.** Everything works; the menu is shown open, and `/` goes to the default language.
 - **Design.** Colours, shapes and layout follow the Wix festival site (red, cream, dark inner pages, grey footer, torn-paper ticket button). Deliberate differences: body text is left-aligned, not justified; the language switch is two links, not a flag drop-down; Instagram is a text link, not an icon; the menu has one extra entry, the link up to the community home.
 
