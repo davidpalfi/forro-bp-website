@@ -261,7 +261,7 @@ p { margin: 0 0 1em; }
 .prose p, .person-bio { text-align: justify; }
 .align-center .prose p, .b-banner .prose p { text-align: center; }
 .align-right .prose p { text-align: right; }
-.person-link { align-self: flex-start; margin-top: auto; display: block; }
+.person-link { align-self: flex-start; margin-top: auto; padding-top: 0.6rem; display: block; }
 .person-link img { width: 2.25rem; height: 2.25rem; }
 .person-link:hover img, .person-link:focus-visible img { opacity: 0.8; }
 
