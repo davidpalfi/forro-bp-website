@@ -21,6 +21,8 @@ Dávid prefers to give the admin a more mature version first (first impressions 
 
 **Look polish done:**
 - ✅ 2026-11-23: separate small logo for the top bar (Festival home page > Banner and tickets > Small logo), as on the Wix site; the big logo stays on the banner. Without a small logo the big one is used in the top bar.
+- ✅ 2026-11-23: the red matches the Wix site (`#c80a2f`, measured from Dávid's screenshot; was `#b92734`, which looked washed out). Cream on it still passes the contrast minimum (4.6:1).
+- ✅ 2026-11-23: the date in the top bar shows from 1240 px wide (was 1400), from the same Dates field as the banner.
 
 **Ideas for the look polish, raised 2026-11-23 (not yet decided):**
 - **Video banner on the festival home**, as on the Wix site: a short silent looping video on computers, the banner photo on phones and with "reduce motion" (Wix does the same). Needs: a video upload field in Festival home page > Banner, `Hero.astro` with `<video autoplay muted loop playsinline>` and the photo as fallback, a click target in the preview, tests and docs. Estimate 2-3 hours of agent work plus 15-20 minutes for Dávid. Before building, check Sanity Free's file storage and bandwidth limits (fallback: serve the file from Cloudflare). The file: best the original from the admin; it could not be found in the Wix page's inspector.

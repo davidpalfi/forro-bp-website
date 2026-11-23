@@ -4,7 +4,7 @@
    Fonts are served from this site (npm packages), nothing loads from third parties. */
 
 :root {
-  --red: #b92734;
+  --red: #c80a2f;
   --cream: #f7e1b5;
   --dark: #212121;
   --footer: #2e2e2e;
@@ -133,6 +133,14 @@ p { margin: 0 0 1em; }
   .menu a.ticket--small { margin-left: 0.75rem; padding: 0.75rem 2rem 0.9rem; order: 5; }
   .lang { order: 3; }
   .js.menu-open body { overflow: auto; }
+}
+/* The date beside the logo, as on the Wix site: from 1240 px, slightly smaller and with
+   tighter spacing until 1400 px so the row still fits in both languages. */
+@media (min-width: 1240px) and (max-width: 1399.98px) {
+  .top { gap: 0.5rem 0.75rem; }
+  .top-date { display: block; font-size: 1.05rem; }
+  .menu a { padding: 0.6rem 0.45rem; }
+  .menu a.ticket--small { margin-left: 0.5rem; padding: 0.75rem 1.5rem 0.9rem; }
 }
 @media (min-width: 1400px) {
   .top { gap: 0.5rem 2rem; }
