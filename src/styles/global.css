@@ -256,9 +256,9 @@ p { margin: 0 0 1em; }
 .person-name { font-size: 1.35rem; margin-bottom: 0.9rem; }
 .person-bio { margin-bottom: 1.1em; }
 
-/* Paragraphs are justified (sorkizárt), as on the Wix site, with hyphenation in the page's
-   language so phones do not get wide gaps. Centred and right-aligned blocks keep their alignment. */
-.prose p, .person-bio { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+/* Paragraphs are justified (sorkizárt), as on the Wix site, without splitting words (Dávid).
+   Centred and right-aligned blocks keep their alignment. */
+.prose p, .person-bio { text-align: justify; }
 .align-center .prose p, .b-banner .prose p { text-align: center; }
 .align-right .prose p { text-align: right; }
 .person-link { align-self: flex-start; margin-top: auto; display: block; }
