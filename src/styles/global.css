@@ -407,3 +407,20 @@ figcaption { font-size: 0.9375rem; margin-top: 0.6rem; opacity: 0.85; }
 .tone-dark .title-band { background: var(--dark); }
 .tone-cream .title-band { background: transparent; }
 .b-full figcaption { padding-inline: var(--gutter); }
+
+/* ---------- Community level: the Forró Budapest palette ----------
+   Gold instead of the festival red, the community's light cream, near-black text and blue
+   buttons, taken from the community's Instagram posts. Cream text on gold is too faint to
+   read (2.4:1), so text on gold is dark (5.3:1); photos keep cream text. */
+.in-community {
+  --red: #b98e4d;      /* gold: page, header and band background */
+  --cream: #e9eadc;
+  --dark: #232323;
+  --plum: #344893;     /* blue: buttons and banner blocks */
+  color: var(--dark);
+}
+.in-community .bg-red { color: var(--dark); }
+.in-community .hero, .in-community .b-banner, .in-community .button { color: var(--cream); }
+.in-community main.tone-cream, .in-community .bg-cream { background: var(--cream); color: var(--dark); }
+.in-community .tone-cream .bg-cream { background: transparent; }
+.js.menu-open .in-community .menu { color: var(--cream); }
