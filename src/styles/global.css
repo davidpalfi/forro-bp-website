@@ -38,6 +38,7 @@ body {
 }
 
 main { flex: 1; background: var(--red); }
+@media (min-width: 900px) { body { font-size: 0.9375rem; } }
 main.tone-dark { background: var(--dark); }
 main.tone-cream { background: var(--cream); color: var(--dark); }
 img { max-width: 100%; height: auto; display: block; }
@@ -72,7 +73,7 @@ p { margin: 0 0 1em; }
 }
 
 .brand { text-decoration: none; margin-right: auto; display: block; }
-.top-date { display: none; margin: 0; font-family: var(--sans); font-weight: 900; text-transform: uppercase; font-size: 1.1rem; white-space: nowrap; }
+.top-date { display: none; margin: 0; font-family: var(--sans); font-weight: 900; text-transform: uppercase; font-size: 1rem; white-space: nowrap; }
 .brand-logo { height: 3rem; width: auto; }
 .brand-text {
   display: block; max-width: 9.5rem;
@@ -127,7 +128,7 @@ p { margin: 0 0 1em; }
   .menu, .js .menu, .js.menu-open .menu {
     display: flex; position: static; flex-direction: row; flex-basis: auto; order: 2;
     background: none; padding: 0; gap: 0; overflow: visible; align-items: center;
-    font-size: 0.8125rem; font-weight: 900; text-transform: uppercase; white-space: nowrap;
+    font-size: 0.75rem; font-weight: 900; text-transform: uppercase; white-space: nowrap;
   }
   .menu a { padding: 0.6rem 0.5rem; }
   .top-date { display: block; }
@@ -145,13 +146,13 @@ p { margin: 0 0 1em; }
   display: inline-block; text-decoration: none; text-align: center;
   background: var(--red); color: var(--cream);
   font-family: var(--sans); font-weight: 900; text-transform: uppercase; letter-spacing: 0.01em;
-  font-size: clamp(1.25rem, 5vw, 1.75rem); line-height: 1.1;
-  padding: 1.1rem 2rem 1.3rem;
+  font-size: 1.15rem; line-height: 1.1;
+  padding: 0.8rem 1.6rem 0.95rem;
   /* The torn-paper shape of the ticket button. */
   clip-path: polygon(6% 4%, 99% 0, 100% 92%, 42% 100%, 0 88%);
 }
 .ticket:hover, .ticket:focus-visible { background: var(--plum); }
-.ticket--small { font-size: 1.15rem; padding: 0.75rem 2rem 0.9rem; background: var(--cream); color: var(--red); }
+.ticket--small { font-size: 1rem; padding: 0.7rem 1.75rem 0.85rem; background: var(--cream); color: var(--red); }
 .ticket--small:hover, .ticket--small:focus-visible { background: var(--white); color: var(--red); }
 .menu a.ticket--small:hover { text-decoration: none; }
 
@@ -159,15 +160,10 @@ p { margin: 0 0 1em; }
   display: inline-block; text-decoration: none; text-align: center;
   background: var(--plum); color: var(--cream);
   font-family: var(--sans); font-weight: 800; letter-spacing: 0.08em;
-  font-size: 1.25rem; padding: 0.8rem 2rem; min-width: 16rem;
+  font-size: 1.05rem; padding: 0.7rem 1.75rem; min-width: 13rem;
 }
 .button:hover, .button:focus-visible { background: var(--dark); }
 
-.ticket-text {
-  font-family: var(--sans); font-weight: 900; text-transform: uppercase; text-decoration: none;
-  font-size: 1.35rem; padding: 0.6rem 1rem;
-}
-.ticket-text:hover { text-decoration: underline; text-underline-offset: 0.3em; }
 
 /* ---------- Banner ---------- */
 
@@ -181,16 +177,16 @@ p { margin: 0 0 1em; }
 .hero-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
 .hero::after { content: ''; position: absolute; inset: 0; background: rgb(0 0 0 / 0.28); z-index: -1; }
 .hero-inner {
-  display: flex; flex-direction: column; align-items: center; gap: 1.75rem;
+  display: flex; flex-direction: column; align-items: center; gap: 1.25rem;
   padding: 3rem var(--gutter); text-align: center;
 }
 .hero-title {
   font-family: var(--sans); font-weight: 900; text-transform: uppercase;
-  font-size: clamp(2.5rem, 12vw, 5rem); line-height: 0.98; letter-spacing: 0.01em;
+  font-size: clamp(2.25rem, 10vw, 3.25rem); line-height: 0.98; letter-spacing: 0.01em;
   max-width: 9ch; text-wrap: balance;
   text-shadow: 0 2px 18px rgb(0 0 0 / 0.45);
 }
-.hero-title img { width: min(70vw, 26rem); }
+.hero-title img { width: min(60vw, 17rem); }
 @media (min-width: 900px) {
   /* On wide screens the logo block sits to the left, over the photo. */
   .hero { place-items: center start; min-height: min(82vh, 52rem); }
@@ -198,7 +194,7 @@ p { margin: 0 0 1em; }
 }
 .hero-date {
   margin: 0; font-family: var(--sans); font-weight: 900; text-transform: uppercase;
-  font-size: clamp(1.4rem, 6vw, 2rem); text-shadow: 0 2px 12px rgb(0 0 0 / 0.5);
+  font-size: 1.1rem; text-shadow: 0 2px 12px rgb(0 0 0 / 0.5);
 }
 
 /* ---------- Bands and inner pages ---------- */
@@ -213,18 +209,18 @@ p { margin: 0 0 1em; }
 .in-community .hero + .band--center { padding-top: 2.5rem; }
 
 .intro p {
-  font-family: var(--serif); font-weight: 700; font-size: 1.1rem; line-height: 1.45;
+  font-family: var(--serif); font-weight: 700; font-size: 1rem; line-height: 1.5;
   margin-bottom: 1.4em;
 }
-.stats { font-family: var(--sans); font-weight: 800; font-size: 1rem; line-height: 1.3; text-wrap: balance; }
+.stats { font-family: var(--sans); font-weight: 800; font-size: 0.9375rem; line-height: 1.3; text-wrap: balance; }
 .lead { font-family: var(--serif); font-weight: 700; font-size: 1.1rem; }
 
 .title-band { background: var(--red); padding: 2.75rem var(--gutter) 2rem; text-align: center; }
-.title-band h1 { font-size: clamp(1.9rem, 8vw, 3.25rem); max-width: 22ch; margin-inline: auto; text-wrap: balance; }
+.title-band h1 { font-size: clamp(1.75rem, 7vw, 2.9rem); max-width: 22ch; margin-inline: auto; text-wrap: balance; }
 
 .page { max-width: calc(var(--measure) + 2 * var(--gutter)); margin-inline: auto; padding: 2rem var(--gutter) 3rem; }
 .page--wide { max-width: 68rem; }
-.page-title { font-size: clamp(1.9rem, 8vw, 2.75rem); text-align: center; margin: 1rem 0 2.5rem; }
+.page-title { font-size: clamp(1.75rem, 7vw, 2.5rem); text-align: center; margin: 1rem 0 2.5rem; }
 .page-banner { width: 100%; max-height: 26rem; object-fit: cover; }
 
 .prose h2 { font-size: 1.35rem; margin: 2rem 0 0.75rem; }
@@ -243,7 +239,7 @@ p { margin: 0 0 1em; }
 .person-photo { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
 .person-text { padding: 1.5rem var(--gutter) 2rem; display: flex; flex-direction: column; flex: 1; }
 .person-role { color: var(--orange); font-size: 1.05rem; margin: 0 0 0.4rem; }
-.person-name { font-size: 1.5rem; margin-bottom: 0.9rem; }
+.person-name { font-size: 1.35rem; margin-bottom: 0.9rem; }
 .person-bio { margin-bottom: 1.1em; }
 .person-link {
   align-self: flex-start; margin-top: auto; padding: 0.55rem 1.1rem;
@@ -278,7 +274,9 @@ p { margin: 0 0 1em; }
 @media (prefers-reduced-motion: no-preference) {
   .ticket, .button, .person-link { transition: background-color 0.15s, color 0.15s; }
 }
-.foot-social { display: flex; justify-content: center; gap: 1.5rem; }
+.foot-social { display: flex; justify-content: center; align-items: center; gap: 1.5rem; }
+.foot-icon img { width: 2.25rem; height: 2.25rem; }
+.foot-icon:hover img, .foot-icon:focus-visible img { opacity: 0.8; }
 @media (min-width: 860px) {
   .foot { display: flex; align-items: center; justify-content: center; gap: 2rem; padding-inline: 2rem; text-align: left; }
   .foot p { margin: 0; }
@@ -315,7 +313,7 @@ p { margin: 0 0 1em; }
 
 .b-large > :last-child, .prose > :last-child { margin-bottom: 0; }
 .b-statement { margin: 0; }
-.b-heading--h2 { font-size: clamp(1.6rem, 5vw, 2rem); }
+.b-heading--h2 { font-size: clamp(1.5rem, 5vw, 1.8rem); }
 .b-heading--h3 { font-size: 1.35rem; font-family: var(--sans); font-weight: 800; }
 .b-heading--h4 { font-size: 1.1rem; }
 .b-button { margin: 0; }

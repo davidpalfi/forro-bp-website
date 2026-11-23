@@ -28,7 +28,7 @@ interface Props {
 }
 
 const { blocks, lang, tone = 'red', class: className } = Astro.props;
-const KNOWN = ['textBlock', 'headingBlock', 'imageBlock', 'galleryBlock', 'buttonBlock', 'bannerBlock', 'columnsBlock', 'videoBlock', 'dividerBlock', 'peopleGridBlock', 'ticketLink'];
+const KNOWN = ['textBlock', 'headingBlock', 'imageBlock', 'galleryBlock', 'buttonBlock', 'bannerBlock', 'columnsBlock', 'videoBlock', 'dividerBlock', 'peopleGridBlock'];
 const groups = groupBlocks(blocks, tone).map((g) => ({
   ...g,
   blocks: g.blocks.filter((b) => {
@@ -111,16 +111,6 @@ const link = (b: Block) => {
                   </a>
                 </p>
               );
-            }
-            case 'ticketLink': {
-              const url = String(b.url ?? '');
-              return url ? (
-                <p class="b-text b-button">
-                  <a class="ticket-text" href={url} target="_blank" rel="noopener">
-                    {String(b.label ?? '')}
-                  </a>
-                </p>
-              ) : null;
             }
             case 'bannerBlock': {
               const photo = getImage(b.image);

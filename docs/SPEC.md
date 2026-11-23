@@ -51,7 +51,7 @@ Out of scope: content for the community level (not designed), a structured (text
   - From 1180 px (the one-row header) the festival's date line (the same `dateLine` as on the banner) is also shown next to the brand.
   - The current page has `aria-current="page"`.
   - Below 1180 px the menu is behind a button and opens as a full-screen panel; Escape closes it. From 1180 px everything sits in one row, in capitals. Without JavaScript the menu is always visible instead.
-- **R8. Footer.** "© year community name", contact email (`mailto:`), Instagram link (the festival's inside the festival, else the community's) and Facebook link when set, and the footer note. Each part is left out when empty. Stacked and centred on phones; in one row from 860 px (copyright left, the rest right).
+- **R8. Footer.** "© year community name", contact email (`mailto:`), Instagram link shown as the Instagram icon (the festival's inside the festival, else the community's) and Facebook link when set, and the footer note. Each part is left out when empty. Stacked and centred on phones; in one row from 860 px (copyright left, the rest right).
 - **R8a. Page background.** Red on the home pages, program, teachers, artists and 404; cream with dark text on text pages.
 
 ### 4.2 Community home (`/<lang>/`)
@@ -62,7 +62,7 @@ Banner with the community title over the banner photo; the intro paragraphs when
 
 1. **Banner.** Banner photo (on phones the phone banner photo, when one is uploaded); the big logo (`logo`, or festival name as text); the ticket button (needs a safe `ticketUrl`; label falls back to "Tickets"/"Jegyek"; new tab); the date line. Centred on phones; from 900 px the block sits to the left over the photo.
 2. **Intro.** Each blank-line-separated block is a paragraph. Left out when empty.
-3. **Closing block.** The line of numbers (`stats`); one button per text page with `showOnHome`; the ticket link again.
+3. **Closing block.** The line of numbers (`stats`); one button per text page with `showOnHome`. No second ticket link (removed 2026-11-23: the banner and the header have one).
 
 ### 4.4 Program
 
@@ -239,7 +239,7 @@ Sections 1 to 10 describe the Pages CMS proof of concept. This section describes
 | Address | Page |
 |---|---|
 | `/<lang>/` | Community home: banner, `communitySettings.homeBlocks`, then the festival band (as 4.2) |
-| `/<lang>/festival/` | Festival home: banner (as 4.3), `festivalSettings.homeBlocks`, then the ticket link |
+| `/<lang>/festival/` | Festival home: banner (as 4.3), `festivalSettings.homeBlocks` |
 | `/<lang>/festival/<address>/` | Every festival page, including program, teachers and artists |
 | `/<lang>/<address>/` | Community pages; `festival` is reserved |
 

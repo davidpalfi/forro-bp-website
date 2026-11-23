@@ -1,6 +1,6 @@
 ---
 // The festival home page: the banner from "Festival home page", then its blocks
-// (introduction, numbers line, buttons, ...), and the ticket link at the end.
+// (introduction, numbers line, buttons, ...). The ticket button is on the banner.
 import Base from '../../../layouts/Base.astro';
 import Hero from '../../../components/Hero.astro';
 import Blocks from '../../../components/Blocks.astro';
@@ -15,10 +15,6 @@ const lang = Astro.params.lang as Lang;
 const festival = getFestival();
 const ticketUrl = safeUrl(festival.ticketUrl);
 const ticketLabel = tr(festival, 'ticketLabel', lang) || UI[lang].tickets;
-const blocks = [
-  ...festival.homeBlocks,
-  ...(ticketUrl ? [{ _type: 'ticketLink', url: ticketUrl, label: ticketLabel, alignment: 'center' }] : []),
-];
 ---
 
 <Base lang={lang} section="festival" pagePath="/festival/">
@@ -32,5 +28,5 @@ const blocks = [
     buttonLabel={ticketLabel}
     buttonNewTab
   />
-  <Blocks blocks={blocks} lang={lang} tone="red" />
+  <Blocks blocks={festival.homeBlocks} lang={lang} tone="red" />
 </Base>

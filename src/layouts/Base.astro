@@ -5,7 +5,7 @@ import '@fontsource-variable/fraunces/index.css';
 import '@fontsource-variable/libre-franklin/index.css';
 import '@fontsource-variable/open-sans/index.css';
 import '../styles/global.css';
-import { getSite, getFestival, getCommunity, getPages, getImage, safeUrl, href, trFirst, editAttr } from '../lib/content';
+import { getSite, getFestival, getCommunity, getPages, getImage, safeUrl, href, trFirst, editAttr, withBase } from '../lib/content';
 import { LANGS, LANG_LABEL, LANG_NAME, UI, tr, type Lang } from '../lib/i18n';
 
 interface Props {
@@ -146,8 +146,8 @@ const year = new Date().getFullYear();
         (instagram || facebook) && (
           <p class="foot-social">
             {instagram && (
-              <a href={instagram} target="_blank" rel="noopener">
-                {t.instagram}
+              <a class="foot-icon" href={instagram} target="_blank" rel="noopener">
+                <img src={withBase('/icons/instagram.png')} width="39" height="39" alt={t.instagram} />
               </a>
             )}
             {facebook && (
