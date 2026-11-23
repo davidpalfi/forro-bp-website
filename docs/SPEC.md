@@ -124,7 +124,7 @@ All content is plain JSON files under `src/content/`. **Form** = what the editin
 | `group` | required: Teacher or Artist | Which page (case ignored) |
 | `role_*` | | Small label above the name |
 | `photo` | JPG, PNG or WebP | Missing file: no photo, with a warning |
-| `bio_*` | multi-line | Paragraphs |
+| `bio_*` | multi-line | Paragraphs: every line break starts one (2026-11-23) |
 | `instagram` | https only | Link |
 | `order` | number | Default 100; lower first |
 

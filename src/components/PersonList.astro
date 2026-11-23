@@ -1,7 +1,7 @@
 ---
 // The people cards: photo, role, name, bio, Instagram link. Used by the "People" block.
 import Picture from './Picture.astro';
-import { paragraphs, safeUrl, withBase, type Person } from '../lib/content';
+import { lineParagraphs, safeUrl, withBase, type Person } from '../lib/content';
 import { UI, tr, type Lang } from '../lib/i18n';
 
 interface Props {
@@ -16,7 +16,7 @@ const { people, lang } = Astro.props;
   {
     people.map((p) => {
       const role = tr(p, 'role', lang);
-      const bio = paragraphs(tr(p, 'bio', lang));
+      const bio = lineParagraphs(tr(p, 'bio', lang));
       const ig = safeUrl(p.instagram);
       return (
         <li class="person">

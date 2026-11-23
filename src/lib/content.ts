@@ -130,6 +130,17 @@ export function paragraphs(s: unknown) {
     .filter(Boolean);
 }
 
+/**
+ * A bio as paragraphs: every line break starts one, so pressing Enter once works as well as
+ * an empty line, and so does text pasted from another site (which may use other break characters).
+ */
+export function lineParagraphs(s: unknown) {
+  return str(s)
+    .split(/[\r\n\u2028\u2029]+/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+}
+
 /** A text (Markdown or HTML) as finished HTML. */
 export function renderBody(body: string, lang?: Lang) {
   if (!body || !body.trim()) return '';

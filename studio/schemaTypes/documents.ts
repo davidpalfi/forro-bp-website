@@ -195,7 +195,7 @@ const page = defineType({
 /* ---------- People ---------- */
 
 const role = localizedFields('role', 'Role (optional)', 'string', 'Shown above the name, e.g. "Dance Teacher".')
-const bio = localizedFields('bio', 'Biography', 'text', 'An empty line starts a new paragraph.')
+const bio = localizedFields('bio', 'Biography', 'text', 'Press Enter to start a new paragraph.')
 
 const person = defineType({
   name: 'person',
