@@ -233,8 +233,11 @@ const year = new Date().getFullYear();
             at = i;
             months.forEach(function (m, j) { m.hidden = j !== i; });
             title.textContent = months[i].querySelector('.cal-month-title').textContent;
-            steps[0].hidden = i === 0;
-            steps[1].hidden = i === months.length - 1;
+            // A missing arrow keeps its place (invisible), so the month name never moves.
+            steps[0].classList.toggle('cal-off', i === 0);
+            steps[1].classList.toggle('cal-off', i === months.length - 1);
+            steps[0].disabled = i === 0;
+            steps[1].disabled = i === months.length - 1;
             if (!keepAddress) history.replaceState(null, '', '#' + months[i].dataset.month);
           }
           box.querySelector('[data-cal-nav]').hidden = false;

@@ -429,7 +429,10 @@ figcaption { font-size: 0.9375rem; margin-top: 0.6rem; opacity: 0.85; }
 
 /* ---------- Event calendar block: one month at a time, with arrows ---------- */
 .b-calendar { width: 100%; }
-.cal-nav { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 1.25rem; }
+/* Three columns, so the month name stays in the same place whichever arrows are shown. */
+.cal-nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; }
+.cal-nav .cal-arrow:first-child { justify-self: end; }
+.cal-nav .cal-arrow:last-child { justify-self: start; }
 .cal-nav[hidden] { display: none; }
 .cal-title { margin: 0; text-align: center; font-family: var(--sans); font-weight: 900; font-size: clamp(1.4rem, 5vw, 1.8rem); }
 .cal-title::first-letter { text-transform: uppercase; }
@@ -437,7 +440,7 @@ figcaption { font-size: 0.9375rem; margin-top: 0.6rem; opacity: 0.85; }
   display: grid; place-items: center; width: 2.75rem; height: 2.75rem; padding: 0;
   border: 0; background: none; color: inherit; cursor: pointer;
 }
-.cal-arrow[hidden] { visibility: hidden; display: grid; }
+.cal-arrow.cal-off { visibility: hidden; }
 .cal-arrow svg { width: 1.5rem; height: 1.5rem; }
 .cal-month { margin-bottom: 2rem; }
 .cal-month-title { margin-bottom: 1rem; }
