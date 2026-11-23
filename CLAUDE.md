@@ -46,4 +46,4 @@ These apply to the JSON files (the import source and test content). Content on t
 
 ## Commit messages
 
-Write commit messages as the maintainer would write them himself: plain and neutral, about what changed and why. Do not mention the maintainer or the admin in the third person ("Dávid asked", "Dávid's choice", "from Dávid"), and do not describe the conversation that led to the change. Example: "Language drop-down with flags", not "Language drop-down with flags, as Dávid asked".
+Write commit messages as if the maintainer had written them: plain and neutral, about what changed and why. Do not mention the maintainer or the admin in the third person ("Dávid asked", "Dávid's choice", "from Dávid"), and do not describe the conversation that led to the change. Example: "Language drop-down with flags", not "Language drop-down with flags, as Dávid asked".
