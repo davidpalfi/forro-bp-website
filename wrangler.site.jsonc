@@ -6,7 +6,7 @@
 // Build variable to set in Cloudflare: SITE_URL (the Worker's https://...workers.dev address).
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "forro-budapest-test",
+  "name": "forro-bp-website",
   "compatibility_date": "2026-11-10",
   "workers_dev": true,
   "preview_urls": false,
