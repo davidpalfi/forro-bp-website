@@ -52,7 +52,7 @@ Out of scope: content for the community level (not designed), a structured (text
   - The current page has `aria-current="page"`.
   - Below 1180 px the menu is behind a button and opens as a full-screen panel; Escape closes it. From 1180 px everything sits in one row, in capitals. Without JavaScript the menu is always visible instead.
 - **R8. Footer.** "© year community name", contact email (`mailto:`), Instagram link shown as the Instagram icon (the festival's inside the festival, else the community's) and Facebook link when set, and the footer note. Each part is left out when empty. Stacked and centred on phones; in one row from 860 px (copyright left, the rest right).
-- **R8a. Page background.** Red on the home pages, program, teachers, artists and 404; cream with dark text on text pages.
+- **R8a. Page background.** Red on the home pages, program, teachers, artists and 404; cream with dark text on text pages. The cream background is the Wix paper texture (`src/styles/paper-cream.webp`, 2026-11-23).
 
 ### 4.2 Community home (`/<lang>/`)
 
