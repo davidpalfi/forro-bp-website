@@ -2,7 +2,7 @@
 
 A guide for the person who updates the site. You need no technical knowledge, and nothing you do here can break the website.
 
-> **For the maintainer, before sending this guide** (updated 2026-11-18): publishing and editing on the page are built and work once the preview and test site are online (`docs/HOSTING.md`). Before sending: replace ‹test site address› below with the real address (twice), redeploy the Studio (`npm run studio:deploy`), test every step yourself in the deployed Studio on a computer and a phone, and fix anything that differs. Then delete this note.
+> **For the maintainer, before sending this guide** (updated 2026-11-23): publishing and editing on the page are built and work once the preview and test site are online (`docs/HOSTING.md`). Before sending: redeploy the Studio (`npm run studio:deploy`), test every step yourself in the deployed Studio on a computer and a phone, and fix anything that differs. Then delete this note.
 
 ---
 
@@ -41,7 +41,7 @@ Most texts have two boxes next to each other: **English** and **Magyar**.
 ## 4. Saving and publishing
 
 - **Everything you type is saved automatically** as a draft. Visitors do not see drafts.
-- When you are happy, click **Publish** (green button, bottom right). The test website, **‹test site address›**, shows it 2 to 5 minutes later. (The real forrobudapest.com stays as it is until the new site goes live.)
+- When you are happy, click **Publish** (green button, bottom right). The test website, **https://forro-bp-website.pdavid92.workers.dev**, shows it 2 to 5 minutes later. (The real forrobudapest.com stays as it is until the new site goes live.)
 - To throw away changes you have not published yet, open the menu next to **Publish** and choose **Discard changes**.
 - Made a mistake you already published? Click the clock icon (**History**) at the top of the document, pick an earlier version and restore it, then publish.
 

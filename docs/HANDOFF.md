@@ -2,7 +2,15 @@
 
 If you are picking this project up with no other context, read this file and `SANITY-PORT-STATUS.md` first, then `USER-NEEDS.md` (who it is for and how little is verified), `DECISIONS.md` (why), `SPEC.md` (what the site does) and `ARCHITECTURE.md` (how the code is organised). `CLAUDE.md` has the rules for a Claude session working in the repo. The root-level [EDITING-GUIDE.md](../EDITING-GUIDE.md) is for the old Pages CMS PoC; [docs/EDITING-GUIDE.md](EDITING-GUIDE.md) is the admin guide for Sanity; check it against the deployed Studio before sending it.
 
-## Current handoff (2026-11-18, night)
+## Current handoff (2026-11-23)
+
+- **Online** (Dávid set up 2026-11-22/23, `HOSTING.md`): preview https://forro-budapest-preview.pdavid92.workers.dev (Worker `forro-budapest-preview`, Viewer token as a Cloudflare secret; the first token was revoked after it appeared in a screenshot), test site https://forro-bp-website.pdavid92.workers.dev (Worker `forro-bp-website`; `wrangler.site.jsonc` renamed to match). Both build `feature/sanity`; builds for other branches off. **Publish rebuilds the test site: tested by Dávid 2026-11-23** (Sanity webhook "Rebuild test site" > Workers Builds deploy hook; the first hook was replaced after it was pasted in chat). Sanity webhooks work on the Free plan.
+- `studio/.env.production` holds the preview address. **Next:** on his computer Dávid runs `git pull`, `npm ci`, `npm run studio:deploy`, then tries Edit on the page in the deployed Studio, also in Safari (partitioned cookie in the frame: the part least certain). Then the invite test and sending the admin the guide.
+- Retry build in Workers Builds rebuilds the same commit; to start a build after changing settings, push a change. Ignore Cloudflare's "update wrangler.jsonc name" suggestion for the test site (it reads the preview's file).
+- Dávid asked: offered to hide the editing outlines when the preview is opened outside the Studio (not answered). Agreed for later: make `feature/sanity` the new `main` (BACKLOG).
+- The npm package is now named `forro-bp-site`.
+
+## Earlier handoff (2026-11-18, night)
 
 - **Go-live code is done** (`DECISIONS.md` S11): preview on Cloudflare Workers with the preview lock (Dávid chose it), no reload after an edit (polish A, Dávid chose it first), test site rebuilt on Publish via a Sanity webhook and a Cloudflare deploy hook. `npm run check` [8] tests it in Cloudflare's local runtime with a stand-in for Sanity. Not tested against the real Studio, Sanity or Cloudflare (blocked from cloud sessions).
 - **Waiting for Dávid:** [HOSTING.md](HOSTING.md) (two Workers, the token as a Cloudflare secret, deploy hook, Sanity webhook). He sends the two `workers.dev` addresses (not secret). Then: preview address into `studio/.env.production` (`SANITY_STUDIO_PREVIEW_URL=https://...`), test address into `docs/EDITING-GUIDE.md`, he runs `npm run studio:deploy` and tries Edit on the page and Publish, especially in Safari (partitioned cookie in the Studio's frame). If drafts never show inside the Studio, the cookie is blocked: next step would be carrying the lock in the address instead (S11, considered).

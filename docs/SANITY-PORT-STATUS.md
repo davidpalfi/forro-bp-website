@@ -35,7 +35,7 @@ Built and verified on 2026-11-18 (late evening, cloud session, no access to Sani
 
 ## Next steps, in order
 
-0. **Dávid: create the two Workers and the webhook** (`HOSTING.md`, about 20 minutes), send the agent the two addresses. Agent: put the preview address in `studio/.env.production`, the test address in the admin guide; Dávid: `npm run studio:deploy`, then try Edit on the page and Publish in the deployed Studio.
+0. ✅ **Done 2026-11-23** (preview and test site online, Publish rebuild tested; addresses in `HANDOFF.md`). **Dávid: create the two Workers and the webhook** (`HOSTING.md`, about 20 minutes), send the agent the two addresses. Agent: put the preview address in `studio/.env.production`, the test address in the admin guide; Dávid: `npm run studio:deploy`, then try Edit on the page and Publish in the deployed Studio.
 1. **Go live for the admin's review** (Dávid's checklist: root `README.md`; agent's brief: top of `BACKLOG.md`). Dávid: Sanity free-plan check, Cloudflare account, preview protection, invite test, whether polish item A comes first. Agent: preview on Cloudflare (no file reads in preview), preview lock, test site rebuilt on Publish, Studio pointed at the online preview and redeployed, guide finished.
 2. **Do not run `npm run studio:deploy` again until the preview is hosted**: the deployed Studio would get an "Edit on the page" tab pointing at `localhost`, which cannot load for the admin.
 3. **After her review:** click-to-edit polish B-G (`BACKLOG.md`), her design corrections, real content.

@@ -27,6 +27,10 @@ Owner: **D** = Dávid (accounts, decisions), **M** = maintainer/agent (code), **
 
 **Not this task:** the domain, Wix, launch; polish B-G (after her review).
 
+**Status 2026-11-23:** both sites online, Publish rebuild tested by Dávid. Left: `npm run studio:deploy` on his computer, try it in the deployed Studio (Safari), invite test, send.
+
+**Agreed for after the review (Dávid, 2026-11-23): make `feature/sanity` the new `main`.** Keep the old proof of concept as branch `pages-cms-poc`; merge; switch off the GitHub Pages workflow (`.github/workflows/deploy.yml`) and disconnect Pages CMS; set both Cloudflare Workers' production branch to `main` (push a change to start the builds).
+
 ---
 
 ## Click-to-edit polish (after the admin's review; item A may come first)

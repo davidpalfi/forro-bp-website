@@ -144,7 +144,7 @@ Replace *preview* and *test* with your two addresses:
 - **Branch**: `feature/sanity`
 - **Save**.
 
-**5.2** An address appears, starting with `https://api.cloudflare.com/client/v4/workers/builds/deploy_hooks/`. Click **Copy**. (Secret.)
+**5.2** An address appears, starting with `https://api.cloudflare.com/client/v4/workers/builds/deploy_hooks/`. Click **Copy** and paste it **only** into Sanity's URL field in 5.4. Do not send it to anyone, not even the agent. (If it ever leaks: delete the hook, make a new one, and put the new address into the Sanity webhook.)
 
 **5.3** Open https://www.sanity.io/manage/project/8hc671sk/api (as in 2.1). Find **Webhooks** (a heading or left-list item) > **Create webhook** (or **Add webhook**).
 
@@ -197,6 +197,9 @@ It prints `"Edit on the page" will open https://forro-budapest-preview...` and d
 ---
 
 ## If something goes wrong
+
+- **Yellow box on the test site's Builds page: "Update wrangler.jsonc ... "name": "forro-bp-website"" (and a pull request from Cloudflare offering that change)**: ignore the box and **close the pull request without merging**. Cloudflare's check reads `wrangler.jsonc`, which belongs to the preview; the test site uses `wrangler.site.jsonc`, which already has the right name. Merging it would make the preview overwrite the test site.
+- **A "Retry build" fails the same way again**: a retry builds the same branch and change as before. After changing settings, let the agent push a change instead.
 
 - **A build fails** (red cross): open the Worker's deployments link (1.11 or 3.8) > click the failed build > **View build log**. Scroll to the end, copy the last 30 lines, send them to the agent (no secrets in them). A failed build changes nothing online.
 - **"Name mismatch" / "does not match the name in your wrangler config"**: the Project name is not exactly `forro-budapest-preview` / `forro-bp-website`. Tell the agent what you typed.
