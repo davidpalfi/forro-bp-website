@@ -5,6 +5,7 @@
 
 :root {
   --red: #c80a2f;
+  --gold: #c28f32; /* mustard: the Forró Budapest logo's colour */
   --cream: #f7e1b5;
   --dark: #212121;
   --ink: #2f2e2e; /* text on cream, the Wix site's dark grey */
@@ -41,6 +42,7 @@ body {
 main { flex: 1; background: var(--red); }
 @media (min-width: 900px) { body { font-size: 0.9375rem; } }
 main.tone-dark { background: var(--dark); }
+main.tone-gold { background: var(--gold); color: var(--footer); }
 /* Cream pages (Location) sit on the Wix site's paper texture, stretched over the whole page. */
 main.tone-cream { background: var(--cream) url('./paper-cream.webp') center top / cover no-repeat; color: var(--ink); }
 img { max-width: 100%; height: auto; display: block; }
@@ -354,6 +356,7 @@ p { margin: 0 0 1em; }
 
 .bg-red { background: var(--red); color: var(--cream); }
 .bg-dark { background: var(--dark); color: var(--cream); }
+.bg-gold { background: var(--gold); color: var(--footer); }
 .bg-cream { background: var(--cream) url('./paper-cream.webp') center / cover; color: var(--ink); }
 /* On a cream page the paper is already behind everything; a band repainting it would show a seam. */
 .tone-cream .bg-cream { background: transparent; }
@@ -405,6 +408,7 @@ figcaption { font-size: 0.9375rem; margin-top: 0.6rem; opacity: 0.85; }
 
 .page-head { max-width: calc(var(--measure) + 2 * var(--gutter)); margin-inline: auto; padding: 2rem var(--gutter) 0; }
 .tone-dark .title-band { background: var(--dark); }
+.tone-gold .title-band { background: var(--gold); }
 .tone-cream .title-band { background: transparent; }
 .b-full figcaption { padding-inline: var(--gutter); }
 

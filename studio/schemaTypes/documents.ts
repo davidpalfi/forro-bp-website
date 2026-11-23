@@ -181,8 +181,9 @@ const page = defineType({
     defineField({
       name: 'tone',
       title: 'Page colour',
+      description: 'On community pages Red shows as mustard, the Forró Budapest colour.',
       type: 'string',
-      options: { list: [{ title: 'Red', value: 'red' }, { title: 'Cream', value: 'cream' }, { title: 'Dark', value: 'dark' }], layout: 'radio', direction: 'horizontal' },
+      options: { list: [{ title: 'Red', value: 'red' }, { title: 'Mustard', value: 'gold' }, { title: 'Cream', value: 'cream' }, { title: 'Dark', value: 'dark' }], layout: 'radio', direction: 'horizontal' },
       initialValue: 'red',
       group: 'settings',
     }),

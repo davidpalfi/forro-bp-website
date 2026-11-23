@@ -27,12 +27,13 @@ export function blockStyleFields() {
     defineField({
       name: 'background',
       title: 'Background',
-      description: '"Same as page" keeps the page colour. Blocks next to each other with the same background and alignment are joined into one band.',
+      description: '"Same as page" keeps the page colour. On community pages Red shows as mustard. Blocks next to each other with the same background and alignment are joined into one band.',
       type: 'string',
       options: {
         list: [
           { title: 'Same as page', value: 'default' },
           { title: 'Red', value: 'red' },
+          { title: 'Mustard', value: 'gold' },
           { title: 'Cream', value: 'cream' },
           { title: 'Dark', value: 'dark' },
         ],

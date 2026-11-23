@@ -311,7 +311,7 @@ const makePages = (byId: Map<string, Obj>) => {
       slug,
       section,
       path: section === 'festival' ? `/festival/${slug}/` : `/${slug}/`,
-      tone: (['red', 'cream', 'dark'].includes(tone) ? tone : 'red') as 'red' | 'cream' | 'dark',
+      tone: (['red', 'gold', 'cream', 'dark'].includes(tone) ? tone : 'red') as 'red' | 'gold' | 'cream' | 'dark',
       title_en: trFirst(d, ['title'], 'en') || slug,
       title_hu: trFirst(d, ['title'], 'hu') || slug,
       showInMenu: flag(true).parse(d.showInMenu),
@@ -488,7 +488,7 @@ export function groupBlocks(blocks: Obj[], tone: string) {
   for (const b of blocks) {
     if (typeof b._type !== 'string') continue;
     const bg = str(b.background);
-    const background = ['red', 'cream', 'dark'].includes(bg) ? bg : tone;
+    const background = ['red', 'gold', 'cream', 'dark'].includes(bg) ? bg : tone;
     const al = str(b.alignment);
     const alignment = ['center', 'right'].includes(al) ? al : 'left';
     const last = groups[groups.length - 1];
