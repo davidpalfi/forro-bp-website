@@ -90,12 +90,18 @@ const link = (b: Block) => {
               const caption = tr(b, 'caption', lang);
               return (
                 <figure class="b-wide b-gallery">
-                  <ul class="gallery">
-                    {list.map((i) => (
-                      <li>
-                        <Picture image={i} lang={lang} sizes="(min-width: 720px) 33vw, 50vw" />
-                      </li>
-                    ))}
+                  <ul class:list={['gallery', b.layout === 'mosaic' && 'gallery--mosaic']}>
+                    {list.map((i, n) => {
+                      const big = getImage(i);
+                      return (
+                        <li>
+                          {/* The link opens the photo large: in the page's viewer with JavaScript, as a plain photo without. */}
+                          <a class="gallery-open" href={big?.src} data-srcset={big?.srcset}>
+                            <Picture image={i} lang={lang} sizes={b.layout === 'mosaic' && n % 5 === 3 ? '(min-width: 720px) 66vw, 100vw' : '(min-width: 720px) 33vw, 50vw'} />
+                          </a>
+                        </li>
+                      );
+                    })}
                   </ul>
                   {caption && <figcaption>{caption}</figcaption>}
                 </figure>

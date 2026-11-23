@@ -116,7 +116,7 @@ Every page is a list of **blocks**, one under the other. You can add, remove and
 | **Text** | Paragraphs with headings, lists and links. **Style** tab → *Text style*: Normal, **Large** (big serif text, like the festival introduction) or **Statement** (one bold line, like "14 Workshops \| 4 Bands …") |
 | **Heading** | A heading on its own, in three sizes |
 | **Image** | One photo, wide, at text width, or across the whole screen, with an optional caption |
-| **Gallery** | Several photos in a grid (three across, two on phones) |
+| **Gallery** | Several photos, as a **Grid** (three across, two on phones) or a **Mosaic** of big and small photos (best with 5 or 10). Visitors can click a photo to see it large and page through the rest |
 | **Button** | A button to one of your pages (choose it from the list) or to an address |
 | **People** | Teacher or artist cards. Leave the list empty to show everyone in the group automatically, or pick people to show only them |
 | **Banner** | A photo with a title, short text and a button on top |

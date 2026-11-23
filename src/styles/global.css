@@ -282,6 +282,41 @@ p { margin: 0 0 1em; }
 .gallery { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .gallery img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
 @media (min-width: 720px) { .gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.gallery-open { display: block; cursor: zoom-in; }
+.gallery-open:focus-visible { outline-offset: 3px; }
+
+/* Mosaic, as on the Wix Location page: every five photos make a block of two small ones, a tall
+   one on the right, then a big one and another tall one. On phones a plain two-column grid. */
+@media (min-width: 720px) {
+  .gallery--mosaic { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: clamp(5rem, 9vw, 7.5rem); grid-auto-flow: dense; gap: 0.5rem; }
+  .gallery--mosaic li { grid-column: span 2; grid-row: span 2; }
+  .gallery--mosaic li:nth-child(5n + 3), .gallery--mosaic li:nth-child(5n + 5) { grid-row: span 3; }
+  .gallery--mosaic li:nth-child(5n + 4) { grid-column: span 4; grid-row: span 4; }
+  .gallery--mosaic .gallery-open, .gallery--mosaic img { height: 100%; }
+  .gallery--mosaic img { aspect-ratio: auto; }
+}
+
+/* The photo viewer opened from a gallery: white, the photo in the middle, arrows at the sides. */
+.lightbox {
+  width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0;
+  background: var(--white); color: var(--dark);
+}
+.lightbox::backdrop { background: var(--white); }
+.lightbox img { position: absolute; inset: 4.5rem 4rem; width: calc(100% - 8rem); height: calc(100% - 9rem); object-fit: contain; }
+.lightbox button {
+  position: absolute; display: grid; place-items: center; width: 3rem; height: 3rem; padding: 0;
+  border: 0; background: none; color: inherit; cursor: pointer;
+}
+.lightbox button svg { width: 1.75rem; height: 1.75rem; }
+.lightbox-close { top: 1rem; right: 1rem; }
+.lightbox-prev { left: 0.5rem; top: 50%; translate: 0 -50%; }
+.lightbox-next { right: 0.5rem; top: 50%; translate: 0 -50%; }
+.lightbox-count { position: absolute; left: 1.25rem; top: 1.6rem; margin: 0; font-family: var(--sans); font-size: 0.875rem; opacity: 0.7; }
+.lightbox button:focus-visible { outline: 2px solid var(--dark); }
+@media (max-width: 719px) {
+  .lightbox img { inset: 4rem 0.5rem; width: calc(100% - 1rem); height: calc(100% - 8rem); }
+  .lightbox-prev, .lightbox-next { top: auto; bottom: 0.75rem; translate: none; }
+}
 
 /* ---------- Footer ---------- */
 

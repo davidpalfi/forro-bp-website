@@ -208,5 +208,63 @@ const year = new Date().getFullYear();
         });
       })();
     </script>
+    <script is:inline>
+      // Gallery photo viewer: a click on a gallery photo opens it large, with arrows, swiping,
+      // the arrow keys and Escape. Built on first use; works after the preview swaps the page.
+      (function () {
+        var box, img, count, list = [], at = 0;
+        var svg = function (d) {
+          return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + d + '" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
+        };
+        var lang = document.documentElement.lang === 'hu';
+        function show(n) {
+          at = (n + list.length) % list.length;
+          var a = list[at], small = a.querySelector('img');
+          img.removeAttribute('srcset');
+          if (a.dataset.srcset) img.srcset = a.dataset.srcset;
+          img.sizes = '100vw';
+          img.src = a.href;
+          img.alt = small ? small.alt : '';
+          count.textContent = list.length > 1 ? at + 1 + ' / ' + list.length : '';
+          box.querySelector('.lightbox-prev').hidden = box.querySelector('.lightbox-next').hidden = list.length < 2;
+        }
+        function build() {
+          box = document.createElement('dialog');
+          box.className = 'lightbox';
+          box.innerHTML =
+            '<p class="lightbox-count"></p><img alt="">' +
+            '<button class="lightbox-close" type="button" aria-label="' + (lang ? 'Bezárás' : 'Close') + '">' + svg('M4 4l16 16M20 4L4 20') + '</button>' +
+            '<button class="lightbox-prev" type="button" aria-label="' + (lang ? 'Előző kép' : 'Previous photo') + '">' + svg('M15 3l-9 9 9 9') + '</button>' +
+            '<button class="lightbox-next" type="button" aria-label="' + (lang ? 'Következő kép' : 'Next photo') + '">' + svg('M9 3l9 9-9 9') + '</button>';
+          document.body.appendChild(box);
+          img = box.querySelector('img');
+          count = box.querySelector('.lightbox-count');
+          box.querySelector('.lightbox-close').onclick = function () { box.close(); };
+          box.querySelector('.lightbox-prev').onclick = function () { show(at - 1); };
+          box.querySelector('.lightbox-next').onclick = function () { show(at + 1); };
+          box.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowLeft') show(at - 1);
+            if (e.key === 'ArrowRight') show(at + 1);
+          });
+          var x0 = null;
+          box.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+          box.addEventListener('touchend', function (e) {
+            if (x0 === null) return;
+            var dx = e.changedTouches[0].clientX - x0;
+            if (Math.abs(dx) > 50) show(at + (dx < 0 ? 1 : -1));
+            x0 = null;
+          });
+        }
+        document.addEventListener('click', function (e) {
+          var a = e.target.closest && e.target.closest('a.gallery-open');
+          if (!a || e.ctrlKey || e.metaKey || e.shiftKey || !window.HTMLDialogElement) return;
+          e.preventDefault();
+          if (!box) build();
+          list = Array.prototype.slice.call(a.closest('ul').querySelectorAll('a.gallery-open'));
+          show(list.indexOf(a));
+          box.showModal();
+        });
+      })();
+    </script>
   </body>
 </html>

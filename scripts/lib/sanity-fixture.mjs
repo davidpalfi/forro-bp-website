@@ -60,7 +60,7 @@ export function makeFixture(contentDir) {
           ...style(),
         },
         { _type: 'imageBlock', _key: 'b03', image: img('full', 'Full width photo'), caption_en: 'A caption', width: 'full', ...style() },
-        { _type: 'galleryBlock', _key: 'b04', images: [{ ...img('g1'), _key: 'g1' }, { ...img('g2'), _key: 'g2' }], ...style() },
+        { _type: 'galleryBlock', _key: 'b04', layout: 'mosaic', images: [{ ...img('g1'), _key: 'g1' }, { ...img('g2'), _key: 'g2' }], ...style() },
         { _type: 'buttonBlock', _key: 'b05', page: ref('page-location'), ...style('cream', 'center') },
         { _type: 'buttonBlock', _key: 'b06', label_en: 'Evil button', url: 'javascript:alert(1)', ...style('cream', 'center') },
         {
