@@ -53,6 +53,8 @@ Owner: **D** = Dávid (accounts, decisions), **M** = maintainer/agent (code), **
 | F | **"Published / Drafts" switch works** | The Studio's switch above the page is ignored; the preview always shows drafts | "Published" shows exactly what visitors see | small | Read the perspective the Presentation tool passes (query parameter or comlink, check the installed version) in `src/middleware.ts`; keep drafts as the default. |
 | G | **People and settings show where they appear** | Pages and the two home pages list their addresses; a person or Site settings lists none | A teacher shows "Teachers page", Site settings "every page"; clicking opens it | small | `resolve.locations` in `studio/sanity.config.ts`. People appear through People blocks (by group or chosen), so a static mapping is wrong for chosen people; check whether the installed version lets `locations` query. |
 
+| H | **Faster update after an edit** (only if the admin finds it slow) | 2-3 s after typing stops, more on the first edit after a pause (Dávid, Safari, 2026-11-23: "lagging a few seconds", no flashing; fine for now) | About a second less | small | Fetch only the documents the page needs instead of all of them; try Cloudflare Smart Placement near Sanity's API. Letter-by-letter would need the site rebuilt as a JavaScript app: not planned. |
+
 Already built into the Studio, nothing to do: the phone-size switch above the page.
 
 **Recommendation agreed with Dávid:** do A, B, E, F, G for sure (about half a day together); try C and D and keep them only if they work smoothly.
