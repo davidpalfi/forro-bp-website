@@ -20,7 +20,7 @@ On the left is the **Content** menu:
 
 | In the menu | What it is |
 |---|---|
-| **Festival home page** | The big banner (photo, logo, dates, ticket button) and everything below it on the festival's front page |
+| **Festival home page** | The big banner (photo, big logo, dates, ticket button), the small logo in the top-left corner and everything below it on the festival's front page |
 | **Festival pages** | Program, Teachers, Artists, Location, Code of Conduct, and any page you add |
 | **Teachers** / **Artists** | One entry per person |
 | **Community home page** | The front page of the community site |

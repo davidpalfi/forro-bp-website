@@ -83,7 +83,8 @@ const festivalSettings = defineType({
   fieldsets: [dateLine.fieldset, ticketLabel.fieldset, festivalTagline.fieldset],
   fields: [
     defineField({ name: 'name', title: 'Festival name', type: 'string', group: 'banner' }),
-    defineField({ name: 'logo', title: 'Logo', description: 'Shown instead of the name when added. A PNG with a transparent background works best.', type: 'image', group: 'banner' }),
+    defineField({ name: 'logo', title: 'Big logo (banner)', description: 'The large logo in the middle of the banner, shown instead of the name. A PNG with a transparent background works best.', type: 'image', group: 'banner' }),
+    defineField({ name: 'headerLogo', title: 'Small logo (top bar)', description: 'The small logo in the top-left corner of every festival page. Without it, the big logo is used there.', type: 'image', group: 'banner' }),
     defineField({ name: 'heroImage', title: 'Banner photo', type: 'imageWithAlt', group: 'banner' }),
     defineField({
       name: 'heroImagePhone',
