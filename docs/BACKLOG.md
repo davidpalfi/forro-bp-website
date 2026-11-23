@@ -11,15 +11,16 @@ Owner: **D** = Dávid (accounts, decisions), **M** = maintainer/agent (code), **
 
 ## ▶ Plan agreed 2026-11-23: a more mature version before she sees it
 
-**Small open items first (D, a few minutes each):**
-- Turn off the old GitHub Pages site: repository **Settings** > **Pages** > unpublish / source none (its workflow was removed with S12; the last published copy may still be online at davidpalfi.github.io/forro-bp-website).
-- Uninstall the Pages CMS GitHub app, or remove this repository from it: GitHub account **Settings** > **Applications**.
+**✅ Small open items done (Dávid, confirmed 2026-11-23):** the old GitHub Pages site is turned off, and the Pages CMS GitHub app no longer has access to this repository.
 
 Dávid prefers to give the admin a more mature version first (first impressions matter; no time pressure). Order:
 
 1. **Polish how the site looks** (next). Open: Dávid either lists what bothers him on the test site (phone and computer; words or screenshots), or asks the agent to review every page at phone and desktop size against the Wix site and list rough spots to choose from. Scope: what clearly looks unfinished or broken; matters of taste (fonts, alignment, language switch) stay for her review (item 19). Placeholder photos, logo and bios are content, fixed in the Studio.
 2. **Then Dávid decides on the click-to-edit polish** (table below). If yes: B, E, F, G (useful whatever her feedback; estimate a few hours of agent work plus 30-60 minutes of Dávid trying them in the Studio and approving pull requests), optionally C and D (try first, drop if not smooth; a couple more hours), H only if she finds the delay slow. Done on a **separate branch** off `main` (e.g. `feature/click-to-edit-polish`); tried on Dávid's computer (`npm run preview:edit` + `npm run studio`), since the online preview only builds `main`; approved pieces merged into `main`.
 3. **Then 13a**, sending it to her.
+
+**Look polish done:**
+- ✅ 2026-11-23: separate small logo for the top bar (Festival home page > Banner and tickets > Small logo), as on the Wix site; the big logo stays on the banner. Without a small logo the big one is used in the top bar.
 
 **Ideas for the look polish, raised 2026-11-23 (not yet decided):**
 - **Video banner on the festival home**, as on the Wix site: a short silent looping video on computers, the banner photo on phones and with "reduce motion" (Wix does the same). Needs: a video upload field in Festival home page > Banner, `Hero.astro` with `<video autoplay muted loop playsinline>` and the photo as fallback, a click target in the preview, tests and docs. Estimate 2-3 hours of agent work plus 15-20 minutes for Dávid. Before building, check Sanity Free's file storage and bandwidth limits (fallback: serve the file from Cloudflare). The file: best the original from the admin; it could not be found in the Wix page's inspector.
@@ -83,7 +84,7 @@ Already built into the Studio, nothing to do: the phone-size switch above the pa
 
 | Phase | State |
 |---|---|
-| Pages CMS proof of concept (`main`) | Done and live at davidpalfi.github.io/forro-bp-website |
+| Pages CMS proof of concept | Retired 2026-11-23 (tag `pages-cms-poc`); its GitHub Pages site is turned off and the Pages CMS app removed |
 | Sanity decisions S1-S4 | Confirmed 2026-11-16 |
 | Sanity proof of concept: schemas, site reading Sanity documents, migration, admin guide | **Built and tested offline** (S5-S7). Not yet run against the real Sanity project |
 | Studio online, content imported | **Done** 2026-11-18 (Dávid), photos repaired with `npm run sanity:import-replace` the same day |

@@ -37,6 +37,7 @@ const CommunitySchema = z.object({ title_en: text, title_hu: text, heroImage: te
 const FestivalSchema = z.object({
   name: text,
   logo: text,
+  headerLogo: text,
   heroImage: text,
   heroImagePhone: text,
   tagline_en: text,
@@ -249,6 +250,7 @@ export function jsonToDocuments(contentDir: string, warn: (msg: string) => void 
       _type: 'festivalSettings',
       name: festival.name,
       logo: img(festival.logo, 'image'),
+      headerLogo: img(festival.headerLogo, 'image'),
       heroImage: img(festival.heroImage),
       heroImagePhone: img(festival.heroImagePhone),
       dateLine_en: festival.dateLine_en,

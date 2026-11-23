@@ -45,7 +45,7 @@ Out of scope: content for the community level (not designed), a structured (text
 - **R5. Indexing.** When `noindex` in `site.json` is true (the default), every page carries `robots: noindex, nofollow`.
 - **R6. Skip link** to the main content is the first focusable element, in the page's language.
 - **R7. Header** (stays at the top while scrolling): the brand, the language switch, the menu.
-  - Brand: in the festival, the festival logo (or its name as text when no logo is uploaded), linking to the festival home. On the community level, the community name, linking to the community home.
+  - Brand: in the festival, the small festival logo (`headerLogo`; without it the big banner logo; the festival name as text when neither is uploaded), linking to the festival home. On the community level, the community name, linking to the community home.
   - Language switch: `EN` and `HU`; each links to the same page in that language; the current one is marked.
   - Festival menu, in order: Home (the festival home), Program, Teachers, Artists, text pages with `showInMenu` (by `order`, then title; shown with their `menuLabel` when set), the community name (link up to the community home), and a cream "Tickets" button (new tab) when `ticketUrl` is a safe link. Community menu: one link to the festival.
   - From 1400 px the festival's date line is also shown next to the brand.
@@ -60,7 +60,7 @@ Banner with the community title over the banner photo; the intro paragraphs when
 
 ### 4.3 Festival home
 
-1. **Banner.** Banner photo (on phones the phone banner photo, when one is uploaded); the logo (or festival name as text); the ticket button (needs a safe `ticketUrl`; label falls back to "Tickets"/"Jegyek"; new tab); the date line. Centred on phones; from 900 px the block sits to the left over the photo.
+1. **Banner.** Banner photo (on phones the phone banner photo, when one is uploaded); the big logo (`logo`, or festival name as text); the ticket button (needs a safe `ticketUrl`; label falls back to "Tickets"/"Jegyek"; new tab); the date line. Centred on phones; from 900 px the block sits to the left over the photo.
 2. **Intro.** Each blank-line-separated block is a paragraph. Left out when empty.
 3. **Closing block.** The line of numbers (`stats`); one button per text page with `showOnHome`; the ticket link again.
 
@@ -103,7 +103,8 @@ All content is plain JSON files under `src/content/`. **Form** = what the editin
 | Field | Form | Use |
 |---|---|---|
 | `name` | required | Brand text, titles. Default "Festival" |
-| `logo` | image | Banner and header; text is used when empty |
+| `logo` | image | Big logo on the banner (and in the header when `headerLogo` is empty); text is used when empty |
+| `headerLogo` | image | Small logo in the header of every festival page (2026-11-23) |
 | `heroImage` | image | Festival banner; default sharing image |
 | `heroImagePhone` | image | Optional taller banner used below 720 px |
 | `dateLine_*` | | Banner; also on the community home |
@@ -223,7 +224,7 @@ Sections 1 to 10 describe the Pages CMS proof of concept. This section describes
 |---|---|
 | `site.json` | `siteSettings`, same fields |
 | `community.json` | `communitySettings`: title, banner photo; intro becomes a Large text block in `homeBlocks` |
-| `festival.json` banner fields | `festivalSettings`: name, logo, banner photo, phone banner photo, dates, ticket address and label, Instagram, tagline |
+| `festival.json` banner fields | `festivalSettings`: name, big logo, small logo, banner photo, phone banner photo, dates, ticket address and label, Instagram, tagline |
 | `festival.json` intro, stats | `festivalSettings.homeBlocks`: a Large text block, a centred Statement text block |
 | text pages with `showOnHome` | a centred Button block per page in `homeBlocks`, linking to the page (label empty, so the page's name is used) |
 | `programHeading`, `programImages`, `programText` | page `program` (order 1, red): heading, one wide Image block per image (alt "Program – name (n)"), a Text block |

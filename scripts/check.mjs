@@ -288,6 +288,10 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
   const nested = docs.find((d) => d._type === 'person' && d.photo?.asset?._ref);
   const nestedRef = nested.photo.asset._ref;
   nested.photo = { _type: 'imageWithAlt', asset: { _type: 'image', asset: nested.photo.asset } };
+  // Two logos: the big one on the banner, the small one in the top bar.
+  const festivalDoc = docs.find((d) => d._type === 'festivalSettings');
+  festivalDoc.logo = { _type: 'image', asset: { _type: 'reference', _ref: 'image-' + 'a'.repeat(40) + '-800x400-png' } };
+  festivalDoc.headerLogo = { _type: 'image', asset: { _type: 'reference', _ref: 'image-' + 'b'.repeat(40) + '-200x100-png' } };
   fs.writeFileSync(path.join(dir, 'fixture.ndjson'), docs.map((d) => JSON.stringify(d)).join('\n'));
   const { code, output } = build(dir, { CONTENT_SOURCE: 'file:fixture.ndjson' });
   check(code === 0, 'build passes');
@@ -316,6 +320,11 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
     check(['A small heading', 'Banner title', 'Banner button', 'Column three', 'A caption', 'b-divider', 'b-space', 'A statement line'].every((t) => page.includes(t)), 'every kind of block is shown');
     check(page.indexOf('>Gisa<') > -1 && page.indexOf('>Gisa<') < page.indexOf('>Dóri Czakó<'), 'a People block with chosen people shows them in the chosen order');
     check(/<main id="main" class="tone-dark"/.test(page), 'the page colour is used');
+    {
+      const home = read(dir, 'en/festival/index.html');
+      const brand = /<img[^>]*class="brand-logo"[^>]*>/.exec(home)?.[0] ?? '';
+      check(brand.includes('b'.repeat(40)) && home.includes('a'.repeat(40)) && !brand.includes('a'.repeat(40)), 'the top bar shows the small logo and the banner the big one');
+    }
     check(fs.existsSync(dist(dir, 'en/classes/index.html')) && read(dir, 'en/index.html').includes('href="/en/classes/"'), 'a community page gets its own address and appears in the community menu');
     check(read(dir, 'en/festival/index.html').includes('href="/en/festival/everything/"'), 'a new festival page appears in the festival menu');
     check(!everything.includes('DRAFT TITLE'), 'drafts never reach the public site');
