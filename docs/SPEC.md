@@ -256,7 +256,7 @@ Sections 1 to 10 describe the Pages CMS proof of concept. This section describes
 |---|---|
 | Text | Rich text at reading width. Large: serif paragraphs as the festival intro. Statement: one bold line as the numbers line (plain text) |
 | Heading | h2, h3 or h4 |
-| Image | Wide (up to about 1150 px), text width, or full screen width; caption below |
+| Image | Wide (up to about 1150 px), text width, or full screen width; caption below. Opens in the photo viewer like gallery photos; the viewer pages through all Image blocks of the page (the program pictures) |
 | Gallery | Layout `grid` (default): 2 columns, 3 from 720 px, photos cut to 4:3. Layout `mosaic`: from 720 px every five photos form the Wix Location-page pattern (two small, a tall one right, a big one, another tall one); 2 columns on phones. Every photo links to its large version and opens in the photo viewer (white, arrows, counter, swipe, arrow keys, Escape; a plain inline script in `Base.astro`, no external code); without JavaScript the link opens the photo |
 | Button | Leads to the chosen page in the visitor's language (label: its own, else the page's menu name), else to the address; left out with a warning when neither is usable |
 | People | The chosen people in the chosen order; with none chosen, everyone in the group by display order, then name. Cards as 4.5 |

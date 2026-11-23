@@ -209,8 +209,10 @@ const year = new Date().getFullYear();
       })();
     </script>
     <script is:inline>
-      // Gallery photo viewer: a click on a gallery photo opens it large, with arrows, swiping,
-      // the arrow keys and Escape. Built on first use; works after the preview swaps the page.
+      // Photo viewer: a click on a gallery photo or an Image block opens it large, with arrows,
+      // swiping, the arrow keys and Escape. A gallery pages through its own photos; Image blocks
+      // page through all Image blocks of the page (e.g. the program pictures). Pinch-zoom stays
+      // possible. Built on first use; works after the preview swaps the page.
       (function () {
         var box, img, count, list = [], at = 0;
         var svg = function (d) {
@@ -247,7 +249,10 @@ const year = new Date().getFullYear();
             if (e.key === 'ArrowRight') show(at + 1);
           });
           var x0 = null;
-          box.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+          box.addEventListener('touchstart', function (e) {
+            var zoomed = window.visualViewport && window.visualViewport.scale > 1.05;
+            x0 = e.touches.length === 1 && !zoomed ? e.touches[0].clientX : null;
+          }, { passive: true });
           box.addEventListener('touchend', function (e) {
             if (x0 === null) return;
             var dx = e.changedTouches[0].clientX - x0;
@@ -260,7 +265,10 @@ const year = new Date().getFullYear();
           if (!a || e.ctrlKey || e.metaKey || e.shiftKey || !window.HTMLDialogElement) return;
           e.preventDefault();
           if (!box) build();
-          list = Array.prototype.slice.call(a.closest('ul').querySelectorAll('a.gallery-open'));
+          var gallery = a.closest('ul.gallery');
+          list = Array.prototype.slice.call(
+            gallery ? gallery.querySelectorAll('a.gallery-open') : document.querySelectorAll('main a.image-open'),
+          );
           show(list.indexOf(a));
           box.showModal();
         });

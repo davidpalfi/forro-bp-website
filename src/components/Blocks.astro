@@ -79,7 +79,9 @@ const link = (b: Block) => {
               const caption = tr(b, 'caption', lang);
               return (
                 <figure class:list={['b-image', imageWidth(b)]}>
-                  <Picture image={b.image} lang={lang} class="b-image-photo" sizes={b.width === 'text' ? '(min-width: 760px) 704px, 100vw' : '(min-width: 1200px) 1150px, 100vw'} />
+                  <a class="gallery-open image-open" href={img.src} data-srcset={img.srcset}>
+                    <Picture image={b.image} lang={lang} class="b-image-photo" sizes={b.width === 'text' ? '(min-width: 760px) 704px, 100vw' : '(min-width: 1200px) 1150px, 100vw'} />
+                  </a>
                   {caption && <figcaption>{caption}</figcaption>}
                 </figure>
               );

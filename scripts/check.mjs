@@ -321,6 +321,7 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
     check(!page.includes('Evil button') && !/(?:href|src)="\s*javascript:/i.test(everything), 'a button with an unsafe link is left out');
     check(page.includes('youtube-nocookie.com/embed/dQw4w9WgXcQ'), 'a YouTube video is embedded without tracking cookies');
     check(/<ul class="gallery gallery--mosaic">/.test(page) && (page.match(/<a class="gallery-open" href="https:\/\/cdn\.sanity\.io\//g) || []).length >= 2 && page.includes('lightbox'), 'a gallery can be a mosaic, and each photo opens large in the photo viewer');
+    check(/<a class="gallery-open image-open" href="https:\/\/cdn\.sanity\.io\//.test(page), 'an Image block opens large in the photo viewer');
     check(['A small heading', 'Banner title', 'Banner button', 'Column three', 'A caption', 'b-divider', 'b-space', 'A statement line'].every((t) => page.includes(t)), 'every kind of block is shown');
     check(page.indexOf('>Gisa<') > -1 && page.indexOf('>Gisa<') < page.indexOf('>Dóri Czakó<'), 'a People block with chosen people shows them in the chosen order');
     check(/<main id="main" class="tone-dark"/.test(page), 'the page colour is used');
