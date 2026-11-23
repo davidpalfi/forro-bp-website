@@ -48,7 +48,7 @@ Without `PREVIEW=1` none of this exists in the output (`npm run check` [7]); [8]
 | Worker | Config | Build command | Deploy command | Settings in Cloudflare |
 |---|---|---|---|---|
 | `forro-budapest-preview` | `wrangler.jsonc` | `npm run preview:build` | `npx wrangler deploy` | secret `SANITY_VIEWER_TOKEN` |
-| `forro-budapest-test` | `wrangler.site.jsonc` | `CONTENT_SOURCE=sanity npm run build` | `npx wrangler deploy --config wrangler.site.jsonc` | build variable `SITE_URL`; deploy hook called by the Sanity webhook |
+| `forro-bp-website` | `wrangler.site.jsonc` | `CONTENT_SOURCE=sanity npm run build` | `npx wrangler deploy --config wrangler.site.jsonc` | build variable `SITE_URL`; deploy hook called by the Sanity webhook |
 
 The Studio's preview address: `studio/.env.production` (`SANITY_STUDIO_PREVIEW_URL`, not secret); `npm run studio:deploy` checks it first. Rollback: the Worker > Deployments > Rollback. `npm run preview:local` builds the Cloudflare preview and runs it at localhost:4323 (wrangler reads `SANITY_VIEWER_TOKEN` from the git-ignored `.env`).
 

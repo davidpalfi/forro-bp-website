@@ -98,18 +98,18 @@ Leave all other fields alone. If you see a **Branch** / **Production branch** fi
 
 | Field | Value |
 |---|---|
-| Project name | `forro-budapest-test` |
+| Project name | `forro-bp-website` |
 | Build command | `CONTENT_SOURCE=sanity npm run build` |
 | Deploy command | `npx wrangler deploy --config wrangler.site.jsonc` |
 
 **3.3** **Create and deploy**. The build may fail again (wrong branch). Go on.
 
-**3.4** Open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-budapest-test/production/settings
-(or: Workers & Pages > **forro-budapest-test** > **Settings**).
+**3.4** Open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-bp-website/production/settings
+(or: Workers & Pages > **forro-bp-website** > **Settings**).
 
 **3.5** **Build** section > **Branch control** > pencil: production branch `feature/sanity`, remove the tick at non-production builds, **Save** (as in 1.10).
 
-**3.6** Find this Worker's address (as in 1.13), e.g. `https://forro-budapest-test.davidpalfi.workers.dev`. Copy it into your note as **test address**.
+**3.6** Find this Worker's address (as in 1.13), e.g. `https://forro-bp-website.pdavid92.workers.dev`. Copy it into your note as **test address**.
 
 **3.7** Still in the **Build** section, find **Variables and secrets** *inside Build* (build variables). Click **+ Add**:
 - **Type**: Text
@@ -117,7 +117,7 @@ Leave all other fields alone. If you see a **Branch** / **Production branch** fi
 - **Value**: the test address, beginning with `https://` and ending with `.workers.dev`
 - **Save**.
 
-**3.8** Tell the agent the branch and `SITE_URL` are set; it pushes a change to start the build (not **Retry build**, which builds `main` again). Watch https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-budapest-test/production/deployments for the green tick.
+**3.8** Tell the agent the branch and `SITE_URL` are set; it pushes a change to start the build (not **Retry build**, which builds `main` again). Watch https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-bp-website/production/deployments for the green tick.
 
 **3.9** Open the test address: the site with the content from Sanity, **no** dark strip.
 
@@ -139,7 +139,7 @@ Replace *preview* and *test* with your two addresses:
 
 ## Part 5. Rebuild when someone clicks Publish (5 minutes)
 
-**5.1** Open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-budapest-test/production/settings > **Build** section > **Deploy Hooks** > **+ Add** (or **Create deploy hook**).
+**5.1** Open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-bp-website/production/settings > **Build** section > **Deploy Hooks** > **+ Add** (or **Create deploy hook**).
 - **Name**: `Sanity publish`
 - **Branch**: `feature/sanity`
 - **Save**.
@@ -169,7 +169,7 @@ Click **Save**. If Sanity says webhooks are not available on your plan, stop and
 
 **5.5** Test it. Open https://forro-budapest.sanity.studio > **Festival home page** > add a full stop somewhere, e.g. at the end of the Hungarian date line > **Publish**.
 
-**5.6** Open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-budapest-test/production/deployments. Within a minute a new build appears. Wait for the green tick, then reload the test address: the full stop is there. Remove it in the Studio and publish again.
+**5.6** Open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-bp-website/production/deployments. Within a minute a new build appears. Wait for the green tick, then reload the test address: the full stop is there. Remove it in the Studio and publish again.
 
 ---
 
@@ -199,7 +199,7 @@ It prints `"Edit on the page" will open https://forro-budapest-preview...` and d
 ## If something goes wrong
 
 - **A build fails** (red cross): open the Worker's deployments link (1.11 or 3.8) > click the failed build > **View build log**. Scroll to the end, copy the last 30 lines, send them to the agent (no secrets in them). A failed build changes nothing online.
-- **"Name mismatch" / "does not match the name in your wrangler config"**: the Project name is not exactly `forro-budapest-preview` / `forro-budapest-test`. Tell the agent what you typed.
+- **"Name mismatch" / "does not match the name in your wrangler config"**: the Project name is not exactly `forro-budapest-preview` / `forro-bp-website`. Tell the agent what you typed.
 - **The build log says it built `main`**: branch control was not saved; repeat 1.10 / 3.5 and retry.
 - **The preview says "could not load the content from Sanity"**: the token is wrong or saved as Text. Repeat part 2 with a new token.
 - **Inside the Studio the dark strip stays**: click **Open preview** (arrow icon above the page) once, then go back. Tell the agent which browser.
