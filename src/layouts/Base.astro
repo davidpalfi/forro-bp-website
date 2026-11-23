@@ -90,21 +90,25 @@ const year = new Date().getFullYear();
       </a>
       {headerDate && <p class="top-date">{headerDate}</p>}
 
-      <p class="lang" aria-label={t.language}>
-        {
-          LANGS.map((l) => (
-            <a
-              href={href(l, pagePath)}
-              lang={l}
-              hreflang={l}
-              aria-current={l === lang ? 'true' : undefined}
-              title={LANG_NAME[l]}
-            >
-              {LANG_LABEL[l]}
-            </a>
-          ))
-        }
-      </p>
+      <details class="lang">
+        <summary aria-label={`${t.language}: ${LANG_NAME[lang]}`}>
+          <img src={withBase(`/icons/flag-${lang}.png`)} width="64" height="64" alt="" />
+          <span>{LANG_LABEL[lang]}</span>
+          <svg class="lang-chevron" viewBox="0 0 16 10" width="16" height="10" aria-hidden="true"><path d="M1 1l7 7 7-7" fill="none" stroke="currentColor" stroke-width="1.8" /></svg>
+        </summary>
+        <ul class="lang-list">
+          {
+            LANGS.map((l) => (
+              <li>
+                <a href={href(l, pagePath)} lang={l} hreflang={l} aria-current={l === lang ? 'true' : undefined}>
+                  <img src={withBase(`/icons/flag-${l}.png`)} width="64" height="64" alt="" />
+                  <span>{LANG_NAME[l]}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </details>
 
       <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" hidden>
         <span class="menu-btn-bars" aria-hidden="true"></span>
@@ -127,6 +131,13 @@ const year = new Date().getFullYear();
           )
         }
       </nav>
+      {
+        ticketUrl && (
+          <a class="ticket ticket--small top-ticket" href={ticketUrl} target="_blank" rel="noopener">
+            {t.tickets}
+          </a>
+        )
+      }
     </header>
 
     <main id="main" class={`tone-${tone}`}>
@@ -179,11 +190,21 @@ const year = new Date().getFullYear();
         btn.addEventListener('click', function () {
           set(btn.getAttribute('aria-expanded') !== 'true');
         });
+        // The language list closes on Escape and on a click anywhere else.
+        var langBox = document.querySelector('details.lang');
         document.addEventListener('keydown', function (e) {
           if (e.key === 'Escape') {
+            if (langBox && langBox.open) {
+              langBox.open = false;
+              langBox.querySelector('summary').focus();
+              return;
+            }
             set(false);
             btn.focus();
           }
+        });
+        document.addEventListener('click', function (e) {
+          if (langBox && langBox.open && !langBox.contains(e.target)) langBox.open = false;
         });
       })();
     </script>

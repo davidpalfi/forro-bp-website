@@ -81,13 +81,24 @@ p { margin: 0 0 1em; }
   font-size: 1rem; line-height: 1.05; letter-spacing: 0.02em;
 }
 
-.lang { margin: 0; display: flex; gap: 0.15rem; font-family: var(--sans); font-weight: 800; }
-.lang a {
-  text-decoration: none; padding: 0.55rem 0.6rem; min-width: 2.75rem; text-align: center;
-  opacity: 0.78;
+/* Language drop-down, as on the Wix site: flag, EN/HU and an arrow; the list opens below. */
+.lang { position: relative; font-family: var(--sans); font-weight: 800; }
+.lang summary {
+  list-style: none; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 0.4rem; font-size: 1.05rem;
 }
-.lang a[aria-current] { opacity: 1; text-decoration: underline; text-underline-offset: 0.3em; text-decoration-thickness: 2px; }
-.lang a:hover { opacity: 1; }
+.lang summary::-webkit-details-marker { display: none; }
+.lang img { width: 1.5rem; height: 1.5rem; }
+.lang-chevron { display: block; margin-left: 0.35rem; transition: transform 0.15s; }
+.lang[open] .lang-chevron { transform: rotate(180deg); }
+.lang-list {
+  position: absolute; right: 0; top: 100%; z-index: 25; margin: 0.25rem 0 0; padding: 0.35rem 0; list-style: none;
+  background: var(--red); box-shadow: 0 6px 18px rgb(0 0 0 / 0.35); min-width: 9.5rem;
+}
+.lang-list a { display: flex; align-items: center; gap: 0.6rem; padding: 0.55rem 1rem; text-decoration: none; white-space: nowrap; }
+.lang-list a:hover, .lang-list a:focus-visible { background: rgb(0 0 0 / 0.15); }
+.lang-list a[aria-current] { text-decoration: underline; text-underline-offset: 0.3em; text-decoration-thickness: 2px; }
+.top .top-ticket { display: none; }
 
 .menu-btn {
   width: 3rem; height: 3rem; padding: 0; border: 0; background: none; color: inherit; cursor: pointer;
@@ -132,8 +143,10 @@ p { margin: 0 0 1em; }
   }
   .menu a { padding: 0.6rem 0.5rem; }
   .top-date { display: block; }
-  .menu a.ticket--small { margin-left: 0.75rem; padding: 0.75rem 2rem 0.9rem; order: 5; }
+  .menu a.ticket--small { display: none; }
   .lang { order: 3; }
+  .lang summary { font-size: 1rem; }
+  .top .top-ticket { display: inline-block; order: 4; margin-left: 0.5rem; }
   .js.menu-open body { overflow: auto; }
 }
 @media (min-width: 1400px) {
@@ -144,16 +157,17 @@ p { margin: 0 0 1em; }
 
 .ticket {
   display: inline-block; text-decoration: none; text-align: center;
-  background: var(--red); color: var(--cream);
+  color: var(--cream);
   font-family: var(--sans); font-weight: 900; text-transform: uppercase; letter-spacing: 0.01em;
   font-size: 1.15rem; line-height: 1.1;
-  padding: 0.8rem 1.6rem 0.95rem;
-  /* The torn-paper shape of the ticket button. */
-  clip-path: polygon(6% 4%, 99% 0, 100% 92%, 42% 100%, 0 88%);
+  padding: 1.2rem 2.1rem 1.35rem;
+  /* The torn-paper shapes are the Wix site's buttons with the words taken out, so the text
+     stays editable and translated. They stretch to the button's size. */
+  background: url('./ticket-red.png') center / 100% 100% no-repeat;
 }
-.ticket:hover, .ticket:focus-visible { background: var(--plum); }
-.ticket--small { font-size: 1rem; padding: 0.7rem 1.75rem 0.85rem; background: var(--cream); color: var(--red); }
-.ticket--small:hover, .ticket--small:focus-visible { background: var(--white); color: var(--red); }
+.ticket:hover, .ticket:focus-visible { filter: brightness(0.85); }
+.ticket--small { font-size: 1rem; padding: 0.95rem 2.4rem 1.05rem; background-image: url('./ticket-cream.png'); color: var(--red); }
+.ticket--small:hover, .ticket--small:focus-visible { filter: brightness(1.06); }
 .menu a.ticket--small:hover { text-decoration: none; }
 
 .button {
