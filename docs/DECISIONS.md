@@ -12,7 +12,7 @@ This file's numbered decisions describe the original Pages CMS/GitHub Pages proo
 |---|---|---|
 | Content/editor | JSON in GitHub, Pages CMS forms | Sanity, Studio hosted by Sanity (S3); schemas refined (S5); content imported by Dávid 2026-11-18 (S7; photos need one re-import, S9) |
 | Public site | Static Astro on GitHub Pages | Static; built from Sanity documents, from Sanity or from the JSON files (S6); hosting not finalized |
-| Visual editing | None | Click-to-edit preview (S9), locked and ready for Cloudflare (S11); not online until Dávid creates the Workers (`HOSTING.md`) |
+| Visual editing | None | Click-to-edit preview (S9), locked, online on Cloudflare (S11) |
 | Languages | English and Hungarian side by side, with fallback | **Confirmed 2026-11-16:** kept (S1 below) |
 | Page content | Fixed fields and Markdown/HTML JSON bodies | **Confirmed 2026-11-16:** full page builder (S2 below) |
 | Images | Local uploads resized at build time | **Confirmed 2026-11-16:** Sanity image service (S4 below) |
@@ -88,12 +88,15 @@ Source: web search of sanity.io/pricing and the roles docs on 2026-11-18 (Free: 
 - **The preview lock** (`src/lib/preview-lock.ts`, Dávid chose it 2026-11-18): the Studio's Presentation tool opens `/preview/enable/` with a one-hour secret it stores in the dataset; the preview checks it with Sanity (`@sanity/preview-url-secret` 4.1.5, with the Viewer token) and sets a cookie signed with a key derived from the token, valid 12 hours, `HttpOnly; SameSite=None; Secure; Partitioned` (Safari 18.4+ drops cross-site cookies in frames without `Partitioned`, per Sanity's draft-mode guide). Without a valid cookie the preview asks Sanity only for published content (no token used) and shows a strip saying drafts are hidden. Considered: Cloudflare Access (another login for the admin, against priority 1); a secret in the address (leaks when copied). Risk: a browser that blocks even partitioned cookies sees no drafts in the frame; workaround "Open preview" in a new tab (`HOSTING.md`).
 - **Polish A, no reload** (Dávid chose to do it before the review): after a save the page is fetched in the background and the content of `<body>` swapped, keeping Sanity's overlay element and the scroll position; the menu script is run again; any error falls back to a reload. Not letter by letter (Sanity saves after a pause).
 - **Studio**: `previewMode.enable` set; the deployed Studio gets the preview's address from `studio/.env.production`, and `npm run studio:deploy` refuses to deploy without an `https://` address there (`scripts/studio-deploy-check.mjs`), so the admin can never get a tab pointing at `localhost`.
-- **Verified 2026-11-23 by Dávid on the real setup:** Workers Builds from `feature/sanity`, the Publish rebuild through the Sanity webhook (available on Free), and the lock in Safari (drafts inside the Studio, the strip outside).
+- **Verified 2026-11-23 by Dávid on the real setup:** Workers Builds, the Publish rebuild through the Sanity webhook (tested during Sanity's Growth trial; webhooks are not among the Growth features the trial lists, so they are expected to work on Free; publish one test change after the trial ends (around 2026-12-18) to confirm), and the lock in Safari (drafts inside the Studio, the strip outside).
 - **Originally not verified** (cloud sessions cannot reach Sanity or Cloudflare): the real Presentation handshake, the cookie inside the Studio's frame in Safari, Workers Builds and the deploy hook, and whether the Sanity webhook is available on Free. Tested instead with a stand-in for Sanity in Cloudflare's local runtime (`scripts/check-preview.mjs`).
+
+### S12. Sanity is the site; `main` carries it (Dávid, 2026-11-23)
+Dávid committed to Sanity: `feature/sanity` was merged into `main`, which is now the branch both Cloudflare Workers build. The Pages CMS proof of concept is retired: its GitHub Pages workflow (`deploy.yml`, `scripts/ci-build.mjs`) and forms (`.pages.yml`) were removed, and its last state is kept as the Git tag `pages-cms-poc` (release "Pages CMS proof of concept"). Why: Sanity's editor and click-to-edit fit the admin far better than Pages CMS did (priority 1), and one main branch is simpler. The JSON files in `src/content` stay as the import source and test content. Supersedes decisions 3, 13 and 14 for the live setup.
 
 ### Still open for the port
 - Whether Cloudflare also hosts the real public site at launch (the test site is there, S11).
-- The invited-editor sign-in, and whether the publish webhook is available on Free (plan: S10; mechanism: S11).
+- The invited-editor sign-in. The publish webhook after the trial ends: webhooks are not among the Growth features the trial lists, so they are expected to work on Free; publish one test change after the trial ends (around 2026-12-18) to confirm.
 - The admin's own trial of the editor; click-to-edit is expected to be a desktop workflow.
 
 ## Context and priorities

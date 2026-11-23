@@ -8,7 +8,7 @@
 // a warning must not stop the site from being published (docs/DECISIONS.md, decision 8).
 //
 // What this cannot check (needs a browser): the menu button, the language redirect on "/",
-// layout on phones, and anything about the live Pages CMS or hosting. See docs/HANDOFF.md.
+// layout on phones, and anything about the live Studio or hosting. See docs/HANDOFF.md.
 
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -226,7 +226,7 @@ console.log('\n[3] Known limit: malformed file syntax');
 }
 
 /* ------------------------------------------------------------------ */
-console.log('\n[4] Served under a sub-path (GitHub Pages project site: name.github.io/repo-name/)');
+console.log('\n[4] Served under a sub-path (a project site at a sub-path, e.g. name.github.io/repo-name/)');
 {
   const dir = copyProject('subpath');
   fs.writeFileSync(

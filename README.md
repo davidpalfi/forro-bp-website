@@ -4,12 +4,12 @@ One website for the Forró Budapest community, with the Budapest Forró Festival
 
 **New here (person or agent)?** Read [docs/HANDOFF.md](docs/HANDOFF.md) first, then [docs/BACKLOG.md](docs/BACKLOG.md).
 
-## Where it stands (2026-11-18)
+## Where it stands (2026-11-23)
 
-| Branch | What it is |
+| Where | What it is |
 |---|---|
-| `main` | The first proof of concept (Pages CMS forms, GitHub Pages), live at davidpalfi.github.io/forro-bp-website. Kept unchanged as the fallback |
-| `feature/sanity` | **The current work.** Content in Sanity, edited in Sanity Studio, including **click-to-edit**: the real page next to the editor, click a text or photo to edit it. Approved by Dávid. **Online** since 2026-11-23: preview https://forro-budapest-preview.pdavid92.workers.dev, test site https://forro-bp-website.pdavid92.workers.dev ([docs/HOSTING.md](docs/HOSTING.md)). Not yet sent to the admin |
+| `main` | **The site.** Content in Sanity, edited in Sanity Studio, including **click-to-edit**: the real page next to the editor, click a text or photo to edit it. Online: preview https://forro-budapest-preview.pdavid92.workers.dev, test site https://forro-bp-website.pdavid92.workers.dev ([docs/HOSTING.md](docs/HOSTING.md)). Not yet sent to the admin |
+| tag `pages-cms-poc` | The first proof of concept (Pages CMS forms, GitHub Pages), kept for reference. Retired 2026-11-23 |
 
 The live forrobudapest.com is still Wix. Nothing here changes it until the domain is moved at launch.
 
@@ -18,7 +18,7 @@ Admin -> Sanity Studio (forro-budapest.sanity.studio) -> content in Sanity
                  |  "Edit on the page"                        |
                  v                                            v
          preview: drafts, on request              npm run build -> static site
-         (now: Dávid's computer; next: online)    (next: online, rebuilt on Publish)
+         (online, Cloudflare)                     (online, rebuilt on Publish)
 ```
 
 ## Next step: send it to the admin for review (online since 2026-11-23; sending on hold)
@@ -96,7 +96,7 @@ Sanity commands (need `npm run sanity:login` once): `npm run studio:deploy`, `np
 | `docs/EDITING-GUIDE.md` | The admin (Sanity) | Plain-language how-to; finish before sending |
 | `docs/HOSTING.md` | Dávid | Click by click: the Cloudflare preview, test site and rebuild on Publish |
 | `docs/GO-LIVE-CHECKLIST.md` | Dávid and the maintainer | Steps up to replacing Wix |
-| `EDITING-GUIDE.md` | The old Pages CMS proof of concept | Historical |
+| `EDITING-GUIDE.md` | The old Pages CMS proof of concept (tag `pages-cms-poc`) | Historical |
 | `CLAUDE.md` | Claude sessions in this repo | Rules for safe changes |
 
 ## Addresses on the site

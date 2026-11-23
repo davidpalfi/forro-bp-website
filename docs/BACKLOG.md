@@ -14,7 +14,7 @@ Owner: **D** = Dávid (accounts, decisions), **M** = maintainer/agent (code), **
 Dávid prefers to give the admin a more mature version first (first impressions matter; no time pressure). Order:
 
 1. **Polish how the site looks** (next). Open: Dávid either lists what bothers him on the test site (phone and computer; words or screenshots), or asks the agent to review every page at phone and desktop size against the Wix site and list rough spots to choose from. Scope: what clearly looks unfinished or broken; matters of taste (fonts, alignment, language switch) stay for her review (item 19). Placeholder photos, logo and bios are content, fixed in the Studio.
-2. **Then Dávid decides on the click-to-edit polish** (table below). If yes: B, E, F, G (useful whatever her feedback; estimate a few hours of agent work plus 30-60 minutes of Dávid trying them in the Studio and approving pull requests), optionally C and D (try first, drop if not smooth; a couple more hours), H only if she finds the delay slow. Done on a **separate branch** off `feature/sanity` (e.g. `feature/click-to-edit-polish`); tried on Dávid's computer (`npm run preview:edit` + `npm run studio`), since the online preview only builds `feature/sanity`; approved pieces merged into `feature/sanity`.
+2. **Then Dávid decides on the click-to-edit polish** (table below). If yes: B, E, F, G (useful whatever her feedback; estimate a few hours of agent work plus 30-60 minutes of Dávid trying them in the Studio and approving pull requests), optionally C and D (try first, drop if not smooth; a couple more hours), H only if she finds the delay slow. Done on a **separate branch** off `main` (e.g. `feature/click-to-edit-polish`); tried on Dávid's computer (`npm run preview:edit` + `npm run studio`), since the online preview only builds `main`; approved pieces merged into `main`.
 3. **Then 13a**, sending it to her.
 
 **Working agreement:** work starts only when Dávid gives a clear go; planning questions get answers and plans only.
@@ -30,7 +30,9 @@ Dávid prefers to give the admin a more mature version first (first impressions 
 4. Dávid invites her (role Administrator) and sends the guide, https://forro-budapest.sanity.studio and https://forro-bp-website.pdavid92.workers.dev, asking her to note what is unclear.
 5. Then backlog item 13 (her trial) and the polish below.
 
-**Agreed for after the review (Dávid, 2026-11-23): make `feature/sanity` the new `main`.** Keep the old proof of concept as branch `pages-cms-poc`; merge; switch off the GitHub Pages workflow (`.github/workflows/deploy.yml`) and disconnect Pages CMS; set both Cloudflare Workers' production branch to `main` (push a change to start the builds).
+**✅ Done 2026-11-23: `main` is the Sanity version** (S12). Old version: tag `pages-cms-poc`. Cloudflare builds `main`.
+
+**Around 2026-12-18 (after Sanity's trial ends):** publish one small change and check the test site rebuilds (webhook on Free). If not: a scheduled rebuild instead.
 
 ---
 
@@ -85,7 +87,7 @@ Already built into the Studio, nothing to do: the phone-size switch above the pa
 
 | # | Item | Owner | Done when | Depends on |
 |---|---|---|---|---|
-| 1 | ✅ **Done 2026-11-18** (S10; webhooks confirmed working on Free 2026-11-23). Check Sanity Free-plan limits (seats, roles, dataset visibility, Studio hosting, image usage) and record the findings with a date in `DECISIONS.md` | D | Findings recorded; no feature used needs Growth | none |
+| 1 | ✅ **Done 2026-11-18** (S10; webhook tested during the Growth trial, webhooks are not among the Growth features the trial lists, so they are expected to work on Free; publish one test change after the trial ends (around 2026-12-18) to confirm). Check Sanity Free-plan limits (seats, roles, dataset visibility, Studio hosting, image usage) and record the findings with a date in `DECISIONS.md` | D | Findings recorded; no feature used needs Growth | none |
 | 2 | ✅ **Done 2026-11-18** (Dávid). Deploy the Studio. Do not redeploy until the preview is hosted (S9) | D | | |
 | 3 | Test the invited-editor sign-in with a test invite | D | A non-developer account can sign in, on a phone too | 2 |
 | 4 | ✅ **Done 2026-11-17.** Audit schema coverage: every JSON field mapped (`SPEC.md` 11.2), gaps fixed (S5), checked automatically by `npm run check` [0] | M | | |
@@ -126,7 +128,7 @@ Already built into the Studio, nothing to do: the phone-size switch above the pa
 | 29 | Alt text on people photos | M | The Sanity person photo already has EN/HU alt fields; the rendering in item 8 should use them |
 | 30 | Accessibility review and testing in browsers other than Chromium | M | Never done |
 | 31 | Sitemap | M | Not specified yet |
-| 32 | Decide whether to keep or retire the Pages CMS PoC and `.pages.yml` once Sanity is live | D | Keep it as the fallback until Sanity is stable |
+| 32 | ✅ Done 2026-11-23: Pages CMS PoC retired, kept as tag `pages-cms-poc` (S12) | D | |
 | 33 | Upgrade Astro and Sanity packages: `npm ci` reports 37 audit warnings (2026-11-18), all in build and editor tooling (file matching, YAML, dev server), none in the published static pages. Do not run `npm audit fix --force`; upgrade the pinned versions deliberately and run `npm run check` | M | Not urgent; do before launch |
 
 ## Open decisions to collect

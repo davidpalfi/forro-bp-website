@@ -2,9 +2,9 @@
 
 How the code is organised and how to change it safely. For what the site does, see `SPEC.md`; for why it is built this way, see `DECISIONS.md`.
 
-## Current state (2026-11-18, `feature/sanity`)
+## Current state (2026-11-23, `main`)
 
-The site renders **Sanity documents**. They come from Sanity, or from the JSON files in `src/content` converted to the same documents; `CONTENT_SOURCE` chooses (`SPEC.md` 11.1). The default is still the JSON files, so the site builds and is tested without Sanity access. The content is imported and the Studio deployed (2026-11-18). Click-to-edit runs as a local preview (below, `SPEC.md` 11.7, `DECISIONS.md` S9). Not built yet: hosting the preview and the rebuild on publish.
+The site renders **Sanity documents**. They come from Sanity, or from the JSON files in `src/content` converted to the same documents; `CONTENT_SOURCE` chooses (`SPEC.md` 11.1). The default is still the JSON files, so the site builds and is tested without Sanity access. The content is imported and the Studio deployed (2026-11-18). Click-to-edit runs as a preview on Cloudflare (and locally); the test site is built from Sanity on Cloudflare and rebuilt on Publish (below, `SPEC.md` 11.7, `DECISIONS.md` S9, S11, S12).
 
 ```text
 Admin -> hosted Sanity Studio -> published documents in Sanity ---------+
@@ -99,8 +99,8 @@ Nothing runs on a server. Browser JavaScript is two small inline scripts: the me
 | `scripts/make-sanity-import.mjs` | `npm run sanity:import-file`: writes `sanity-import/` (ignored by Git) |
 | `scripts/check.mjs` | `npm run check`: schema check, six test builds, and that the preview stays out of public builds [7] |
 | `scripts/check-schema.mjs`, `scripts/lib/` | Documents vs Studio schema; Node loader for Studio files; Sanity-shaped test content |
-| `scripts/optimize-images.mjs`, `scripts/ci-build.mjs` | Photo resizing; the build as run on GitHub |
-| `.pages.yml`, `.github/workflows/` | The Pages CMS forms and GitHub Pages deploy of the old proof of concept. They still match the JSON files |
+| `scripts/optimize-images.mjs` | Photo resizing before every build |
+| `.github/workflows/check.yml` | Runs `npm run check` on pull requests and code pushes to `main`. (The Pages CMS forms and the GitHub Pages deploy were removed 2026-11-23; see tag `pages-cms-poc`) |
 | `astro.config.mjs` | Reads `SITE_URL` and `SITE_BASE`; trailing slashes. With `PREVIEW=1`: on-request rendering, `.env`, the editing script |
 | `.env.example` | Names the preview's setting (`SANITY_VIEWER_TOKEN`); the real `.env` is git-ignored |
 
@@ -136,8 +136,6 @@ Nothing runs on a server. Browser JavaScript is two small inline scripts: the me
 - In preview, texts end in invisible marker characters. Never compare or parse a text field (`_en`/`_hu`, names) in code; if a new field holds a value the code compares or uses as an address, check it is not caught by the marker filter in `source.ts`.
 - A component with a `<script>` imported by `Base.astro` is bundled into every build even when not rendered. Preview-only browser code goes through the integration in `astro.config.mjs`.
 - In an import file the upload instruction `_sanityAsset` belongs on the photo object, not inside `asset`.
-- In `.pages.yml`, `{primary}` in a file name pattern is the primary field's value; how it treats accented letters is unverified.
-- Pages CMS's stored value formats were assumed from its docs, not observed. See the assumptions table in `DECISIONS.md`.
 
 ## How to change things
 
@@ -166,7 +164,7 @@ No code: the admin creates it in the Studio. A page with a fixed layout that is 
 ### Change fixed wording or add a language
 
 Wording: edit `UI` in `src/lib/i18n.ts`, same key in every language.
-A third language: add it to `LANGS`, `LANG_LABEL`, `LANG_NAME` and `UI`; add `_xx` fields to the schemas and to `.pages.yml`; add the `og:locale` case in `Base.astro`. The forms get long with three languages; reconsider decision 5 first.
+A third language: add it to `LANGS`, `LANG_LABEL`, `LANG_NAME` and `UI`; add `_xx` fields to the schemas and to the Studio schema (`studio/schemaTypes`); add the `og:locale` case in `Base.astro`. The forms get long with three languages; reconsider decision 5 first.
 
 ### Change the design
 
@@ -179,7 +177,7 @@ After the import (`SANITY-PORT-STATUS.md`), set `CONTENT_SOURCE=sanity` in the h
 
 ### Upgrade Astro, Node or another dependency
 
-Change the exact versions in `package.json` and `.node-version` (and `node-version` in `deploy.yml`), run `npm install`, then `npm run check` and the browser checks.
+Change the exact versions in `package.json` and `.node-version` (Cloudflare's builds read `.node-version`), run `npm install`, then `npm run check` and the browser checks.
 
 ### Change the Sanity content model
 

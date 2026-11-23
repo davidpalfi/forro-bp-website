@@ -34,7 +34,7 @@ You land back in Cloudflare.
 | Build command | `npm run preview:build` |
 | Deploy command | `npx wrangler deploy` |
 
-Leave all other fields alone. If you see a **Branch** / **Production branch** field, choose `feature/sanity`.
+Leave all other fields alone. If you see a **Branch** / **Production branch** field, choose `main`.
 
 **1.6** Click **Create and deploy** (or **Save and Deploy**).
 
@@ -46,10 +46,10 @@ Leave all other fields alone. If you see a **Branch** / **Production branch** fi
 (or: https://dash.cloudflare.com/?to=/:account/workers-and-pages > click **forro-budapest-preview** > the **Settings** tab).
 
 **1.10** **Settings** > **Builds**. Switch off **Builds for Preview branches** (on the "Previews Base" view). Then choose **Production** next to the Builds heading, find **Branch control** and click the pencil icon next to it.
-- **Production branch**: choose `feature/sanity`
+- **Production branch**: choose `main`
 - Click **Save**.
 
-**1.11** A **Retry build** would build `main` again, so do not use it. A new build starts by itself with the next change pushed to `feature/sanity`: tell the agent the branch is set, and it pushes one (2026-11-22: that is how the first good build was started). Then open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-budapest-preview/production/deployments and watch for a build on `feature/sanity`.
+**1.11** After changing the branch, do not use **Retry build** (it builds the same change again). A new build starts with the next change pushed to `main`: tell the agent the branch is set, and it pushes one. Then watch https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-budapest-preview/production/deployments for a build on `main`.
 
 **1.12** Wait 2-4 minutes until the build has a green tick.
 
@@ -107,7 +107,7 @@ Leave all other fields alone. If you see a **Branch** / **Production branch** fi
 **3.4** Open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-bp-website/production/settings
 (or: Workers & Pages > **forro-bp-website** > **Settings**).
 
-**3.5** **Build** section > **Branch control** > pencil: production branch `feature/sanity`, remove the tick at non-production builds, **Save** (as in 1.10).
+**3.5** **Build** section > **Branch control** > pencil: production branch `main`, remove the tick at non-production builds, **Save** (as in 1.10).
 
 **3.6** Find this Worker's address (as in 1.13), e.g. `https://forro-bp-website.pdavid92.workers.dev`. Copy it into your note as **test address**.
 
@@ -141,7 +141,7 @@ Replace *preview* and *test* with your two addresses:
 
 **5.1** Open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-bp-website/production/settings > **Build** section > **Deploy Hooks** > **+ Add** (or **Create deploy hook**).
 - **Name**: `Sanity publish`
-- **Branch**: `feature/sanity`
+- **Branch**: `main`
 - **Save**.
 
 **5.2** An address appears, starting with `https://api.cloudflare.com/client/v4/workers/builds/deploy_hooks/`. Click **Copy** and paste it **only** into Sanity's URL field in 5.4. Do not send it to anyone, not even the agent. (If it ever leaks: delete the hook, make a new one, and put the new address into the Sanity webhook.)
@@ -195,6 +195,15 @@ It prints `"Edit on the page" will open https://forro-budapest-preview...` and d
 **6.5** Do 6.4 in **Safari** too and tell the agent whether the dark strip is gone there (Safari is the browser most likely to block the preview's cookie).
 
 ---
+
+## Moving from `feature/sanity` to `main` (done once, 2026-11-23)
+
+The Workers were first set up on `feature/sanity`. When that branch was merged into `main`:
+
+1. Both Workers > **Settings** > **Builds** > **Production** > **Branch control**: production branch `main`, **Save**.
+2. `forro-bp-website` > **Settings** > **Builds** > **Deploy Hooks**: delete `Sanity publish` (it builds `feature/sanity`), add a new one on branch `main`, copy its address.
+3. Sanity > API > **Webhooks** > `Rebuild test site` > edit: replace the URL with the new hook address, save.
+4. The agent pushes a change to `main`; both Workers build it. Then a test Publish in the Studio.
 
 ## If something goes wrong
 

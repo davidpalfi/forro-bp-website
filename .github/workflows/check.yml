@@ -1,6 +1,6 @@
-# Runs the test suite (npm run check) when CODE changes: on pull requests, and on pushes to
-# main that touch anything other than content and photos. Content edits from the editor do
-# not run this; they cannot break code and should go live quickly (see deploy.yml).
+# Runs the test suite (npm run check) when code changes: on pull requests, and on pushes to
+# main that touch anything other than the JSON content and photos. Publishing is done by
+# Cloudflare (docs/HOSTING.md), not by GitHub.
 name: Check
 
 on:

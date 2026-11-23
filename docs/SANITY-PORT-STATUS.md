@@ -37,14 +37,14 @@ Built and verified on 2026-11-18 (late evening, cloud session, no access to Sani
 
 1. **Send it to the admin when Dávid is ready** (`BACKLOG.md` 13a): his phone check of the forms, invite test, a clean copy of the guide, invite her, send.
 2. **Her trial** (`BACKLOG.md` 13), then polish B-H, her design corrections, real content.
-3. **Make `feature/sanity` the new `main`** (agreed 2026-11-23, after the review; steps in `BACKLOG.md`).
+3. ✅ `main` is the Sanity version (2026-11-23, S12).
 4. **Launch** per `GO-LIVE-CHECKLIST.md`: hosting of the real site, domain, redirects, noindex off.
 
 Do not deploy the Studio from a computer whose `studio/.env.production` lacks the preview address (`npm run studio:deploy` refuses anyway).
 
 ## Rules for whoever continues
 
-- Work on `feature/sanity` (or a branch from it); keep `main`, its live site and `.pages.yml` unchanged until launch.
+- Work on a branch from `main` and open a pull request into `main` (since 2026-11-23, S12). The old proof of concept is the tag `pages-cms-poc`.
 - Never request or commit tokens. Project id and dataset name are configuration, not secrets.
 - Keep `npm run check` passing; when the model changes, update `from-json.ts`, the schema, `SPEC.md` 11 and the admin guide together.
 - Keep this file current.

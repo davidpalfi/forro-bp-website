@@ -4,7 +4,7 @@ import { defineConfig } from 'astro/config';
 // Address settings come from the environment so the same code works everywhere:
 //   SITE_URL  e.g. https://name.github.io   (default: https://example.com)
 //   SITE_BASE e.g. /repo-name               (default: /, used for custom domains)
-// The GitHub workflow (.github/workflows/deploy.yml) sets both automatically.
+// Cloudflare's build of the test site sets SITE_URL (docs/HOSTING.md); SITE_BASE is only for sub-paths.
 const site = process.env.SITE_URL || 'https://example.com';
 const rawBase = (process.env.SITE_BASE || '/').trim();
 const base = rawBase === '/' || rawBase === '' ? '/' : '/' + rawBase.replace(/^\/+|\/+$/g, '');
