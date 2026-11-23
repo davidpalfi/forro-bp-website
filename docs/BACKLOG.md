@@ -123,7 +123,7 @@ Already built into the Studio, nothing to do: the phone-size switch above the pa
 | 16 | Hungarian gaps: code of conduct, artists heading, roles "Consent Facilitator" and "Music Teacher", ticket button label | A | All Hungarian fields filled | 15 |
 | 17 | A native Hungarian speaker checks the fixed wording in `src/lib/i18n.ts` | A or D | Corrections made | none |
 | 18 | Care-team names and phone numbers for the code of conduct: decide where they go without being public in the repo or dataset export | D + A | Decision recorded | 1 |
-| 19 | Design sign-off on phone and desktop: fonts, justified vs left-aligned text (language switch and Instagram icon chosen by Dávid, S13) | A | Her approval recorded (AC16) | 8, 15 |
+| 19 | Design sign-off on phone and desktop: fonts (justified text, language switch and Instagram icon chosen by Dávid, S13) | A | Her approval recorded (AC16) | 8, 15 |
 | 20 | Launch practicalities: domain registrar and access, Wix renewal date, who owns the accounts (ideally the admin or a community account), who gets build-failure alerts, public or private repository | D | Answers recorded in `DECISIONS.md` | none |
 | 21 | Redirects from old Wix addresses; first find the exact Hungarian Wix addresses | M | Every old address lands on its new page, query strings kept where possible | 9, 20 |
 | 22 | Decide what `/` shows: community home or festival home | D | Recorded | none |

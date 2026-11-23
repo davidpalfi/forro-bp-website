@@ -175,7 +175,7 @@ Menu words, "Skip to content", the ticket-button fallback, "Instagram" and the 4
 - **Accessibility.** Semantic headings, skip link, visible keyboard focus, current-page and current-language markers, a labelled menu button with `aria-expanded`, link texts that name the person on Instagram links, reduced motion respected. Known gaps: people photos have empty alt text (the name is next to them); the program is images, so its content is not available to screen readers unless the optional text is filled in; no formal audit.
 - **Responsive.** Phone first; breakpoints at 720, 860, 900, 1180 and 1400 px. No horizontal scrolling from 320 px up.
 - **Without JavaScript.** Everything works; the menu is shown open, and `/` goes to the default language.
-- **Design.** Colours, shapes and layout follow the Wix festival site (red, cream, dark inner pages, grey footer, torn-paper ticket button). The ticket buttons use the Wix button shapes with live text. Deliberate differences: body text is left-aligned, not justified; the menu has one extra entry, the link up to the community home.
+- **Design.** Colours, shapes and layout follow the Wix festival site (red, cream, dark inner pages, grey footer, torn-paper ticket button). The ticket buttons use the Wix button shapes with live text. Paragraphs (text blocks and bios) are justified with hyphenation, as on Wix (Dávid, 2026-11-23); centred and right-aligned blocks keep their alignment. Deliberate differences: the menu has one extra entry, the link up to the community home.
 
 ## 9. Acceptance criteria
 

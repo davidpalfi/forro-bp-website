@@ -255,6 +255,12 @@ p { margin: 0 0 1em; }
 .person-role { color: var(--orange); font-size: 1.05rem; margin: 0 0 0.4rem; }
 .person-name { font-size: 1.35rem; margin-bottom: 0.9rem; }
 .person-bio { margin-bottom: 1.1em; }
+
+/* Paragraphs are justified (sorkizárt), as on the Wix site, with hyphenation in the page's
+   language so phones do not get wide gaps. Centred and right-aligned blocks keep their alignment. */
+.prose p, .person-bio { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+.align-center .prose p, .b-banner .prose p { text-align: center; }
+.align-right .prose p { text-align: right; }
 .person-link {
   align-self: flex-start; margin-top: auto; padding: 0.55rem 1.1rem;
   border: 2px solid var(--cream); text-decoration: none;
