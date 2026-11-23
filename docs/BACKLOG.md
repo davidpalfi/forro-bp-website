@@ -9,7 +9,17 @@ Priority:
 
 Owner: **D** = Dávid (accounts, decisions), **M** = maintainer/agent (code), **A** = admin.
 
-## ▶ Next: send it to the admin for review (on hold until Dávid is ready)
+## ▶ Plan agreed 2026-11-23: a more mature version before she sees it
+
+Dávid prefers to give the admin a more mature version first (first impressions matter; no time pressure). Order:
+
+1. **Polish how the site looks** (next). Open: Dávid either lists what bothers him on the test site (phone and computer; words or screenshots), or asks the agent to review every page at phone and desktop size against the Wix site and list rough spots to choose from. Scope: what clearly looks unfinished or broken; matters of taste (fonts, alignment, language switch) stay for her review (item 19). Placeholder photos, logo and bios are content, fixed in the Studio.
+2. **Then Dávid decides on the click-to-edit polish** (table below). If yes: B, E, F, G (useful whatever her feedback; estimate a few hours of agent work plus 30-60 minutes of Dávid trying them in the Studio and approving pull requests), optionally C and D (try first, drop if not smooth; a couple more hours), H only if she finds the delay slow. Done on a **separate branch** off `feature/sanity` (e.g. `feature/click-to-edit-polish`); tried on Dávid's computer (`npm run preview:edit` + `npm run studio`), since the online preview only builds `feature/sanity`; approved pieces merged into `feature/sanity`.
+3. **Then 13a**, sending it to her.
+
+**Working agreement:** work starts only when Dávid gives a clear go; planning questions get answers and plans only.
+
+## Then: send it to the admin for review (on hold until Dávid is ready)
 
 **Go-live is done (2026-11-23, `DECISIONS.md` S11, `HOSTING.md`).** Preview https://forro-budapest-preview.pdavid92.workers.dev with the preview lock, test site https://forro-bp-website.pdavid92.workers.dev rebuilt on Publish, Studio deployed pointing at the preview. Verified by Dávid on a computer in Safari: drafts inside Edit on the page only, no reload after an edit (2-3 s delay, polish H), Publish rebuilds the test site.
 
@@ -24,7 +34,7 @@ Owner: **D** = Dávid (accounts, decisions), **M** = maintainer/agent (code), **
 
 ---
 
-## Click-to-edit polish (after the admin's review; item A may come first)
+## Click-to-edit polish (A done; B-H: Dávid decides after the look polish, see the plan at the top)
 
 **Why (2026-11-18, evening).** Dávid tried click-to-edit on his computer (`npm run preview:edit` + local Studio, "Edit on the page") and found it works "pretty awesome"; he also created a community page in the Studio without help. Verdict on S8: **continue with Sanity**. He wants it as polished as Sanity allows. Item A (no reload) may be done before the review if Dávid wants; the rest after her feedback.
 

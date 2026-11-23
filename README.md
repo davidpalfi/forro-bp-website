@@ -47,7 +47,9 @@ Goal: the admin signs in, edits the real content herself (on the page on a compu
 - [x] Admin guide (`docs/EDITING-GUIDE.md`) has the real addresses. Its short maintainer note at the top is removed in the copy sent to her.
 - [x] Run through it on a computer (Dávid, Safari, 2026-11-23): edit on the page (drafts show, no reload, 2-3 s delay), publish, test site rebuilds. `npm run check` passes.
 
-**3. Dávid: send it, when you are ready** (on hold since 2026-11-23, Dávid's choice; backlog item 13a)
+**Before sending (agreed 2026-11-23):** a more mature version first: polish how the site looks, then decide on the click-to-edit polish (`docs/BACKLOG.md`, top).
+
+**3. Dávid: send it, when you are ready** (backlog item 13a)
 - [ ] Try the forms on your phone once (sign in at forro-budapest.sanity.studio, change a text, publish).
 - [ ] Test the invite on yourself (second e-mail address, accept on a phone).
 - [ ] Ask the agent for a clean copy of the guide (without the maintainer note).
