@@ -136,7 +136,7 @@ Already built into the Studio, nothing to do: the phone-size switch above the pa
 
 | # | Item | Owner | Notes |
 |---|---|---|---|
-| 26 | Community level: ask the admin what it should show (classes, parties, people, links) and how often it changes, then design it | D + A, then M | Dávid wants Events, Contact and About Us in the community menu (2026-11-18). Contact and About Us: community pages, no code. Events: a page now, or an events document type + block once the admin says what an event holds. **Event calendar built 2026-11-23** (S15): months in the Studio, an Event calendar block on a page |
+| 26 | Community level: ask the admin what it should show (classes, parties, people, links) and how often it changes, then design it | D + A, then M | Dávid wants Events, Contact and About Us in the community menu (2026-11-18). Contact and About Us: community pages, no code. Events: a page now, or an events document type + block once the admin says what an event holds. **Event calendar built 2026-11-23** (S15): an Event calendar block with one picture per month |
 | 27 | New block types from the admin's drawings | M | Do not guess blocks before her drawings arrive (S2) |
 | 28 | Program as text as well as images, for screen readers and search | A / M | Optional text field exists in the PoC |
 | 29 | Alt text on people photos | M | The Sanity person photo already has EN/HU alt fields; the rendering in item 8 should use them |

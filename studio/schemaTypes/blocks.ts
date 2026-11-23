@@ -309,15 +309,55 @@ const peopleGridBlock = defineType({
   },
 })
 
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+const calendarMonth = defineType({
+  name: 'calendarMonth',
+  title: 'Month',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'year',
+      title: 'Year',
+      type: 'number',
+      initialValue: () => new Date().getFullYear(),
+      validation: (rule) => rule.required().integer().min(2024).max(2100),
+    }),
+    defineField({
+      name: 'month',
+      title: 'Month',
+      type: 'number',
+      options: { list: MONTHS.map((title, i) => ({ title, value: i + 1 })) },
+      validation: (rule) => rule.required(),
+    }),
+    defineField({ name: 'image', title: 'Calendar picture', type: 'imageWithAlt', validation: (rule) => rule.required() }),
+  ],
+  preview: {
+    select: { year: 'year', month: 'month', media: 'image' },
+    prepare: ({ year, month, media }) => ({ title: `${year ?? '?'} ${MONTHS[(month ?? 0) - 1] ?? '?'}`, media }),
+  },
+})
+
 const eventCalendarBlock = defineType({
   name: 'eventCalendarBlock',
   title: 'Event calendar',
   type: 'object',
   groups: blockGroups,
-  // Shows the months from "Event calendar" in the Studio menu, one at a time with arrows; it
-  // opens on the current month and past months disappear by themselves. Only style settings here.
-  fields: [...blockStyleFields()],
-  preview: { prepare: () => ({ title: 'Event calendar', subtitle: 'The months from "Event calendar"' }) },
+  fields: [
+    defineField({
+      name: 'months',
+      title: 'Months',
+      description: 'Click "Add item" for each month: choose the year and month and upload its calendar picture. Visitors see one month at a time with arrows, starting with the current month; months that are over disappear by themselves.',
+      type: 'array',
+      of: [defineArrayMember({ type: 'calendarMonth' })],
+      group: 'content',
+    }),
+    ...blockStyleFields(),
+  ],
+  preview: {
+    select: { months: 'months', media: 'months.0.image' },
+    prepare: ({ months, media }) => ({ title: 'Event calendar', subtitle: `${Array.isArray(months) ? months.length : 0} months`, media }),
+  },
 })
 
 export const blockTypes = [
@@ -334,6 +374,7 @@ export const blockTypes = [
   videoBlock,
   dividerBlock,
   peopleGridBlock,
+  calendarMonth,
   eventCalendarBlock,
 ]
 
@@ -350,6 +391,4 @@ export const BLOCK_TYPES = [
   'dividerBlock',
 ]
 
-/** The blocks a month of the event calendar can hold: everything but another calendar. */
-export const monthBlockMembers = BLOCK_TYPES.map((type) => defineArrayMember({ type }))
 export const pageBlockMembers = [...BLOCK_TYPES, 'eventCalendarBlock'].map((type) => defineArrayMember({ type }))

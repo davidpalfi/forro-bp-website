@@ -1,7 +1,7 @@
 // The documents the admin edits. Field names match the site's content model
 // (src/lib/sanity/model.ts); change both together. See docs/SPEC.md, section 11.
 import { defineField, defineType } from 'sanity'
-import { monthBlockMembers, pageBlockMembers } from './blocks'
+import { pageBlockMembers } from './blocks'
 import { linkRule, localizedFields } from './shared'
 
 const homeBlocks = (title: string) =>
@@ -225,44 +225,6 @@ const person = defineType({
   },
 })
 
-/* ---------- Event calendar ---------- */
-
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-
-const eventMonth = defineType({
-  name: 'eventMonth',
-  title: 'Event calendar month',
-  type: 'document',
-  fields: [
-    defineField({
-      name: 'year',
-      title: 'Year',
-      type: 'number',
-      initialValue: () => new Date().getFullYear(),
-      validation: (rule) => rule.required().integer().min(2024).max(2100),
-    }),
-    defineField({
-      name: 'month',
-      title: 'Month',
-      type: 'number',
-      options: { list: MONTHS.map((title, i) => ({ title, value: i + 1 })) },
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'blocks',
-      title: 'Events this month',
-      description: 'Posters, texts, buttons: the same blocks as on a page. The month is shown from the 1st and disappears by itself when it is over.',
-      type: 'array',
-      of: monthBlockMembers,
-    }),
-  ],
-  orderings: [{ title: 'Month', name: 'byMonth', by: [{ field: 'year', direction: 'asc' }, { field: 'month', direction: 'asc' }] }],
-  preview: {
-    select: { year: 'year', month: 'month' },
-    prepare: ({ year, month }) => ({ title: `${year ?? '?'} ${MONTHS[(month ?? 0) - 1] ?? '?'}` }),
-  },
-})
-
 export const SINGLETONS = ['siteSettings', 'communitySettings', 'festivalSettings']
 
-export const documentTypes = [siteSettings, communitySettings, festivalSettings, page, person, eventMonth]
+export const documentTypes = [siteSettings, communitySettings, festivalSettings, page, person]

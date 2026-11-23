@@ -444,4 +444,4 @@ figcaption { font-size: 0.9375rem; margin-top: 0.6rem; opacity: 0.85; }
 .cal-js .cal-month-title { display: none; }
 .cal-js .cal-month { margin-bottom: 0; }
 .cal-empty { text-align: center; }
-.blocks--nested { padding: 0; }
+.cal-picture { width: 100%; }

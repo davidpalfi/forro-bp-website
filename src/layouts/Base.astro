@@ -306,7 +306,7 @@ const year = new Date().getFullYear();
           var gallery = a.closest('ul.gallery');
           list = Array.prototype.slice.call(
             gallery ? gallery.querySelectorAll('a.gallery-open') : document.querySelectorAll('main a.image-open'),
-          );
+          ).filter(function (x) { return x.offsetParent !== null; });
           show(list.indexOf(a));
           box.showModal();
         });

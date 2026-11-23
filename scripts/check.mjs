@@ -291,19 +291,24 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
   // A bio pasted from another site: an "empty" line holding a zero-width space, and a single line break.
   const linePerson = docs.find((d) => d._type === 'person' && d.name === 'Gisa');
   linePerson.bio_en = 'First paragraph.\n\u200b\nSecond paragraph,\nsame paragraph.';
-  // Event calendar: a month that is over, this month, next month, a duplicate and one without a month.
+  // Event calendar: a month that is over, this month, next month, next month again, one without a month.
   const today = new Date();
   const ym = (d) => ({ year: d.getFullYear(), month: d.getMonth() + 1 });
   const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-  const text = (t) => ({ _type: 'textBlock', _key: 't' + t.length, body_en: [{ _type: 'block', _key: 'b', style: 'normal', markDefs: [], children: [{ _type: 'span', _key: 's', text: t, marks: [] }] }] });
-  docs.push(
-    { _id: 'month-old', _type: 'eventMonth', year: 2020, month: 1, blocks: [text('Old month event')] },
-    { _id: 'month-now', _type: 'eventMonth', ...ym(today), blocks: [text('This month event')] },
-    { _id: 'month-next', _type: 'eventMonth', ...ym(nextMonth), blocks: [text('Next month event')] },
-    { _id: 'month-twice', _type: 'eventMonth', ...ym(nextMonth), blocks: [text('Duplicate month event')] },
-    { _id: 'month-none', _type: 'eventMonth', blocks: [] },
-  );
-  docs.find((d) => d._id === 'page-everything').blocks.push({ _type: 'eventCalendarBlock', _key: 'cal', background: 'default', alignment: 'center' });
+  const pic = (n) => ({ _type: 'imageWithAlt', asset: { _type: 'reference', _ref: `image-${String(n).repeat(40)}-800x600-png` } });
+  docs.find((d) => d._id === 'page-everything').blocks.push({
+    _type: 'eventCalendarBlock',
+    _key: 'cal',
+    months: [
+      { _key: 'm1', year: 2020, month: 1, image: pic(1) },
+      { _key: 'm2', ...ym(nextMonth), image: pic(2) },
+      { _key: 'm3', ...ym(today), image: pic(3) },
+      { _key: 'm4', ...ym(nextMonth), image: pic(4) },
+      { _key: 'm5', image: pic(5) },
+    ],
+    background: 'default',
+    alignment: 'center',
+  });
   // Two logos: the big one on the banner, the small one in the top bar.
   const festivalDoc = docs.find((d) => d._type === 'festivalSettings');
   festivalDoc.logo = { _type: 'image', asset: { _type: 'reference', _ref: 'image-' + 'a'.repeat(40) + '-800x400-png' } };
@@ -322,7 +327,7 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
     ['"javascript:alert(1)" is not a usable address', 'an unsafe button link'],
     ['photos in Sanity are stored the wrong way', 'a photo within a photo (first import)'],
     ['has no year or month and was skipped', 'an event calendar month without a month'],
-    ['twice; only one is shown', 'the same event calendar month twice'],
+    ['twice; only the first is shown', 'the same event calendar month twice'],
   ]) check(output.includes(text), `warning: ${what}`);
   if (code === 0) {
     const page = read(dir, 'en/festival/everything/index.html');
@@ -336,7 +341,10 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
     check(!page.includes('Evil button') && !/(?:href|src)="\s*javascript:/i.test(everything), 'a button with an unsafe link is left out');
     check(page.includes('youtube-nocookie.com/embed/dQw4w9WgXcQ'), 'a YouTube video is embedded without tracking cookies');
     check(/<ul class="gallery gallery--mosaic">/.test(page) && (page.match(/<a class="gallery-open" href="https:\/\/cdn\.sanity\.io\//g) || []).length >= 2 && page.includes('lightbox'), 'a gallery can be a mosaic, and each photo opens large in the photo viewer');
-    check(page.includes('This month event') && page.includes('Next month event') && !page.includes('Old month event') && page.includes('data-cal-nav') && (page.match(/class="cal-month"/g) || []).length === 2, 'the event calendar shows this month and later, each month once, with the month switcher');
+    {
+      const months = [...page.matchAll(/data-month="(\d{4}-\d{2})"/g)].map((m) => m[1]);
+      check(months.length === 2 && months[0] < months[1] && !page.includes('1'.repeat(40)) && page.includes('2'.repeat(40)) && page.includes('3'.repeat(40)) && !page.includes('4'.repeat(40)) && page.includes('data-cal-nav') && (page.match(/<p class="cal-empty"/g) || []).length === 1, 'the event calendar shows this month and later in order, each month once with its picture, with the month switcher');
+    }
     check(/<a class="gallery-open image-open" href="https:\/\/cdn\.sanity\.io\//.test(page), 'an Image block opens large in the photo viewer');
     check(['A small heading', 'Banner title', 'Banner button', 'Column three', 'A caption', 'b-divider', 'b-space', 'A statement line'].every((t) => page.includes(t)), 'every kind of block is shown');
     check(page.indexOf('>Gisa<') > -1 && page.indexOf('>Gisa<') < page.indexOf('>Dóri Czakó<'), 'a People block with chosen people shows them in the chosen order');

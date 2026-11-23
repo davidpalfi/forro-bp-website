@@ -11,7 +11,7 @@ import {
   trRich,
   blockLink,
   peopleForBlock,
-  getEventMonths,
+  calendarMonths,
   monthName,
   videoEmbed,
   getImage,
@@ -191,23 +191,27 @@ const link = (b: Block) => {
               // Every month from this one on is built; a script in Base.astro shows one at a time,
               // starting with the visitor's current month, and drops months that are over.
               // Without JavaScript all months are shown one under the other.
-              const months = getEventMonths();
+              const months = calendarMonths(b);
               const arrow = (d: string) => <svg viewBox="0 0 24 24" aria-hidden="true"><path d={d} fill="none" stroke="currentColor" stroke-width="2" /></svg>;
               return (
                 <div class="b-wide b-calendar" data-calendar>
-                  {months.length === 0 && <p class="cal-empty">{UI[lang].noEvents}</p>}
-                  <p class="cal-empty" data-cal-empty hidden>{UI[lang].noEvents}</p>
+                  <p class="cal-empty" data-cal-empty hidden={months.length > 0}>{UI[lang].noEvents}</p>
                   <div class="cal-nav" data-cal-nav hidden>
                     <button type="button" class="cal-arrow" data-cal-step="-1" aria-label={UI[lang].prevMonth}>{arrow('M15 4l-8 8 8 8')}</button>
                     <h2 class="cal-title" data-cal-title aria-live="polite" />
                     <button type="button" class="cal-arrow" data-cal-step="1" aria-label={UI[lang].nextMonth}>{arrow('M9 4l8 8-8 8')}</button>
                   </div>
-                  {months.map((m) => (
-                    <section class="cal-month" id={m.key} data-month={m.key}>
-                      <h2 class="cal-title cal-month-title">{monthName(m, lang)}</h2>
-                      <Astro.self blocks={m.blocks} lang={lang} tone={tone} class="blocks--nested" />
-                    </section>
-                  ))}
+                  {months.map((m) => {
+                    const img = getImage(m.image);
+                    return (
+                      <section class="cal-month" id={m.key} data-month={m.key}>
+                        <h2 class="cal-title cal-month-title">{monthName(m, lang)}</h2>
+                        <a class="gallery-open image-open" href={img?.src} data-srcset={img?.srcset}>
+                          <Picture image={m.image} lang={lang} alt={monthName(m, lang)} class="cal-picture" sizes="(min-width: 1200px) 1150px, 100vw" />
+                        </a>
+                      </section>
+                    );
+                  })}
                 </div>
               );
             }
