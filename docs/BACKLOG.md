@@ -11,9 +11,7 @@ Owner: **D** = Dávid (accounts, decisions), **M** = maintainer/agent (code), **
 
 ## ▶ Plan agreed 2026-11-23: a more mature version before she sees it
 
-**Small open items first (D, a few minutes each):**
-- Turn off the old GitHub Pages site: repository **Settings** > **Pages** > unpublish / source none (its workflow was removed with S12; the last published copy may still be online at davidpalfi.github.io/forro-bp-website).
-- Uninstall the Pages CMS GitHub app, or remove this repository from it: GitHub account **Settings** > **Applications**.
+**✅ Small open items done (Dávid, confirmed 2026-11-23):** the old GitHub Pages site is turned off, and the Pages CMS GitHub app no longer has access to this repository.
 
 Dávid prefers to give the admin a more mature version first (first impressions matter; no time pressure). Order:
 
@@ -83,7 +81,7 @@ Already built into the Studio, nothing to do: the phone-size switch above the pa
 
 | Phase | State |
 |---|---|
-| Pages CMS proof of concept (`main`) | Done and live at davidpalfi.github.io/forro-bp-website |
+| Pages CMS proof of concept | Retired 2026-11-23 (tag `pages-cms-poc`); its GitHub Pages site is turned off and the Pages CMS app removed |
 | Sanity decisions S1-S4 | Confirmed 2026-11-16 |
 | Sanity proof of concept: schemas, site reading Sanity documents, migration, admin guide | **Built and tested offline** (S5-S7). Not yet run against the real Sanity project |
 | Studio online, content imported | **Done** 2026-11-18 (Dávid), photos repaired with `npm run sanity:import-replace` the same day |
