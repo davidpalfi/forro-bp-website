@@ -1,6 +1,6 @@
 # Project backlog
 
-Built on 2026-11-17 (last updated 2026-11-18, evening) from `HANDOFF.md`, `SANITY-PORT-STATUS.md`, `GO-LIVE-CHECKLIST.md`, `DECISIONS.md`, `SPEC.md` and `USER-NEEDS.md`. It only lists work those documents describe. When an item is done, tick it here and update the status file it came from.
+Built on 2026-11-17 (last updated 2026-11-23) from `HANDOFF.md`, `SANITY-PORT-STATUS.md`, `GO-LIVE-CHECKLIST.md`, `DECISIONS.md`, `SPEC.md` and `USER-NEEDS.md`. It only lists work those documents describe. When an item is done, tick it here and update the status file it came from.
 
 Priority:
 - **P0**: blocks the Sanity port; do in this order.
@@ -13,7 +13,7 @@ Owner: **D** = Dávid (accounts, decisions), **M** = maintainer/agent (code), **
 
 **Go-live is done (2026-11-23, `DECISIONS.md` S11, `HOSTING.md`).** Preview https://forro-budapest-preview.pdavid92.workers.dev with the preview lock, test site https://forro-bp-website.pdavid92.workers.dev rebuilt on Publish, Studio deployed pointing at the preview. Verified by Dávid on a computer in Safari: drafts inside Edit on the page only, no reload after an edit (2-3 s delay, polish H), Publish rebuilds the test site.
 
-**13a. Send it to the admin** (D; Dávid is not ready yet, 2026-11-23). When he is:
+**13a. Send it to the admin** (D; on hold since 2026-11-23, Dávid decides when). Then:
 1. Dávid tries the forms once on his phone (sign in, change a text, publish).
 2. Dávid tests the invite on himself: sanity.io/manage > project > Members > invite a second e-mail address, accept on a phone.
 3. Agent: a clean copy of `docs/EDITING-GUIDE.md` without the maintainer note at the top (as a file or shareable page, Dávid's choice); check it against the deployed Studio once more.
@@ -75,7 +75,7 @@ Already built into the Studio, nothing to do: the phone-size switch above the pa
 
 | # | Item | Owner | Done when | Depends on |
 |---|---|---|---|---|
-| 1 | Check Sanity Free-plan limits (seats, roles, dataset visibility, Studio hosting, image usage) and record the findings with a date in `DECISIONS.md` | D | Findings recorded; no feature used needs Growth | none |
+| 1 | ✅ **Done 2026-11-18** (S10; webhooks confirmed working on Free 2026-11-23). Check Sanity Free-plan limits (seats, roles, dataset visibility, Studio hosting, image usage) and record the findings with a date in `DECISIONS.md` | D | Findings recorded; no feature used needs Growth | none |
 | 2 | ✅ **Done 2026-11-18** (Dávid). Deploy the Studio. Do not redeploy until the preview is hosted (S9) | D | | |
 | 3 | Test the invited-editor sign-in with a test invite | D | A non-developer account can sign in, on a phone too | 2 |
 | 4 | ✅ **Done 2026-11-17.** Audit schema coverage: every JSON field mapped (`SPEC.md` 11.2), gaps fixed (S5), checked automatically by `npm run check` [0] | M | | |
@@ -122,8 +122,7 @@ Already built into the Studio, nothing to do: the phone-size switch above the pa
 ## Open decisions to collect
 
 - **The real domain: forrobudapest.com or forrobudapest.hu (or both)?** The docs assume .com (where the Wix site was read on 2026-11-11); Dávid wrote .hu on 2026-11-18. Ask before any launch or redirect work (20, 21, 24). Until launch the test addresses are free Cloudflare ones (`*.pages.dev` or `*.workers.dev`) and `forro-budapest.sanity.studio`.
-- Hosting for preview and production (9)
-- Rebuild provider and webhook (11)
+- Hosting for the real public site at launch (9; preview and test site are on Cloudflare, S11)
 - Launch practicalities (20)
 - What `/` shows (22)
 - Care-team contact details (18)
