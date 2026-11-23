@@ -209,6 +209,44 @@ const year = new Date().getFullYear();
       })();
     </script>
     <script is:inline>
+      // Event calendar blocks: drop the months that are over (the site is only rebuilt on
+      // publish), then show one month at a time with arrows, starting with the current month
+      // or the one in the address (#2026-12). Without JavaScript every month is listed.
+      (function () {
+        var now = new Date();
+        var current = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+        document.querySelectorAll('[data-calendar]').forEach(function (box) {
+          var months = [].slice.call(box.querySelectorAll('[data-month]')).filter(function (m) {
+            if (m.dataset.month >= current) return true;
+            m.remove();
+            return false;
+          });
+          box.classList.add('cal-js');
+          if (!months.length) {
+            box.querySelector('[data-cal-empty]').hidden = false;
+            return;
+          }
+          var title = box.querySelector('[data-cal-title]');
+          var steps = box.querySelectorAll('[data-cal-step]');
+          var at = 0;
+          function show(i, keepAddress) {
+            at = i;
+            months.forEach(function (m, j) { m.hidden = j !== i; });
+            title.textContent = months[i].querySelector('.cal-month-title').textContent;
+            steps[0].hidden = i === 0;
+            steps[1].hidden = i === months.length - 1;
+            if (!keepAddress) history.replaceState(null, '', '#' + months[i].dataset.month);
+          }
+          box.querySelector('[data-cal-nav]').hidden = false;
+          var wanted = months.findIndex(function (m) { return '#' + m.dataset.month === location.hash; });
+          show(wanted >= 0 ? wanted : 0, true);
+          steps.forEach(function (b) {
+            b.addEventListener('click', function () { show(at + Number(b.dataset.calStep)); });
+          });
+        });
+      })();
+    </script>
+    <script is:inline>
       // Photo viewer: a click on a gallery photo or an Image block opens it large, with arrows,
       // swiping, the arrow keys and Escape. A gallery pages through its own photos; Image blocks
       // page through all Image blocks of the page (e.g. the program pictures). Pinch-zoom stays

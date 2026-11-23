@@ -34,8 +34,8 @@ const loaded = isPreview() ? { source: 'sanity' as const, docs: [] } : await loa
 export const contentSource = loaded.source;
 
 /** The documents being shown, and the lists made from them (see useDocuments at the end). */
-type State = { byId: Map<string, Obj>; people: Person[]; pages: Page[]; photoTargets: WeakMap<object, string> };
-const emptyState = (): State => ({ byId: new Map(), people: [], pages: [], photoTargets: new WeakMap() });
+type State = { byId: Map<string, Obj>; people: Person[]; pages: Page[]; months: EventMonth[]; photoTargets: WeakMap<object, string> };
+const emptyState = (): State => ({ byId: new Map(), people: [], pages: [], months: [], photoTargets: new WeakMap() });
 let shared: State = emptyState();
 // In the preview each request renders with its own documents, so two requests running at the
 // same time (one with drafts, one without) can never see each other's content.
@@ -234,6 +234,42 @@ export function peopleForBlock(block: Obj) {
     .filter((p): p is Person => Boolean(p));
   if (chosen.length) return chosen;
   return g in GROUPS ? getPeople(g as Group) : S().people;
+}
+
+/* ---------- Event calendar ---------- */
+
+const makeMonths = (byId: Map<string, Obj>) => {
+  const seen = new Set<string>();
+  const out = [];
+  const docs = ofType('eventMonth', byId).sort((a, b) => String(a._id).localeCompare(String(b._id)));
+  for (const d of docs) {
+    const year = num.parse(d.year);
+    const month = num.parse(d.month);
+    if (!year || !month || month < 1 || month > 12 || !Number.isInteger(year) || !Number.isInteger(month)) {
+      warnOnce(`an event calendar month ("${d._id}") has no year or month and was skipped`);
+      continue;
+    }
+    const key = `${year}-${String(month).padStart(2, '0')}`;
+    if (seen.has(key)) {
+      warnOnce(`the event calendar has ${key} twice; only one is shown`);
+      continue;
+    }
+    seen.add(key);
+    out.push({ id: String(d._id), key, year, month, blocks: list(d.blocks) as Block[] });
+  }
+  return out.sort((a, b) => a.key.localeCompare(b.key));
+};
+export type EventMonth = ReturnType<typeof makeMonths>[number];
+
+/** The months to build: this month and later. Each visitor's browser then hides the months that are over. */
+export function getEventMonths(now = new Date()) {
+  const current = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  return S().months.filter((m) => m.key >= current);
+}
+
+/** "2026. november" / "November 2026". */
+export function monthName(m: EventMonth, lang: Lang) {
+  return new Intl.DateTimeFormat(lang === 'hu' ? 'hu-HU' : 'en-GB', { year: 'numeric', month: 'long', timeZone: 'UTC' }).format(Date.UTC(m.year, m.month - 1, 1));
 }
 
 /* ---------- Pages ---------- */
@@ -477,6 +513,7 @@ function makeState(docs: unknown[]): State {
   if (isPreview()) for (const d of st.byId.values()) notePhotos(d, st.photoTargets);
   st.people = makePeople(st.byId);
   st.pages = makePages(st.byId);
+  st.months = makeMonths(st.byId);
   return st;
 }
 

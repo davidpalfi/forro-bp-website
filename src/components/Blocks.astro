@@ -11,12 +11,14 @@ import {
   trRich,
   blockLink,
   peopleForBlock,
+  getEventMonths,
+  monthName,
   videoEmbed,
   getImage,
   warnOnce,
   type Block,
 } from '../lib/content';
-import { tr, type Lang } from '../lib/i18n';
+import { tr, UI, type Lang } from '../lib/i18n';
 
 interface Props {
   blocks: Record<string, unknown>[];
@@ -28,7 +30,7 @@ interface Props {
 }
 
 const { blocks, lang, tone = 'red', class: className } = Astro.props;
-const KNOWN = ['textBlock', 'headingBlock', 'imageBlock', 'galleryBlock', 'buttonBlock', 'bannerBlock', 'columnsBlock', 'videoBlock', 'dividerBlock', 'peopleGridBlock'];
+const KNOWN = ['textBlock', 'headingBlock', 'imageBlock', 'galleryBlock', 'buttonBlock', 'bannerBlock', 'columnsBlock', 'videoBlock', 'dividerBlock', 'peopleGridBlock', 'eventCalendarBlock'];
 const groups = groupBlocks(blocks, tone).map((g) => ({
   ...g,
   blocks: g.blocks.filter((b) => {
@@ -184,6 +186,30 @@ const link = (b: Block) => {
                   <PersonList people={people} lang={lang} />
                 </div>
               ) : null;
+            }
+            case 'eventCalendarBlock': {
+              // Every month from this one on is built; a script in Base.astro shows one at a time,
+              // starting with the visitor's current month, and drops months that are over.
+              // Without JavaScript all months are shown one under the other.
+              const months = getEventMonths();
+              const arrow = (d: string) => <svg viewBox="0 0 24 24" aria-hidden="true"><path d={d} fill="none" stroke="currentColor" stroke-width="2" /></svg>;
+              return (
+                <div class="b-wide b-calendar" data-calendar>
+                  {months.length === 0 && <p class="cal-empty">{UI[lang].noEvents}</p>}
+                  <p class="cal-empty" data-cal-empty hidden>{UI[lang].noEvents}</p>
+                  <div class="cal-nav" data-cal-nav hidden>
+                    <button type="button" class="cal-arrow" data-cal-step="-1" aria-label={UI[lang].prevMonth}>{arrow('M15 4l-8 8 8 8')}</button>
+                    <h2 class="cal-title" data-cal-title aria-live="polite" />
+                    <button type="button" class="cal-arrow" data-cal-step="1" aria-label={UI[lang].nextMonth}>{arrow('M9 4l8 8-8 8')}</button>
+                  </div>
+                  {months.map((m) => (
+                    <section class="cal-month" id={m.key} data-month={m.key}>
+                      <h2 class="cal-title cal-month-title">{monthName(m, lang)}</h2>
+                      <Astro.self blocks={m.blocks} lang={lang} tone={tone} class="blocks--nested" />
+                    </section>
+                  ))}
+                </div>
+              );
             }
             default:
               return null;

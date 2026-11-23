@@ -262,6 +262,7 @@ Sections 1 to 10 describe the Pages CMS proof of concept. This section describes
 | People | The chosen people in the chosen order; with none chosen, everyone in the group by display order, then name. Cards as 4.5 |
 | Banner | Photo with a dark veil (plum without photo), title, text, button |
 | Columns | 2 to 4 side by side from 760 px, each with optional photo (4:3), heading, text |
+| Event calendar | The `eventMonth` documents from the current month on (by `year`, `month`), one at a time: the month name ("2026. november" / "November 2026") between arrows, no arrow before the first or after the last month; opens on the visitor's current month or the one in the address (`#2026-12`), and the arrows update the address. Built months are this month and later; the browser also drops months that are over, since the site is only rebuilt on publish. Without JavaScript all months are listed with their names. No month: "No events planned yet". A month without a year or month, or the same month twice, is skipped with a warning. Months hold the usual blocks (not another calendar) |
 | Video | YouTube (through youtube-nocookie.com) or Vimeo (`dnt=1`) in a 16:9 frame, loaded lazily; any other address is left out with a warning |
 | Divider | A line, or 2 rem of space |
 

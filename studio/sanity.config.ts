@@ -69,6 +69,16 @@ export default defineConfig({
             S.divider(),
             singleton(S, 'communitySettings', 'Community home page'),
             pagesIn(S, 'Community pages', 'community'),
+            S.listItem()
+              .id('event-calendar')
+              .title('Event calendar')
+              .child(
+                S.documentList()
+                  .title('Event calendar')
+                  .schemaType('eventMonth')
+                  .filter('_type == "eventMonth"')
+                  .defaultOrdering([{ field: 'year', direction: 'asc' }, { field: 'month', direction: 'asc' }]),
+              ),
             S.divider(),
             S.documentTypeListItem('person').title('Everyone (teachers and artists)'),
             singleton(S, 'siteSettings', 'Site settings'),

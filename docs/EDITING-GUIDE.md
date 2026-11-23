@@ -24,7 +24,8 @@ On the left is the **Content** menu:
 | **Festival pages** | Program, Teachers, Artists, Location, Code of Conduct, and any page you add |
 | **Teachers** / **Artists** | One entry per person |
 | **Community home page** | The front page of the community site |
-| **Community pages** | Pages of the community site (none yet) |
+| **Community pages** | Pages of the community site |
+| **Event calendar** | One entry per month, shown by the Event calendar block |
 | **Everyone (teachers and artists)** | All people in one list |
 | **Site settings** | Community name, contact email, social links, "Hide the site from Google" |
 
@@ -102,6 +103,13 @@ Open the person, click the **⋯** menu next to **Publish** and choose **Unpubli
 2. Click the **Text** block. The toolbar gives you **bold**, *italic*, headings, lists and links.
 3. To add a link: select words, click the link button, and type the address: `https://…` for another website, or for a page of this site just the part after the language, such as `/festival/program/`.
 4. **Publish**.
+
+### The event calendar
+The calendar page shows one month at a time, with arrows to the other months. It opens on the current month, and a month disappears by itself once it is over, so there is nothing to clean up.
+1. Open **Event calendar** and click **+** to add a month.
+2. Choose the **Year** and **Month**, then add the month's events under **Events this month** with the usual blocks (an Image block per poster, Text, Buttons…). Visitors can tap a poster to see it large.
+3. **Publish**. The new month appears with an arrow from the month before it.
+4. The calendar itself is the **Event calendar** block on a page (e.g. a community page called Event calendar). Put it under the page's heading or intro text. Each month can only be added once.
 
 ## 6. Building pages with blocks
 

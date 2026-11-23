@@ -153,7 +153,7 @@ Nothing runs on a server. Browser JavaScript is two small inline scripts: the me
 3. `scripts/lib/sanity-fixture.mjs`: use it on the "everything" page; add an assertion in `scripts/check.mjs` [6].
 4. `SPEC.md` P9 and the block table in `docs/EDITING-GUIDE.md`.
 
-### Add a new kind of document (for example classes on the community level)
+### Add a new kind of document (example: `eventMonth`, the event calendar)
 
 Schema in `documents.ts` and the Studio menu in `sanity.config.ts`; add the type to `DOCUMENT_TYPES` in `src/lib/source.ts`; a helper in `content.ts` that sorts and warns about anything it skips; a block or a page that shows it; test content and assertions; `SPEC.md`, and `DECISIONS.md` if it is a real decision.
 

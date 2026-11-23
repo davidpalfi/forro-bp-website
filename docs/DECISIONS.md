@@ -100,6 +100,9 @@ Dávid compared the test site with the Wix site in the same window and asked for
 ### S14. The community level has its own palette (Dávid, 2026-11-23)
 The community home and community pages use the Forró Budapest palette from the community's Instagram posts: gold (`#c28f32`, measured from the round Forró Budapest logo) instead of the festival red, light cream (`#e9eadc`), dark grey text (`#2e2e2e`, as the footer) and dark grey buttons with cream text (blue `#344893` and cream buttons tried first and dropped the same day). The festival keeps the Wix red. Text on gold is dark: cream on gold measures 2.4:1, too faint to read. Done with CSS variables scoped to `.in-community`, so every component follows without changes.
 
+### S15. Event calendar: months as documents, one shown at a time (Dávid, 2026-11-23)
+An `eventMonth` document per month (year, month, blocks) and an "Event calendar" block that shows them one at a time with arrows, opening on the current month; past months disappear by themselves (at build time and, since the site is only rebuilt on publish, again in the visitor's browser). Chosen over a hover drop-down (no hover on phones) and over a full calendar (more than needed: the months hold posters and short texts). Months reuse the page blocks, so posters open large in the photo viewer. A plain inline script in `Base.astro`, no external code. The preview's update-without-reload does not rerun the script, so while editing all months are listed until the page is reloaded.
+
 ### Still open for the port
 - Whether Cloudflare also hosts the real public site at launch (the test site is there, S11).
 - The invited-editor sign-in. The publish webhook after the trial ends: webhooks are not among the Growth features the trial lists, so they are expected to work on Free; publish one test change after the trial ends (around 2026-12-18) to confirm.

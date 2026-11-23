@@ -26,6 +26,9 @@ export const UI: Record<Lang, Record<string, string>> = {
     notFoundTitle: 'Page not found',
     notFoundText: 'This address does not exist.',
     notFoundLink: 'Go to the home page',
+    prevMonth: 'Previous month',
+    nextMonth: 'Next month',
+    noEvents: 'No events planned yet. Check back soon!',
   },
   hu: {
     skip: 'Ugrás a tartalomra',
@@ -41,6 +44,9 @@ export const UI: Record<Lang, Record<string, string>> = {
     notFoundTitle: 'Az oldal nem található',
     notFoundText: 'Ez a cím nem létezik.',
     notFoundLink: 'Vissza a főoldalra',
+    prevMonth: 'Előző hónap',
+    nextMonth: 'Következő hónap',
+    noEvents: 'Még nincs meghirdetett esemény. Nézz vissza hamarosan!',
   },
 };
 

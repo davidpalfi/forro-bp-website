@@ -309,6 +309,17 @@ const peopleGridBlock = defineType({
   },
 })
 
+const eventCalendarBlock = defineType({
+  name: 'eventCalendarBlock',
+  title: 'Event calendar',
+  type: 'object',
+  groups: blockGroups,
+  // Shows the months from "Event calendar" in the Studio menu, one at a time with arrows; it
+  // opens on the current month and past months disappear by themselves. Only style settings here.
+  fields: [...blockStyleFields()],
+  preview: { prepare: () => ({ title: 'Event calendar', subtitle: 'The months from "Event calendar"' }) },
+})
+
 export const blockTypes = [
   richText,
   imageWithAlt,
@@ -323,6 +334,7 @@ export const blockTypes = [
   videoBlock,
   dividerBlock,
   peopleGridBlock,
+  eventCalendarBlock,
 ]
 
 export const BLOCK_TYPES = [
@@ -338,4 +350,6 @@ export const BLOCK_TYPES = [
   'dividerBlock',
 ]
 
-export const pageBlockMembers = BLOCK_TYPES.map((type) => defineArrayMember({ type }))
+/** The blocks a month of the event calendar can hold: everything but another calendar. */
+export const monthBlockMembers = BLOCK_TYPES.map((type) => defineArrayMember({ type }))
+export const pageBlockMembers = [...BLOCK_TYPES, 'eventCalendarBlock'].map((type) => defineArrayMember({ type }))

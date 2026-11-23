@@ -23,7 +23,7 @@ export const SANITY = {
   apiVersion: '2025-02-19',
 };
 
-export const DOCUMENT_TYPES = ['siteSettings', 'communitySettings', 'festivalSettings', 'page', 'person'];
+export const DOCUMENT_TYPES = ['siteSettings', 'communitySettings', 'festivalSettings', 'page', 'person', 'eventMonth'];
 
 const QUERY = `*[_type in $types && !(_id in path("drafts.**")) && !(_id in path("versions.**"))]`;
 
