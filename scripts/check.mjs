@@ -309,6 +309,8 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
     background: 'default',
     alignment: 'center',
   });
+  // The festival link placed after the community pages in the community menu, with its own name.
+  Object.assign(docs.find((d) => d._type === 'communitySettings'), { festivalMenuOrder: 999, festivalMenuLabel_en: 'Festival' });
   // Two logos: the big one on the banner, the small one in the top bar.
   const festivalDoc = docs.find((d) => d._type === 'festivalSettings');
   festivalDoc.logo = { _type: 'image', asset: { _type: 'reference', _ref: 'image-' + 'a'.repeat(40) + '-800x400-png' } };
@@ -354,6 +356,10 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
       const home = read(dir, 'en/festival/index.html');
       const brand = /<img[^>]*class="brand-logo"[^>]*>/.exec(home)?.[0] ?? '';
       check(brand.includes('b'.repeat(40)) && home.includes('a'.repeat(40)) && !brand.includes('a'.repeat(40)), 'the top bar shows the small logo and the banner the big one');
+    }
+    {
+      const nav = /<nav id="menu"[\s\S]*?<\/nav>/.exec(read(dir, 'en/index.html'))?.[0] ?? '';
+      check(nav.indexOf('href="/en/classes/"') > -1 && nav.indexOf('href="/en/classes/"') < nav.indexOf('>Festival<'), 'the festival link in the community menu takes its own menu order and menu label');
     }
     check(fs.existsSync(dist(dir, 'en/classes/index.html')) && read(dir, 'en/index.html').includes('href="/en/classes/"'), 'a community page gets its own address and appears in the community menu');
     check(read(dir, 'en/festival/index.html').includes('href="/en/festival/everything/"'), 'a new festival page appears in the festival menu');

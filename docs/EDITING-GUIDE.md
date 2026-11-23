@@ -147,6 +147,8 @@ Blocks next to each other with the same background and alignment are joined into
    - **Address**: click **Generate** to make it from the English name, e.g. `workshops` gives `/en/festival/workshops/`. Lowercase letters, numbers and hyphens only. Do not change it later: links people saved would stop working.
    - **Page colour**: Red (like Program), Cream (like Location) or Dark.
    - **Show in the menu** and **Menu order** (smaller numbers first; Program is 1, Teachers 2, Artists 3, Location 11).
+   - **Menu label**: a different, shorter name for the menu button, in both languages. Without it, the page name is used.
+   - In the community menu, the link to the festival is not a page: its position and name are in **Community home page** (**Festival link: menu order** and **Festival link: menu label**). It is first by default (order 0).
    - Optional: a shorter **Menu label**, and a **Short description** for Google and link previews.
 6. **Publish**.
 

@@ -53,15 +53,25 @@ const siteSettings = defineType({
 
 const communityTitle = localizedFields('title', 'Title on the banner')
 
+const festivalMenuLabel = localizedFields('festivalMenuLabel', 'Festival link: menu label (optional)', 'string', 'The word for the festival in the community menu. Without it, the festival name is used.')
+
 const communitySettings = defineType({
   name: 'communitySettings',
   title: 'Community home page',
   type: 'document',
-  fieldsets: [communityTitle.fieldset],
+  fieldsets: [communityTitle.fieldset, festivalMenuLabel.fieldset],
   fields: [
     ...communityTitle.fields,
     defineField({ name: 'heroImage', title: 'Banner photo', type: 'imageWithAlt' }),
     homeBlocks('Home page blocks'),
+    defineField({
+      name: 'festivalMenuOrder',
+      title: 'Festival link: menu order',
+      description: 'Where the link to the festival sits in the community menu, among the community pages (their "Menu order" is in each page\'s Settings tab). Smaller numbers come first; 0 puts it first.',
+      type: 'number',
+      initialValue: 0,
+    }),
+    ...festivalMenuLabel.fields,
   ],
   preview: { prepare: () => ({ title: 'Community home page' }) },
 })

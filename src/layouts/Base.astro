@@ -35,13 +35,17 @@ const canonical = new URL(href(lang, pagePath), Astro.site).href;
 const share = getImage(shareImage || (inFestival ? festival.heroImage : community.heroImage) || festival.heroImage);
 const shareUrl = share ? new URL(share.src, Astro.site).href : '';
 
-// The menu: the section's pages marked "Show in the menu", in their menu order.
+// The menu: the section's pages marked "Show in the menu", in their menu order. In the
+// community menu the festival link takes its place by "Festival link: menu order" (default first).
 const menuPages = getPages(section)
   .filter((p) => p.showInMenu)
-  .map((p) => ({ path: p.path, label: trFirst(p, ['menuLabel', 'title'], lang) }));
+  .map((p) => ({ path: p.path, label: trFirst(p, ['menuLabel', 'title'], lang), order: p.order }));
+const festivalOrder = typeof community.festivalMenuOrder === 'number' && Number.isFinite(community.festivalMenuOrder) ? community.festivalMenuOrder : 0;
 const nav = inFestival
   ? [{ path: '/festival/', label: t.home }, ...menuPages, { path: '/', label: site.name }]
-  : [{ path: '/festival/', label: festival.name }, ...menuPages];
+  : [{ path: '/festival/', label: trFirst(community, ['festivalMenuLabel'], lang) || festival.name, order: festivalOrder }, ...menuPages].sort(
+      (a, b) => (a.order ?? 0) - (b.order ?? 0),
+    );
 
 const brandPath = inFestival ? '/festival/' : '/';
 // The top bar uses the small logo; without one, the big banner logo.
