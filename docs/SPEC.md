@@ -1,6 +1,6 @@
 # Specification
 
-What the site does and how it must behave, as built on 2026-11-11. Requirement IDs (R1, R2, ...) are referred to in the acceptance criteria at the end. For why, see `DECISIONS.md`.
+What the original Pages CMS proof of concept does and how it behaved when checked on 2026-11-11. Requirement IDs (R1, R2, ...) refer to that baseline. The Sanity version on `feature/sanity` is described in section 11, which wins where they differ. For current status and decisions, see `HANDOFF.md` and `DECISIONS.md`.
 
 ## 1. Purpose and users
 
@@ -205,3 +205,105 @@ A = automated by `npm run check`. M = by hand (see `HANDOFF.md`).
 - Whether the program should also exist as text.
 - Launch details: domain, redirects from old Wix addresses, private or public repository, failure notifications.
 - A sitemap, analytics, alt-text fields for photos.
+
+## 11. Sanity version (`feature/sanity`)
+
+Sections 1 to 10 describe the Pages CMS proof of concept. This section describes the Sanity version as built on `feature/sanity` on 2026-11-17. Where it differs from sections 3 to 5, this section wins on that branch. Choices S1 to S7 are in `DECISIONS.md`.
+
+### 11.1 Content source
+
+- **P1.** The site is built from a set of Sanity documents: `siteSettings`, `communitySettings`, `festivalSettings` (one each, fixed ids), `page` and `person`. The schemas are in `studio/schemaTypes/`.
+- **P2.** `CONTENT_SOURCE` chooses where they come from: unset or `json` = the JSON files in `src/content`, converted by `src/lib/from-json.ts`; `sanity` = the published documents in Sanity project `8hc671sk`, dataset `production`, read at build time; `file:<path>` = an `.ndjson` file of documents. Drafts (`drafts.*`) are never used.
+- **P3.** With `sanity`, a failed request, an authorisation error or a dataset with no festival settings and no pages **fails the build** on purpose, so the host keeps the previous site. Every other content problem is a `[content-warning]`, as before.
+- **P4.** `npm run sanity:import-file` writes `sanity-import/data.ndjson` and copies the photos it uses to `sanity-import/images/`. Document ids are fixed (`person-<file name>`, `page-<file name>`, `page-program`, ...), contain no dots, and the file is identical on every run. `npm run sanity:import` writes the file and imports it with `--missing`: only documents that do not exist yet are created. Nothing is ever deleted. `npm run sanity:import-replace` overwrites the published documents in the file with it (drafts are untouched); only for before the admin starts editing. In the file, a photo carries its upload instruction (`_sanityAsset`) on the photo object itself.
+
+### 11.2 Mapping from the JSON files
+
+| JSON | Sanity |
+|---|---|
+| `site.json` | `siteSettings`, same fields |
+| `community.json` | `communitySettings`: title, banner photo; intro becomes a Large text block in `homeBlocks` |
+| `festival.json` banner fields | `festivalSettings`: name, logo, banner photo, phone banner photo, dates, ticket address and label, Instagram, tagline |
+| `festival.json` intro, stats | `festivalSettings.homeBlocks`: a Large text block, a centred Statement text block |
+| text pages with `showOnHome` | a centred Button block per page in `homeBlocks`, linking to the page (label empty, so the page's name is used) |
+| `programHeading`, `programImages`, `programText` | page `program` (order 1, red): heading, one wide Image block per image (alt "Program – name (n)"), a Text block |
+| `teachersHeading`, `artistsHeading` | pages `teachers` and `artists` (order 2 and 3, red), each with one People block for its group |
+| `pages/<name>.json` | page `<name>` (cream): title, menu label, cover photo, a Text block (Markdown converted to rich text), a Gallery block; order = 10 + its order |
+| `people/<name>.json` | `person-<name>`, same fields; the name is entered once |
+
+`npm run check` section 5 proves the site built from the import file is byte-identical to the site built from the JSON files.
+
+### 11.3 Addresses
+
+| Address | Page |
+|---|---|
+| `/<lang>/` | Community home: banner, `communitySettings.homeBlocks`, then the festival band (as 4.2) |
+| `/<lang>/festival/` | Festival home: banner (as 4.3), `festivalSettings.homeBlocks`, then the ticket link |
+| `/<lang>/festival/<address>/` | Every festival page, including program, teachers and artists |
+| `/<lang>/<address>/` | Community pages; `festival` is reserved |
+
+- **P5.** A page is skipped with a warning when its address is missing or not lowercase letters, digits and hyphens, when it is reserved, or when another page in the same section already has it (the one earlier in menu order wins).
+- **P6. Menus.** Festival: Home, the festival pages with "Show in the menu" by menu order (then id), the community name, the Tickets button. Community: the festival, then the community pages with "Show in the menu". Label: the menu label, else the page name, in the visitor's language first.
+
+### 11.4 A page
+
+- **P7.** Optional photo across the top. Then the big heading (else the page name): in a band of the page colour on red and dark pages, above the content on cream pages. Then the blocks. `<title>` uses the page name; the description and sharing photo come from the page.
+- **P8. Bands.** Neighbouring blocks with the same background ("Same as page" counts as the page colour) and alignment share one band. A band directly after a band of the same colour has no top padding.
+- **P9. Blocks.**
+
+| Block | Shown as |
+|---|---|
+| Text | Rich text at reading width. Large: serif paragraphs as the festival intro. Statement: one bold line as the numbers line (plain text) |
+| Heading | h2, h3 or h4 |
+| Image | Wide (up to about 1150 px), text width, or full screen width; caption below |
+| Gallery | Grid, 2 columns, 3 from 720 px, photos cut to 4:3 |
+| Button | Leads to the chosen page in the visitor's language (label: its own, else the page's menu name), else to the address; left out with a warning when neither is usable |
+| People | The chosen people in the chosen order; with none chosen, everyone in the group by display order, then name. Cards as 4.5 |
+| Banner | Photo with a dark veil (plum without photo), title, text, button |
+| Columns | 2 to 4 side by side from 760 px, each with optional photo (4:3), heading, text |
+| Video | YouTube (through youtube-nocookie.com) or Vimeo (`dnt=1`) in a 16:9 frame, loaded lazily; any other address is left out with a warning |
+| Divider | A line, or 2 rem of space |
+
+A block of an unknown kind is skipped with a warning. Two-language fields fall back as in section 6, per field.
+
+- **P10. Links in rich text.** `https://`, `mailto:` and site addresses only; `javascript:` and the like are removed. A site address written without a language (`/festival/program/`) gets the visitor's language.
+- **P11. Photos.** Uploaded photos come from `cdn.sanity.io` at 480, 960 and 1600 px wide (never wider than the original), with the editor's crop. When a photo is cut to a shape by the design, the editor's focus point (hotspot) decides what stays visible. The description (alt text) is used in the visitor's language. Photos in the JSON files and in a not-yet-imported import file still come from `public/uploads` as before.
+
+### 11.5 Editor (Sanity Studio)
+
+- **P12.** Hosted by Sanity at `forro-budapest.sanity.studio` (configured in `studio/sanity.cli.ts`, not yet deployed). Menu: Festival home page, Festival pages, Teachers, Artists, Community home page, Community pages, Everyone, Site settings. The three settings documents cannot be created again, duplicated or deleted. New people and pages created from a list get that list's group or section.
+- **P13.** English and Hungarian ("Magyar") fields side by side. Every block has a Content and a Style tab. Link fields accept `https://`, `mailto:` and `/` addresses. The page address must be lowercase letters, digits and hyphens and is generated from the English name without accents.
+
+### 11.6 Requirements still to build
+
+- **P23. Click-to-edit polish** (planned 2026-11-18, `BACKLOG.md` A-G; A, no reload, done: P20): whole blocks outlined and clickable; right-click menu and drag to reorder if they work without React; links, e-mail and band colours clickable, fixed wording marked as not editable; the Studio's Published/Drafts switch honoured; people and site settings list where they appear.
+- **P14. Hosted visual editing** (built 2026-11-18, `DECISIONS.md` S11). The click-to-edit preview (11.7) on Cloudflare Workers (`npm run preview:build`, `wrangler.jsonc`). It shows drafts only to a browser the Studio has let in through `/preview/enable/` (a one-hour Studio secret, checked with Sanity; then a signed cookie for 12 hours); a wrong or missing secret gets 401 and no cookie; the entrance only leads to a path on the preview itself. Without the cookie it shows published content and a strip at the bottom saying drafts are hidden. Each request sees only its own content. Unknown first words in the address (not `en`/`hu`) get the 404 page. Public output stays static; drafts and credentials stay out of it.
+- **P15. Publish rebuild** (built 2026-11-18, not yet connected). The test site (`wrangler.site.jsonc`, static files from `CONTENT_SOURCE=sanity npm run build`) is rebuilt by a Sanity webhook calling the Worker's deploy hook when a published document of a site type is created, changed or deleted; drafts do not rebuild. A failed build deploys nothing, so the previous version stays online. Unknown addresses get the 404 page; `/en/festival` leads to `/en/festival/`.
+- **P16. Admin acceptance.** The admin signs in herself, edits, publishes and confirms the result on phone and desktop before the Sanity version replaces the current site.
+- **P17. Security and privacy.** Tokens only in provider secret stores, never in the repository or chat. No private care-team contact details in the repository or the dataset.
+
+### 11.7 Click-to-edit preview (built 2026-11-18; ready for Cloudflare, P14)
+
+- **P18. Preview mode.** `npm run preview:edit` (environment `PREVIEW=1`) serves the site at `http://localhost:4322` (beside `npm run dev` on 4321), rendering every page on request from the newest **drafts** in Sanity (drafts over published). It needs `SANITY_VIEWER_TOKEN` in the git-ignored `.env` file. Drafts appear only after the Studio has opened the preview (the lock, P14); otherwise published content, which needs no token. Responses are `no-store` and `noindex`.
+- **P19. Click targets.** Texts from fields ending in `_en`/`_hu` (including rich text) and names carry invisible markers; every photo has a `data-sanity` attribute. In the Studio's **Edit on the page** view, hovering outlines them and a click opens that field. Other values (tone, group, section, address, links, e-mail) never carry markers.
+- **P20. After an edit** in the Studio the preview page shows the draft without reloading: no white flash, the scroll position stays, the menu button still works (since 2026-11-18; before, it reloaded). If the update fails, the page reloads. Nothing is published by editing.
+- **P21. Studio.** The tool **Edit on the page** (Presentation) shows the preview at `SANITY_STUDIO_PREVIEW_URL` (default `http://localhost:4322`; the deployed Studio takes it from `studio/.env.production`, and `npm run studio:deploy` refuses to deploy without an `https://` address), starting at `/en/festival/`, through the lock's entrance `/preview/enable/`. An address opens its document: `/<lang>/festival/` the festival home page, `/<lang>/festival/<address>/` that festival page, `/<lang>/` the community home page, `/<lang>/<address>/` that community page. Festival and community home pages and every page list where they appear on the site, in both languages. People are edited by clicking them on the page that shows them.
+- **P22. Public builds are untouched.** Without `PREVIEW=1` the build is static and identical to a build without this feature: no editing script (not even bundled), no `data-sanity` attributes, no markers, no drafts.
+
+### 11.8 Acceptance state (2026-11-18)
+
+| ID | Criterion | How | State |
+|---|---|---|---|
+| AC17 | Every document the JSON conversion and the test content produce fits the Studio schema | A (`npm run check` [0]) | passes |
+| AC18 | The import file has fixed, dot-free ids, all people, no un-uploaded photos, and is identical on every run | A [5] | passes |
+| AC19 | The site built from the import file is identical to the site built from the JSON files | A [5] | passes |
+| AC20 | Sanity-shaped content: crop and focus point, alt text, every block, language added to site links, unsafe links removed, drafts excluded, community pages and menus, the warnings in P5 and P9, only `cdn.sanity.io` and `youtube-nocookie.com` as outside sources | A [6] | passes |
+| AC21 | The JSON-based site looks as before at 390 and 1280 px | M | done 2026-11-17, side by side with the previous build: same layout; the festival home's closing band and the location gallery sit slightly closer to the text |
+| AC22 | Studio builds and the schema validates | A (`npm run studio:build`, `npx sanity schema validate`) | passes |
+| AC23 | Studio deployed; maintainer and an invited editor can sign in | M | not done |
+| AC24 | Import into `production`; the site built with `CONTENT_SOURCE=sanity` matches | M | imported by Dávid 2026-11-18 (20 documents, 6 photos), photos repaired with `npm run sanity:import-replace`; the build passes with photos from Sanity. Side-by-side look not compared yet |
+| AC25 | P14 to P16 | M | P14 and P15 built and tested with a stand-in for Sanity in Cloudflare's local runtime (A [8]); not yet online; P16 not done |
+| AC29 | Hosted preview: lock (wrong, missing, forged and expired secrets or cookies show no drafts), parallel requests, every page, 404s, update without reload in a browser | A [8] | passes |
+| AC26 | Public builds carry no click-to-edit parts (P22); the import file puts upload instructions on the photo; a photo within a photo still shows | A [5] [6] [7] | passes |
+| AC27 | Preview against the real project: every page renders, texts carry markers (also through rich text), every photo has a click target, the editing script finds them | M | done 2026-11-18 with published content; drafts with Dávid's token tried by him the same day |
+| AC28 | Dávid clicks a text and a photo in **Edit on the page**, edits, sees the change without publishing, and judges whether it is clearly better than forms (S8) | M | done 2026-11-18 in Safari with drafts: approved ("pretty awesome") |

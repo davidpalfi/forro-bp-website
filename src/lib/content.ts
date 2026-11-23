@@ -1,82 +1,82 @@
-// Everything the pages need from the content files, in one place.
-// Pages never read raw files; they call these helpers, which tolerate missing
-// fields and skip broken entries (with a warning) instead of failing the build.
+// Everything the pages need from the content, in one place.
+// Pages never read raw content; they call these helpers, which tolerate missing or odd
+// fields and skip broken entries (with a [content-warning]) instead of failing the build.
+//
+// The content is a set of Sanity documents (site, community and festival settings, pages
+// made of blocks, people), loaded once per build by source.ts: from Sanity itself, or from
+// the JSON files converted by from-json.ts. Either way the pages see the same shapes.
 
+import { AsyncLocalStorage } from 'node:async_hooks';
 import fs from 'node:fs';
 import path from 'node:path';
-import { getCollection } from 'astro:content';
-import { z } from 'astro/zod';
+import { portableTextToMarkdown } from '@portabletext/markdown';
+import { createImageUrlBuilder } from '@sanity/image-url';
 import { marked } from 'marked';
-import { text, flag, textList } from './schema';
-import { isLang, type Lang } from './i18n';
-import siteRaw from '../content/settings/site.json';
-import communityRaw from '../content/settings/community.json';
-import festivalRaw from '../content/settings/festival.json';
+import { text, flag, num } from './schema.ts';
+import { isLang, tr, LANGS, type Lang } from './i18n.ts';
+import { createDataAttribute } from '@sanity/visual-editing/create-data-attribute';
+import { loadDocuments, isPreview, SANITY, STUDIO_URL } from './source.ts';
+
+/* ---------- Warnings ---------- */
+
+const warned = new Set<string>();
+export const warnOnce = (msg: string) => {
+  if (warned.has(msg)) return;
+  warned.add(msg);
+  console.warn(`[content-warning] ${msg}`);
+};
+
+/* ---------- Loading ---------- */
+
+type Obj = Record<string, unknown>;
+// The click-to-edit preview loads its own documents on each request and starts with none.
+const loaded = isPreview() ? { source: 'sanity' as const, docs: [] } : await loadDocuments(warnOnce);
+export const contentSource = loaded.source;
+
+/** The documents being shown, and the lists made from them (see useDocuments at the end). */
+type State = { byId: Map<string, Obj>; people: Person[]; pages: Page[]; photoTargets: WeakMap<object, string> };
+const emptyState = (): State => ({ byId: new Map(), people: [], pages: [], photoTargets: new WeakMap() });
+let shared: State = emptyState();
+// In the preview each request renders with its own documents, so two requests running at the
+// same time (one with drafts, one without) can never see each other's content.
+const perRequest = new AsyncLocalStorage<State>();
+const S = () => perRequest.getStore() ?? shared;
+const ofType = (type: string, byId = S().byId) => [...byId.values()].filter((d) => d._type === type);
+const asObj = (v: unknown): Obj => (v && typeof v === 'object' && !Array.isArray(v) ? (v as Obj) : {});
+const str = (v: unknown) => text.parse(v);
+const list = (v: unknown): Obj[] => (Array.isArray(v) ? v.filter((x) => x && typeof x === 'object') : []) as Obj[];
 
 /* ---------- Settings ---------- */
 
-const SiteSchema = z.object({
-  name: text,
-  defaultLang: text,
-  tagline_en: text,
-  tagline_hu: text,
-  email: text,
-  instagram: text,
-  facebook: text,
-  footerNote_en: text,
-  footerNote_hu: text,
-  noindex: flag(true),
-});
-
-const CommunitySchema = z.object({
-  title_en: text,
-  title_hu: text,
-  heroImage: text,
-  intro_en: text,
-  intro_hu: text,
-});
-
-const FestivalSchema = z.object({
-  name: text,
-  logo: text,
-  heroImage: text,
-  heroImagePhone: text,
-  tagline_en: text,
-  tagline_hu: text,
-  dateLine_en: text,
-  dateLine_hu: text,
-  ticketUrl: text,
-  ticketLabel_en: text,
-  ticketLabel_hu: text,
-  intro_en: text,
-  intro_hu: text,
-  stats_en: text,
-  stats_hu: text,
-  instagram: text,
-  programHeading_en: text,
-  programHeading_hu: text,
-  programImages: textList,
-  programText_en: text,
-  programText_hu: text,
-  teachersHeading_en: text,
-  teachersHeading_hu: text,
-  artistsHeading_en: text,
-  artistsHeading_hu: text,
-});
-
 export function getSite() {
-  const s = SiteSchema.parse(siteRaw);
-  const defaultLang: Lang = isLang(s.defaultLang) ? s.defaultLang : 'en';
-  return { ...s, name: s.name || 'Community', defaultLang };
+  const s = asObj(S().byId.get('siteSettings'));
+  const lang = str(s.defaultLang);
+  const defaultLang: Lang = isLang(lang) ? lang : 'en';
+  return {
+    ...s,
+    name: str(s.name) || 'Community',
+    defaultLang,
+    email: str(s.email),
+    instagram: str(s.instagram),
+    facebook: str(s.facebook),
+    noindex: flag(true).parse(s.noindex),
+  };
 }
 
 export function getCommunity() {
-  return CommunitySchema.parse(communityRaw);
+  const c = asObj(S().byId.get('communitySettings'));
+  return { ...c, heroImage: c.heroImage, homeBlocks: list(c.homeBlocks) };
 }
 
 export function getFestival() {
-  const f = FestivalSchema.parse(festivalRaw);
-  return { ...f, name: f.name || 'Festival' };
+  const f = asObj(S().byId.get('festivalSettings'));
+  return {
+    ...f,
+    name: str(f.name) || 'Festival',
+    ticketUrl: str(f.ticketUrl),
+    instagram: str(f.instagram),
+    homeBlocks: list(f.homeBlocks),
+  };
 }
 
 /* ---------- Addresses and links ---------- */
@@ -96,35 +96,42 @@ export function href(lang: Lang, pagePath = '/') {
   return withBase(`/${lang}/${pagePath.replace(/^\/+/, '')}`);
 }
 
+/** Addresses written in content that already name a language or a file folder are left alone. */
+const LANGLESS = new RegExp(`^/(?!(?:${LANGS.join('|')})(?:/|$)|uploads/|_img/)`);
+
 /**
  * Text written by editors may contain links like [Program](/en/festival/program/) and photos at
- * /uploads/x.jpg. This puts the base path in front of those in the finished HTML.
+ * /uploads/x.jpg. This puts the base path in front of those in the finished HTML, and, when a
+ * language is given, the language in front of site links written without one (/festival/).
  */
-export function rebaseHtml(html: string) {
+export function rebaseHtml(html: string, lang?: Lang) {
+  let out = html;
+  if (lang) out = out.replace(/(\shref=")(\/[^"]*)"/g, (m, a: string, p: string) => (LANGLESS.test(p) && !p.startsWith('//') ? `${a}/${lang}${p}"` : m));
   const base = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '');
-  if (!base) return html;
-  return html.replace(/(\s(?:href|src)=")\/(?!\/)/g, `$1${base}/`);
+  if (!base) return out;
+  return out.replace(/(\s(?:href|src)=")\/(?!\/)/g, `$1${base}/`);
 }
 
 /** Only allow normal links. Anything else (e.g. "javascript:") is dropped. Site-relative links get the base path. */
-export function safeUrl(u: string) {
-  const v = (u ?? '').trim();
+export function safeUrl(u: unknown, lang?: Lang) {
+  const v = str(u);
   if (!/^(https?:\/\/|mailto:|\/(?!\/))/i.test(v)) return '';
-  return v.startsWith('/') ? withBase(v) : v;
+  if (!v.startsWith('/')) return v;
+  return lang && LANGLESS.test(v) ? href(lang, v) : withBase(v);
 }
 
 /* ---------- Text ---------- */
 
 /** Plain multi-line text: each blank-line-separated block is a paragraph. */
-export function paragraphs(s: string) {
-  return (s ?? '')
+export function paragraphs(s: unknown) {
+  return str(s)
     .split(/\n\s*\n/)
     .map((p) => p.trim())
     .filter(Boolean);
 }
 
-/** A text page body (Markdown or HTML, whichever the editor saved) as finished HTML. */
-export function renderBody(body: string) {
+/** A text (Markdown or HTML) as finished HTML. */
+export function renderBody(body: string, lang?: Lang) {
   if (!body || !body.trim()) return '';
   let html = '';
   try {
@@ -136,68 +143,158 @@ export function renderBody(body: string) {
   }
   // Editors are trusted, but a pasted "javascript:" link should still never reach visitors.
   html = html.replace(/\s(href|src)="\s*(?:javascript|data|vbscript):[^"]*"/gi, '');
-  return rebaseHtml(html);
+  return rebaseHtml(html, lang);
 }
 
-/* ---------- Collections ---------- */
+/** Sanity rich text (Portable Text) as finished HTML; a plain string is treated as Markdown. */
+export function renderRich(value: unknown, lang: Lang) {
+  if (typeof value === 'string') return renderBody(value, lang);
+  if (!Array.isArray(value) || value.length === 0) return '';
+  try {
+    return renderBody(portableTextToMarkdown(value as never), lang);
+  } catch (e) {
+    warnOnce(`a text could not be shown: ${(e as Error).message}`);
+    return '';
+  }
+}
+
+/** The plain text of a rich text, e.g. for a one-line statement. */
+export function richPlain(value: unknown) {
+  if (typeof value === 'string') return value;
+  return list(value)
+    .map((b) => list(b.children).map((c) => str(c.text)).join(''))
+    .filter(Boolean)
+    .join('\n\n');
+}
+
+/** A two-language rich-text field: the visitor's language, else the other one. */
+export function trRich(obj: Obj, key: string, lang: Lang): unknown {
+  const filled = (v: unknown) => (typeof v === 'string' ? v.trim() !== '' : Array.isArray(v) && richPlain(v).trim() !== '');
+  if (filled(obj[`${key}_${lang}`])) return obj[`${key}_${lang}`];
+  for (const l of LANGS) if (filled(obj[`${key}_${l}`])) return obj[`${key}_${l}`];
+  return undefined;
+}
+
+/**
+ * The first of several two-language fields that is filled in, preferring the visitor's
+ * language over the field order: trFirst(page, ['heading', 'title'], 'hu') tries heading_hu,
+ * title_hu, then heading_en, title_en.
+ */
+export function trFirst(obj: Obj | null | undefined, fields: string[], lang: Lang) {
+  if (!obj) return '';
+  for (const l of [lang, ...LANGS.filter((x) => x !== lang)]) {
+    for (const f of fields) {
+      const v = obj[`${f}_${l}`];
+      if (typeof v === 'string' && v.trim() !== '') return v;
+    }
+  }
+  return '';
+}
+
+/* ---------- People ---------- */
 
 const GROUPS = { teacher: 'teacher', artist: 'artist' } as const;
 export type Group = keyof typeof GROUPS;
-const warned = new Set<string>();
-const warnOnce = (msg: string) => {
-  if (warned.has(msg)) return;
-  warned.add(msg);
-  console.warn(`[content-warning] ${msg}`);
-};
 
-export async function getPeople(group?: Group) {
-  const entries = await getCollection('people');
-  const all = entries
-    .map((e) => {
-      const g = e.data.group.toLowerCase();
-      if (!(g in GROUPS)) {
-        warnOnce(`person "${e.id}" has no group (Teacher or Artist) and is shown with the teachers`);
-      }
+const makePeople = (byId: Map<string, Obj>) =>
+  ofType('person', byId)
+    .map((d) => {
+      const g = str(d.group).toLowerCase();
+      if (!(g in GROUPS)) warnOnce(`person "${d._id}" has no group (Teacher or Artist) and is shown with the teachers`);
       return {
-        id: e.id,
-        ...e.data,
-        name: e.data.name || e.id,
+        ...d,
+        id: d._id as string,
+        name: str(d.name) || String(d._id).replace(/^person-/, ''),
         group: (g in GROUPS ? g : 'teacher') as Group,
-        order: e.data.order ?? 100,
+        instagram: str(d.instagram),
+        order: num.parse(d.order) ?? 100,
       };
     })
     .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
-  return group ? all.filter((p) => p.group === group) : all;
-}
-export type Person = Awaited<ReturnType<typeof getPeople>>[number];
+export type Person = ReturnType<typeof makePeople>[number];
 
-/** Addresses under /festival/ that belong to built-in pages; a text page with one of these names is skipped. */
-export const RESERVED_SLUGS = new Set(['program', 'teachers', 'artists']);
-
-export async function getPages() {
-  const entries = (await getCollection('pages')).filter((e) => {
-    if (!RESERVED_SLUGS.has(e.id)) return true;
-    warnOnce(`text page "${e.id}" uses a reserved address and was skipped`);
-    return false;
-  });
-  return entries
-    .map((e) => ({
-      slug: e.id,
-      ...e.data,
-      title_en: e.data.title_en || e.data.title_hu || e.id,
-      title_hu: e.data.title_hu || e.data.title_en || e.id,
-      order: e.data.order ?? 100,
-    }))
-    .sort((a, b) => a.order - b.order || a.title_en.localeCompare(b.title_en));
+export function getPeople(group?: Group) {
+  return group ? S().people.filter((p) => p.group === group) : S().people;
 }
-export type TextPage = Awaited<ReturnType<typeof getPages>>[number];
+
+/** The people a "People" block shows: the chosen ones in their order, or everyone in the group. */
+export function peopleForBlock(block: Obj) {
+  const g = str(block.group).toLowerCase();
+  const chosen = list(block.people)
+    .map((r) => S().people.find((p) => p.id === r._ref))
+    .filter((p): p is Person => Boolean(p));
+  if (chosen.length) return chosen;
+  return g in GROUPS ? getPeople(g as Group) : S().people;
+}
+
+/* ---------- Pages ---------- */
+
+export type Section = 'community' | 'festival';
+/** Addresses the site itself uses; a page with one of these is skipped. */
+export const RESERVED: Record<Section, string[]> = { festival: [], community: ['festival'] };
+
+const makePages = (byId: Map<string, Obj>) => {
+  const seen = new Set<string>();
+  const out = [];
+  const sorted = ofType('page', byId)
+    .map((d) => ({ d, order: num.parse(d.order) ?? 100 }))
+    .sort((a, b) => a.order - b.order || String(a.d._id).localeCompare(String(b.d._id)));
+  for (const { d, order } of sorted) {
+    const slug = str(asObj(d.slug).current).toLowerCase();
+    const section: Section = str(d.section) === 'community' ? 'community' : 'festival';
+    const name = trFirst(d, ['title'], 'en') || slug || String(d._id);
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+      warnOnce(`page "${name}" has no usable address and was skipped`);
+      continue;
+    }
+    if (RESERVED[section].includes(slug)) {
+      warnOnce(`page "${name}" uses a reserved address (${slug}) and was skipped`);
+      continue;
+    }
+    if (seen.has(`${section}/${slug}`)) {
+      warnOnce(`page "${name}" has the same address as another page (${slug}) and was skipped`);
+      continue;
+    }
+    seen.add(`${section}/${slug}`);
+    const tone = str(d.tone);
+    out.push({
+      ...d,
+      id: d._id as string,
+      slug,
+      section,
+      path: section === 'festival' ? `/festival/${slug}/` : `/${slug}/`,
+      tone: (['red', 'cream', 'dark'].includes(tone) ? tone : 'red') as 'red' | 'cream' | 'dark',
+      title_en: trFirst(d, ['title'], 'en') || slug,
+      title_hu: trFirst(d, ['title'], 'hu') || slug,
+      showInMenu: flag(true).parse(d.showInMenu),
+      order,
+      blocks: list(d.blocks),
+    });
+  }
+  return out;
+};
+export type Page = ReturnType<typeof makePages>[number];
+
+export function getPages(section: Section = 'festival') {
+  return S().pages.filter((p) => p.section === section);
+}
+
+/** Where a button or banner leads: the chosen page in the visitor's language, else its address. */
+export function blockLink(block: Obj, lang: Lang) {
+  const ref = str(asObj(block.page)._ref);
+  if (ref) {
+    const target = S().pages.find((p) => p.id === ref);
+    if (target) return { url: href(lang, target.path), label: trFirst(target, ['menuLabel', 'title'], lang), external: false };
+    warnOnce(`a button points to a page that is not published (${ref})`);
+  }
+  const url = safeUrl(block.url, lang);
+  if (str(block.url) && !url) warnOnce(`the link "${str(block.url)}" is not a usable address and was left out`);
+  return { url, label: '', external: /^https?:\/\//i.test(url) };
+}
 
 /* ---------- Images ---------- */
 
-type Manifest = Record<
-  string,
-  { width: number; height: number; variants: { w: number; url: string }[] }
->;
+type Manifest = Record<string, { width: number; height: number; variants: { w: number; url: string }[] }>;
 let manifest: Manifest | null = null;
 
 function loadManifest(): Manifest {
@@ -211,11 +308,13 @@ function loadManifest(): Manifest {
   return manifest;
 }
 
-export type ResolvedImage = { src: string; srcset?: string; width?: number; height?: number };
+export type ResolvedImage = { src: string; srcset?: string; width?: number; height?: number; position?: string };
 
-/** Returns web-sized variants when we made them; otherwise the original path; nothing if the file is gone. */
-export function getImage(src?: string): ResolvedImage | undefined {
-  if (!src) return undefined;
+const WIDTHS = [480, 960, 1600];
+const sanityImages = createImageUrlBuilder({ projectId: SANITY.projectId, dataset: SANITY.dataset });
+
+/** A photo in public/uploads: web-sized variants when the build made them, else the original. */
+function localImage(src: string): ResolvedImage | undefined {
   let clean = src;
   try {
     clean = decodeURI(src);
@@ -223,6 +322,8 @@ export function getImage(src?: string): ResolvedImage | undefined {
     /* keep as is */
   }
   const local = '/' + clean.replace(/^\/+/, '');
+  // The hosted preview has no project files to look in (Cloudflare): show the address as it is.
+  if (isPreview()) return /^https?:\/\//i.test(src) ? { src } : { src: withBase(local) };
   const found = loadManifest()[local];
   if (!found || found.variants.length === 0) {
     if (/^https?:\/\//i.test(src)) return { src };
@@ -242,3 +343,146 @@ export function getImage(src?: string): ResolvedImage | undefined {
     height: found.height,
   };
 }
+
+/** A photo uploaded to Sanity, served by Sanity's image service with the editor's crop. */
+function sanityImage(image: Obj, ref: string): ResolvedImage | undefined {
+  const m = /^image-[A-Za-z0-9]+-(\d+)x(\d+)-[a-z0-9]+$/.exec(ref);
+  if (!m) {
+    warnOnce(`a photo has an unexpected reference (${ref}) and was left out`);
+    return undefined;
+  }
+  const crop = asObj(image.crop);
+  const c = (k: string) => Math.min(Math.max(Number(crop[k]) || 0, 0), 1);
+  const width = Math.max(1, Math.round(Number(m[1]) * (1 - c('left') - c('right'))));
+  const height = Math.max(1, Math.round(Number(m[2]) * (1 - c('top') - c('bottom'))));
+  const widths = WIDTHS.filter((w) => w < width).concat(Math.min(width, WIDTHS[WIDTHS.length - 1]));
+  const url = (w: number) => sanityImages.image(image as never).width(w).fit('max').auto('format').url();
+  const hotspot = asObj(image.hotspot);
+  let position: string | undefined;
+  if (typeof hotspot.x === 'number' && typeof hotspot.y === 'number') {
+    // The hotspot is relative to the whole photo; object-position needs it relative to the crop.
+    const x = (hotspot.x - c('left')) / (1 - c('left') - c('right') || 1);
+    const y = (hotspot.y - c('top')) / (1 - c('top') - c('bottom') || 1);
+    position = `${Math.round(Math.min(Math.max(x, 0), 1) * 100)}% ${Math.round(Math.min(Math.max(y, 0), 1) * 100)}%`;
+  }
+  return {
+    src: url(widths[widths.length - 1]),
+    srcset: widths.map((w) => `${url(w)} ${w}w`).join(', '),
+    width,
+    height,
+    position,
+  };
+}
+
+/**
+ * Any photo the content can hold, ready for an <img>: a Sanity image (uploaded, or one from
+ * the JSON files not uploaded yet) or a plain /uploads/ path. Nothing when it is missing.
+ */
+export function getImage(image: unknown): ResolvedImage | undefined {
+  if (!image) return undefined;
+  if (typeof image === 'string') return localImage(image);
+  const o = asObj(image);
+  if (typeof o._upload === 'string') return localImage(o._upload);
+  const asset = asObj(o.asset);
+  if (typeof asset._ref === 'string') return sanityImage(o, asset._ref);
+  // A photo within a photo, as the first import of 2026-11-18 made them: still shown, but the
+  // document should be imported again (npm run sanity:import-replace) or the photo chosen again.
+  const inner = asObj(asset.asset);
+  if (typeof inner._ref === 'string') {
+    warnOnce('some photos in Sanity are stored the wrong way (from the first import); run "npm run sanity:import-replace" once');
+    return sanityImage({ ...asset, ...o, asset: inner }, inner._ref);
+  }
+  // An import file that has not been imported yet: image@file://./images/x.jpg is public/uploads/x.jpg
+  const pending = /^image@file:\/\/\.\/images\/(.+)$/.exec(str(o._sanityAsset));
+  if (pending) return localImage(`/uploads/${pending[1]}`);
+  return undefined;
+}
+
+/* ---------- Click-to-edit targets for photos (preview only) ---------- */
+
+// Texts carry invisible markers that say which field they come from; photos cannot, so in
+// the preview every photo object is noted with its document and field, and the <img> gets a
+// data-sanity attribute. Public builds note nothing and print no attribute.
+function notePhotos(doc: Obj, photoTargets: WeakMap<object, string>) {
+  const edit = createDataAttribute({ id: String(doc._id), type: String(doc._type), baseUrl: STUDIO_URL });
+  const walk = (value: unknown, path: (string | { _key: string })[]) => {
+    if (Array.isArray(value)) {
+      // Items without a key cannot be addressed reliably, so they get no click target.
+      for (const item of value) {
+        const key = item && typeof item === 'object' ? (item as Obj)._key : undefined;
+        if (typeof key === 'string') walk(item, [...path, { _key: key }]);
+      }
+    } else if (value && typeof value === 'object') {
+      const o = value as Obj;
+      if (path.length && o.asset && typeof o.asset === 'object') photoTargets.set(o, edit(path as never).toString());
+      for (const [k, v] of Object.entries(o)) if (!k.startsWith('_') && k !== 'asset') walk(v, [...path, k]);
+    }
+  };
+  walk(doc, []);
+}
+
+/** The data-sanity attribute that makes a photo clickable in the preview; nothing otherwise. */
+export const editAttr = (image: unknown) => (image && typeof image === 'object' ? S().photoTargets.get(image) : undefined);
+
+/** The description of a photo for screen readers, in the visitor's language. */
+export const altOf = (image: unknown, lang: Lang) => tr(asObj(image), 'alt', lang);
+
+/* ---------- Blocks ---------- */
+
+export type Block = Obj & { _type: string; _key?: string };
+
+/**
+ * Consecutive blocks with the same background and alignment share one band, so a heading,
+ * its text and a button sit together instead of in separate stripes.
+ */
+export function groupBlocks(blocks: Obj[], tone: string) {
+  const groups: { background: string; alignment: string; blocks: Block[] }[] = [];
+  for (const b of blocks) {
+    if (typeof b._type !== 'string') continue;
+    const bg = str(b.background);
+    const background = ['red', 'cream', 'dark'].includes(bg) ? bg : tone;
+    const al = str(b.alignment);
+    const alignment = ['center', 'right'].includes(al) ? al : 'left';
+    const last = groups[groups.length - 1];
+    if (last && last.background === background && last.alignment === alignment) last.blocks.push(b as Block);
+    else groups.push({ background, alignment, blocks: [b as Block] });
+  }
+  return groups;
+}
+
+/** A YouTube or Vimeo address as an embeddable player address; '' for anything else. */
+export function videoEmbed(url: unknown) {
+  const u = safeUrl(url);
+  let m = /^https:\/\/(?:www\.|m\.)?(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/.exec(u);
+  if (m) return `https://www.youtube-nocookie.com/embed/${m[1]}`;
+  m = /^https:\/\/(?:www\.)?vimeo\.com\/(?:video\/)?(\d+)/.exec(u);
+  if (m) return `https://player.vimeo.com/video/${m[1]}?dnt=1`;
+  return '';
+}
+
+/* ---------- Which documents are shown ---------- */
+
+function makeState(docs: unknown[]): State {
+  const st = emptyState();
+  for (const d of docs) if (d && typeof d === 'object' && typeof (d as Obj)._id === 'string') st.byId.set((d as Obj)._id as string, d as Obj);
+  if (isPreview()) for (const d of st.byId.values()) notePhotos(d, st.photoTargets);
+  st.people = makePeople(st.byId);
+  st.pages = makePages(st.byId);
+  return st;
+}
+
+/** Makes these documents the content every helper above reads. A build calls it once (below). */
+export function useDocuments(docs: unknown[]) {
+  shared = makeState(docs);
+}
+
+/**
+ * Runs `render` with these documents as the content, for this request only: the click-to-edit
+ * preview (src/middleware.ts) calls it on every request with the documents it just loaded.
+ * Pages never notice the difference.
+ */
+export function withDocuments<T>(docs: unknown[], render: () => Promise<T>): Promise<T> {
+  return perRequest.run(makeState(docs), render);
+}
+
+useDocuments(loaded.docs);

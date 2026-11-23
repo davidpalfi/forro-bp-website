@@ -1,5 +1,5 @@
 {
-  "name": "festival-site",
+  "name": "forro-bp-site",
   "type": "module",
   "version": "0.1.0",
   "private": true,
@@ -7,15 +7,40 @@
     "dev": "node scripts/optimize-images.mjs && astro dev",
     "build": "node scripts/optimize-images.mjs && astro build",
     "preview": "astro preview",
-    "check": "node scripts/check.mjs"
+    "check": "node scripts/check.mjs",
+    "studio": "cd studio && sanity dev",
+    "studio:build": "cd studio && sanity build",
+    "studio:deploy": "node scripts/studio-deploy-check.mjs && cd studio && sanity deploy",
+    "sanity:import-file": "node scripts/make-sanity-import.mjs",
+    "sanity:import": "npm run sanity:import-file && cd studio && sanity datasets import ../sanity-import/data.ndjson --dataset production --missing",
+    "sanity:import-replace": "npm run sanity:import-file && cd studio && sanity datasets import ../sanity-import/data.ndjson --dataset production --replace",
+    "sanity:login": "cd studio && sanity login",
+    "preview:edit": "node scripts/optimize-images.mjs && PREVIEW=1 astro dev --ignore-lock",
+    "preview:build": "node scripts/optimize-images.mjs && PREVIEW=1 astro build",
+    "preview:local": "npm run preview:build && wrangler dev --port 4323"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "14.4.8",
+    "@astrojs/react": "7.1.9",
     "@fontsource-variable/fraunces": "5.3.0",
     "@fontsource-variable/libre-franklin": "5.3.0",
     "@fontsource-variable/open-sans": "5.3.0",
+    "@portabletext/astro": "0.2.0",
+    "@portabletext/markdown": "2.9.4",
+    "@sanity/astro": "3.6.2",
+    "@sanity/client": "8.16.0",
+    "@sanity/image-url": "2.1.1",
+    "@sanity/preview-url-secret": "4.1.5",
+    "@sanity/visual-editing": "6.2.1",
     "astro": "7.4.10",
+    "groq": "6.23.0",
     "marked": "18.2.0",
-    "sharp": "0.35.5"
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "sanity": "6.23.0",
+    "sharp": "0.35.5",
+    "styled-components": "6.6.0",
+    "wrangler": "4.162.0"
   },
   "engines": {
     "node": ">=22.23.4"

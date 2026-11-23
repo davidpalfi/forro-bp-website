@@ -1,8 +1,43 @@
 # Handoff: start here
 
-If you are picking this project up with no other context, read this file first, then `USER-NEEDS.md` (who it is for and how little is verified), `DECISIONS.md` (why), `SPEC.md` (what the site does) and `ARCHITECTURE.md` (how the code is organised). `CLAUDE.md` has the rules for a Claude session working in the repo; `EDITING-GUIDE.md` is for the person who edits the site.
+If you are picking this project up with no other context, read this file and `SANITY-PORT-STATUS.md` first, then `USER-NEEDS.md` (who it is for and how little is verified), `DECISIONS.md` (why), `SPEC.md` (what the site does) and `ARCHITECTURE.md` (how the code is organised). `CLAUDE.md` has the rules for a Claude session working in the repo. The root-level [EDITING-GUIDE.md](../EDITING-GUIDE.md) is for the old Pages CMS PoC; [docs/EDITING-GUIDE.md](EDITING-GUIDE.md) is the admin guide for Sanity; check it against the deployed Studio before sending it.
 
-## In 60 seconds
+## Current handoff (2026-11-23)
+
+- **`main` is the Sanity version** (S12, 2026-11-23). The Pages CMS proof of concept is retired and kept as the tag `pages-cms-poc`; its GitHub Pages workflow and `.pages.yml` are removed. Code changes: a branch and a pull request into `main`; every push to `main` rebuilds both Cloudflare sites.
+
+- **Online** (Dávid set up 2026-11-22/23, `HOSTING.md`): preview https://forro-budapest-preview.pdavid92.workers.dev (Worker `forro-budapest-preview`, its own Viewer token `Cloudflare preview` as a Cloudflare secret), test site https://forro-bp-website.pdavid92.workers.dev (Worker `forro-bp-website`; `wrangler.site.jsonc` renamed to match). Both build `main`; builds for other branches off. **Publish rebuilds the test site: tested by Dávid 2026-11-23** (Sanity webhook "Rebuild test site" > Workers Builds deploy hook "Sanity publish"). Tested during Sanity's Growth trial; webhooks are not among the Growth features the trial lists, so they are expected to work on Free; publish one test change after the trial ends (around 2026-12-18) to confirm.
+- **Preview lock verified for real in Safari (Dávid, 2026-11-23):** the strip shows on the preview address opened directly and is gone inside the deployed Studio's Edit on the page, so the partitioned cookie works in Safari's frame. No-reload update inside the Studio works (no flash; 2-3 s delay, fine for now; BACKLOG polish H).
+- `studio/.env.production` holds the preview address; the Studio is deployed with it.
+- **Next (plan agreed 2026-11-23, top of `BACKLOG.md`):** a more mature version before the admin sees it: (1) polish how the site looks (waiting for Dávid's list, or his go for an agent review), (2) Dávid decides on click-to-edit polish B-G on a separate branch, (3) send it to her (13a).
+- **Working agreement:** start work only when Dávid gives a clear go; when he is planning or asking, answer and plan only.
+- Retry build in Workers Builds rebuilds the same commit; to start a build after changing settings, push a change. Ignore Cloudflare's "update wrangler.jsonc name" suggestion for the test site (it reads the preview's file).
+- Editing outlines on the preview opened outside the Studio (only on hover): Dávid is fine with them (2026-11-23).
+- The npm package is now named `forro-bp-site`.
+
+## Earlier handoff (2026-11-18, night)
+
+- **Go-live code is done** (`DECISIONS.md` S11): preview on Cloudflare Workers with the preview lock (Dávid chose it), no reload after an edit (polish A, Dávid chose it first), test site rebuilt on Publish via a Sanity webhook and a Cloudflare deploy hook. `npm run check` [8] tests it in Cloudflare's local runtime with a stand-in for Sanity. Not tested against the real Studio, Sanity or Cloudflare (blocked from cloud sessions).
+- **Waiting for Dávid:** [HOSTING.md](HOSTING.md) (two Workers, the token as a Cloudflare secret, deploy hook, Sanity webhook). He sends the two `workers.dev` addresses (not secret). Then: preview address into `studio/.env.production` (`SANITY_STUDIO_PREVIEW_URL=https://...`), test address into `docs/EDITING-GUIDE.md`, he runs `npm run studio:deploy` and tries Edit on the page and Publish, especially in Safari (partitioned cookie in the Studio's frame). If drafts never show inside the Studio, the cookie is blocked: next step would be carrying the lock in the address instead (S11, considered).
+- Still open: the domain (launch only); polish B-G after her review.
+
+## Earlier handoff (2026-11-18, late evening)
+
+- **Next task: go live for the admin's review** (online preview with a lock, test site rebuilt on Publish, Studio redeployed, guide finished). Dávid's checklist is in the root [README.md](../README.md); the agent's brief is at the top of [BACKLOG.md](BACKLOG.md). Dávid's account steps are done (2026-11-18, late evening): Sanity stays on the **Free plan** with both him and the admin as **Administrators** (`DECISIONS.md` S10; the Growth trial downgrades to Free by itself), and a **Cloudflare account exists** (he signed in with GitHub; no project created, repository not connected: tell him exactly what to click when the code is ready). The invite test was moved to just before he sends her the link. Click-to-edit polish A-G comes after her review (A possibly before).
+- **Decided since:** the preview lock and polish A first (both built, S11). **Still open:** the real domain (.com, .hu or both), only needed for launch. Keep instructions for Dávid short, click by click, with direct links; he sometimes works from a phone.
+- **Cloud agent sessions** cannot open sanity.io (blocked by the session's network settings); a web search worked. Docs-only changes are pushed straight to the working branch, now `main` (agreed 2026-11-18 for the then working branch `feature/sanity`); code goes on a branch with a pull request into `main`.
+- **Click-to-edit is built and approved.** Dávid tried it on his computer on 2026-11-18 (`npm run preview:edit` plus the local Studio's "Edit on the page") and found it "pretty awesome"; Sanity stays (`DECISIONS.md` S8 outcome, S9; `SPEC.md` 11.7).
+- Confirmed against the real project on 2026-11-18: Dávid is signed in, the content is imported and the photos repaired, the Studio is deployed (without "Edit on the page"; do not redeploy before the preview is hosted), the dataset can be read without a token, and `CONTENT_SOURCE=sanity npm run build` passes. Dávid has also published one community page himself.
+- Dávid's `.env` holds his Viewer token for the preview. Never read it out, print it or ask for it.
+- Run `npm run` commands from the project folder (`cd ~/src/forro-budapest-site`), not from the home folder.
+
+- **Read [SANITY-PORT-STATUS.md](SANITY-PORT-STATUS.md) first.** It has the state, what was and was not verified, and the exact next commands.
+- The Sanity proof of concept was built on branch `feature/sanity` (merged into `main` 2026-11-23): refined Studio schemas, the site rendering Sanity documents (from Sanity, or from the JSON files converted to the same documents), a repeatable import file and command, a wider `npm run check`, and the admin guide [EDITING-GUIDE.md](EDITING-GUIDE.md). Decisions S5-S7 in `DECISIONS.md`; behaviour in `SPEC.md` section 11; code map in `ARCHITECTURE.md`.
+- The default build still reads the JSON files and looks the same as the live proof of concept. `main`, its GitHub Pages site and `.pages.yml` are unchanged.
+- Not built: hosted preview, rebuild on publish, hosting choice. See [BACKLOG.md](BACKLOG.md).
+- The sections below document the original Pages CMS proof of concept.
+
+## Original Pages CMS PoC (2026-11-11)
 
 - **What:** one static website (Astro) for the Forró Budapest community. The community level is an empty shell; the Budapest Forró Festival sits below it at `/<lang>/festival/`. English and Hungarian. The look is copied from the festival's current Wix site (forrobudapest.com), which this is meant to replace.
 - **How it is edited:** content is JSON files in this repo. A free editor (Pages CMS) gives the non-technical admin forms that save those files. GitHub Pages builds and hosts it.
@@ -10,7 +45,7 @@ If you are picking this project up with no other context, read this file first, 
 - **State:** a proof of concept to show the admin. It builds, the automated checks pass, and it was looked at in a browser at phone and desktop size. It has **never been on GitHub**, and **Pages CMS has never been connected**. Photos, the logo and most longer texts are placeholders.
 - **First thing to do:** publish it and run the editor trial with the admin (steps 1 to 3 below). The whole plan rests on that.
 
-## Status (2026-11-11)
+## Original PoC status (2026-11-11; historical)
 
 Done:
 - Pages in both languages: community home, festival home, program, teachers, artists, text pages (location, code of conduct), 404, and the language redirect on `/`.
@@ -45,7 +80,9 @@ Not done:
 - Browsers other than Chromium; a real accessibility review.
 - The changes of 2026-11-11 are in the working folder but **not committed** to Git.
 
-## Next steps, in order
+## Superseded Pages CMS next steps
+
+The sequence below was written for the original Pages CMS/GitHub Pages plan and is no longer the launch plan. Use [GO-LIVE-CHECKLIST.md](GO-LIVE-CHECKLIST.md) for Sanity. The old-address table below remains useful when planning redirects.
 
 1. **Publish on GitHub Pages.** Commit the working folder. Create an empty public repository, add it as `origin`, push `main`. In the repository: Settings > Pages > Build and deployment > Source: **GitHub Actions**. Watch the Actions tab; the address is `https://<user>.github.io/<repo>/`. If a workflow fails, read its log: the workflows were written from documentation and have not run yet.
 2. **Connect Pages CMS** (pagescms.org, sign in with GitHub, install its app on the repository). Walk through every form and fill in the assumptions table in `DECISIONS.md`: what exactly is saved for photos, photo lists, rich text and selects? Fix code or config where it differs.
@@ -76,6 +113,16 @@ npm ci             # once (exact versions from the lockfile)
 npm run dev        # preview at http://localhost:4321 (resizes photos first)
 npm run build      # builds dist/ ; read any [content-warning] lines
 npm run check      # the test suite, about 20-40 seconds
+npm run studio     # start Sanity Studio at http://localhost:3333
+npm run studio:build
+npm run studio:deploy  # deploy to Sanity hosting; requires account access
+npm run sanity:login   # sign in to Sanity on this computer (once)
+npm run sanity:import-file  # write sanity-import/ from src/content; sends nothing
+npm run sanity:import  # write it and import missing documents into Sanity
+npm run sanity:import-replace  # overwrite the imported documents with the import file (before the admin starts only)
+CONTENT_SOURCE=sanity npm run build   # build from the published content in Sanity
+npm run preview:edit   # click-to-edit preview at http://localhost:4322 (drafts; needs .env, see .env.example)
+npm run preview:build  # the same preview built for Cloudflare (docs/HOSTING.md); preview:local runs it at :4323
 ```
 
 Needs Node 22.23.4 or newer. Build for a sub-path locally: `SITE_URL=https://x.github.io SITE_BASE=/repo npm run build`.

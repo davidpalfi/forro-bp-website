@@ -1,0 +1,35 @@
+---
+// One page made in the editor (festival or community): optional photo on top, the big
+// heading, then its blocks. Red and dark pages show the heading in a coloured band; cream
+// pages show it above the text, like the Wix text pages.
+import Base from '../layouts/Base.astro';
+import PageTitle from './PageTitle.astro';
+import Picture from './Picture.astro';
+import Blocks from './Blocks.astro';
+import { trFirst, type Page } from '../lib/content';
+import type { Lang } from '../lib/i18n';
+
+interface Props {
+  page: Page;
+  lang: Lang;
+}
+
+const { page, lang } = Astro.props;
+const title = trFirst(page, ['title'], lang);
+const heading = trFirst(page, ['heading', 'title'], lang);
+const description = trFirst(page, ['description'], lang);
+---
+
+<Base lang={lang} section={page.section} pagePath={page.path} title={title} description={description} shareImage={page.coverImage} tone={page.tone}>
+  {page.coverImage ? <Picture image={page.coverImage} lang={lang} class="page-banner" sizes="100vw" eager /> : null}
+  {
+    page.tone === 'cream' ? (
+      <div class="page-head">
+        <h1 class="page-title">{heading}</h1>
+      </div>
+    ) : (
+      <PageTitle title={heading} />
+    )
+  }
+  <Blocks blocks={page.blocks} lang={lang} tone={page.tone} class="after-title" />
+</Base>

@@ -1,6 +1,18 @@
 node_modules/
 dist/
 .astro/
+/studio/.sanity/
 # Web-sized copies generated at build time from public/uploads
 public/_img/
 .DS_Store
+# Import file for Sanity, made by npm run sanity:import-file
+/sanity-import/
+# Local secrets for the click-to-edit preview (SANITY_VIEWER_TOKEN). Never commit.
+.env
+.env.*
+!.env.example
+# Not secret: the address of the click-to-edit preview on Cloudflare, for the deployed Studio.
+!studio/.env.production
+# Cloudflare (wrangler) local files and secrets
+.wrangler/
+.dev.vars*

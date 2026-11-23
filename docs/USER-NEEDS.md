@@ -1,6 +1,6 @@
 # User needs
 
-What the design decisions rest on, and how well each need is known. Sources: what the owner (a developer in the community) said in conversation, including two things he relayed from the admin, and a read of every page of the current Wix site on 2026-11-11 (text of the English pages, phone screenshots of both languages, desktop screenshots of the English version). **No interview with the admin, no analytics and no visitor research exist.** Do not treat "assumed" items as findings. When a need is confirmed or corrected, change its status here and update the decisions that depend on it.
+What the design decisions rest on, and how well each need is known. Sources: the owner's conversations (including the 2026-11-15 Sanity planning discussion), two things relayed from the admin, and a read of every page of the current Wix site on 2026-11-11 (English page text, phone screenshots of both languages, desktop screenshots of English). **No direct interview with the admin, analytics, or visitor research exist.** Do not treat "assumed" items as findings. When a need is confirmed or corrected, change its status here and update the decisions that depend on it.
 
 Status labels: **Stated** (the owner said it), **Relayed** (the owner reported the admin saying it), **Observed** (seen on the existing site), **Assumed** (a reasonable guess, unchecked).
 
@@ -8,7 +8,7 @@ Status labels: **Stated** (the owner said it), **Relayed** (the owner reported t
 
 | User | What is known |
 |---|---|
-| **Admin** | Owns the current Wix site and made its design. Not technical. Runs regular classes in the community. Wants to update the site herself. Writes both English and Hungarian herself. Has no GitHub account and no paid Claude plan, and should not need either. (Stated) |
+| **Admin** | Owns the current Wix site and made its design. Not technical. Runs regular classes in the community. Wants to update the site herself. Writes both English and Hungarian herself. Has no GitHub account and should not need one to edit the site. (Stated) |
 | **Owner / maintainer** | Software engineer in the community, new to building websites. A few other technical people could help long term. Uses Claude for development. (Stated) |
 | **Visitor** | Dancers from Hungary and abroad. Nothing measured. |
 
@@ -18,15 +18,15 @@ Status labels: **Stated** (the owner said it), **Relayed** (the owner reported t
 
 | ID | Need | Status | Drives |
 |---|---|---|---|
-| N1 | The admin updates content herself, without a developer | Stated (top priority) | Pages CMS forms (decision 3), EDITING-GUIDE |
-| N2 | No subscription and no paid accounts; leaving Wix is about cost | Stated | Static site and free hosting (1, 13), no Claude path for her (3) |
+| N1 | The admin updates content herself, without a developer | Stated (top priority) | Editor choice and admin acceptance test; Sanity with visual preview is being explored |
+| N2 | No subscription; content may live with a provider if the service meets the need and remains free to use | Stated (updated 2026-11-15) | Verify Sanity and hosting free-plan terms before committing; provider location is no longer itself disqualifying |
 | N3 | Robust and hard for her to break | Stated | Lenient code, warnings do not block (8), no cross-links (7) |
 | N4 | One community site, with the festival as a section below it | Stated; the admin agreed (Relayed) | Two levels (4) |
 | N5 | The community site uses the festival site's design | Relayed ("a good idea") | The Wix look is copied (10) |
 | N6 | English and Hungarian | Stated; Observed on the Wix site | Two languages (5) |
 | N7 | The community level stays empty for now | Stated | Empty shell (4) |
 | N8 | A working copy on GitHub Pages to show her | Stated | GitHub Pages proof of concept (13) |
-| N9 | Editing need not feel like Wix, only be doable by her | Stated | Forms instead of a visual page editor |
+| N9 | Detached forms are unintuitive for the admin; a page-context editing experience is preferred if it is usable | Stated by owner, 2026-11-15; confirmed 2026-11-18 when the Sanity forms alone felt the same | Click-to-edit is built next (S8), then validated with the admin |
 | N10 | Old addresses keep working when the domain moves | Assumed | Redirect list in HANDOFF |
 | N11 | Someone technical learns of a failed build | Assumed | Open question: who gets failure emails |
 
@@ -64,5 +64,5 @@ Status labels: **Stated** (the owner said it), **Relayed** (the owner reported t
 1. **Pages CMS trial (the first test).** Have her sign in on her own phone from the email invitation, add a teacher with a photo and both bios, and replace a program image. Watch, do not help. Where she hesitates is the finding.
 2. **Community level.** What should it show: weekly classes, parties, people, links? How often does that change?
 3. **Design details.** Which fonts does the Wix design use? Is left-aligned body text acceptable (the Wix site justifies it, which leaves wide gaps on a phone)?
-4. **Practicalities.** Where is the domain registered, when does the Wix plan renew, who should own the GitHub repository, who gets failure emails, may the repository be public?
+4. **Practicalities.** Where is the domain registered, when does the Wix plan renew, who should own the project/provider accounts, who gets failure emails, and what backup or dataset visibility is acceptable?
 5. **Visitors.** If Wix has visitor statistics, look at device split and top pages before they are lost.

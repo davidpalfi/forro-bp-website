@@ -1,9 +1,10 @@
 ---
 // The community home page. Deliberately almost empty for now: the same banner and frame
-// as the festival, a short intro if one is written, and the way down to the festival.
+// as the festival, the blocks from "Community home page" if any, and the way to the festival.
 import Base from '../../layouts/Base.astro';
 import Hero from '../../components/Hero.astro';
-import { getSite, getCommunity, getFestival, paragraphs, href } from '../../lib/content';
+import Blocks from '../../components/Blocks.astro';
+import { getSite, getCommunity, getFestival, href } from '../../lib/content';
 import { LANGS, UI, tr, type Lang } from '../../lib/i18n';
 
 export function getStaticPaths() {
@@ -14,20 +15,11 @@ const lang = Astro.params.lang as Lang;
 const site = getSite();
 const community = getCommunity();
 const festival = getFestival();
-const intro = paragraphs(tr(community, 'intro', lang));
 ---
 
 <Base lang={lang} section="community" pagePath="/">
   <Hero image={community.heroImage} title={tr(community, 'title', lang) || site.name} />
-  {
-    intro.length > 0 && (
-      <section class="band band--red intro">
-        {intro.map((p) => (
-          <p>{p}</p>
-        ))}
-      </section>
-    )
-  }
+  <Blocks blocks={community.homeBlocks} lang={lang} tone="red" />
   <section class="band band--red band--center">
     <p class="stats">{festival.name}</p>
     {tr(festival, 'dateLine', lang) && <p class="lead">{tr(festival, 'dateLine', lang)}</p>}

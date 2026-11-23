@@ -1,17 +1,23 @@
 ---
-// A photo from public/uploads, with web-sized versions when the build made them.
-import { getImage } from '../lib/content';
+// A photo: from Sanity's image service, or from public/uploads with web-sized versions.
+// `image` is whatever the content holds (a Sanity image or an /uploads/ path).
+// The editor's focus point keeps the important part visible when the photo is cropped.
+import { getImage, altOf, editAttr } from '../lib/content';
+import type { Lang } from '../lib/i18n';
 
 interface Props {
-  src?: string;
+  image?: unknown;
+  lang?: Lang;
+  /** Overrides the description stored with the photo. */
   alt?: string;
   sizes?: string;
   class?: string;
   eager?: boolean;
 }
 
-const { src, alt = '', sizes = '100vw', class: className, eager = false } = Astro.props;
-const img = getImage(src);
+const { image, lang, alt, sizes = '100vw', class: className, eager = false } = Astro.props;
+const img = getImage(image);
+const description = alt ?? (lang ? altOf(image, lang) : '');
 ---
 
 {
@@ -22,10 +28,12 @@ const img = getImage(src);
       sizes={img.srcset ? sizes : undefined}
       width={img.width}
       height={img.height}
-      alt={alt}
+      alt={description}
       class={className}
+      style={img.position ? `object-position: ${img.position}` : undefined}
       loading={eager ? 'eager' : 'lazy'}
       decoding="async"
+      data-sanity={editAttr(image)}
     />
   )
 }

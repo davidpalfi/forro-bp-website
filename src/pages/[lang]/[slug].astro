@@ -1,0 +1,18 @@
+---
+// Community pages made in the editor: /<language>/<address>/ ("festival" is taken).
+import PageView from '../../components/PageView.astro';
+import { getPages } from '../../lib/content';
+import { LANGS, type Lang } from '../../lib/i18n';
+
+export function getStaticPaths() {
+  return LANGS.flatMap((lang) => getPages('community').map((page) => ({ params: { lang, slug: page.slug } })));
+}
+
+// Looked up by address (not passed from getStaticPaths) so the click-to-edit preview,
+// which renders on each request, always shows the latest content.
+const lang = Astro.params.lang as Lang;
+const page = getPages('community').find((p) => p.slug === Astro.params.slug);
+if (!page) return new Response(null, { status: 404 });
+---
+
+<PageView page={page} lang={lang} />

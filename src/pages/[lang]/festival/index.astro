@@ -1,8 +1,10 @@
 ---
-// The festival home page: banner, intro, the counts line, buttons.
+// The festival home page: the banner from "Festival home page", then its blocks
+// (introduction, numbers line, buttons, ...), and the ticket link at the end.
 import Base from '../../../layouts/Base.astro';
 import Hero from '../../../components/Hero.astro';
-import { getFestival, getPages, paragraphs, safeUrl, href } from '../../../lib/content';
+import Blocks from '../../../components/Blocks.astro';
+import { getFestival, safeUrl } from '../../../lib/content';
 import { LANGS, UI, tr, type Lang } from '../../../lib/i18n';
 
 export function getStaticPaths() {
@@ -11,11 +13,12 @@ export function getStaticPaths() {
 
 const lang = Astro.params.lang as Lang;
 const festival = getFestival();
-const intro = paragraphs(tr(festival, 'intro', lang));
-const stats = tr(festival, 'stats', lang);
 const ticketUrl = safeUrl(festival.ticketUrl);
 const ticketLabel = tr(festival, 'ticketLabel', lang) || UI[lang].tickets;
-const buttons = (await getPages()).filter((p) => p.showOnHome);
+const blocks = [
+  ...festival.homeBlocks,
+  ...(ticketUrl ? [{ _type: 'ticketLink', url: ticketUrl, label: ticketLabel, alignment: 'center' }] : []),
+];
 ---
 
 <Base lang={lang} section="festival" pagePath="/festival/">
@@ -29,30 +32,5 @@ const buttons = (await getPages()).filter((p) => p.showOnHome);
     buttonLabel={ticketLabel}
     buttonNewTab
   />
-  {
-    intro.length > 0 && (
-      <section class="band band--red intro">
-        {intro.map((p) => (
-          <p>{p}</p>
-        ))}
-      </section>
-    )
-  }
-  <section class="band band--red band--center">
-    {stats && <p class="stats">{stats}</p>}
-    {
-      buttons.map((p) => (
-        <a class="button" href={href(lang, `/festival/${p.slug}/`)}>
-          {tr(p, 'title', lang)}
-        </a>
-      ))
-    }
-    {
-      ticketUrl && (
-        <a class="ticket-text" href={ticketUrl} target="_blank" rel="noopener">
-          {ticketLabel}
-        </a>
-      )
-    }
-  </section>
+  <Blocks blocks={blocks} lang={lang} tone="red" />
 </Base>

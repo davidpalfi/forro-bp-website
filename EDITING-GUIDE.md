@@ -1,5 +1,7 @@
 # How to update the website
 
+**This guide applies only to the Pages CMS proof of concept. It is superseded for the Sanity port.** See [`docs/EDITING-GUIDE.md`](docs/EDITING-GUIDE.md), which is a draft and is not ready to send to the admin.
+
 A short guide for the person who edits the site. You do not need any technical knowledge.
 
 **The basics:** you fill in forms and press save. A few minutes later the change is on the website. You cannot break the design, because the forms only change texts, photos and links.

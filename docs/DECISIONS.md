@@ -4,6 +4,101 @@ Read this before changing the structure of the site. When you change or add a de
 
 Last full revision: 2026-11-11, after a design review and a look at every page of the current Wix site. What changed in that revision is listed under "History" at the end.
 
+## Current port status (2026-11-18)
+
+This file's numbered decisions describe the original Pages CMS/GitHub Pages proof of concept. A Sanity port was proposed after Pages CMS was connected and found unintuitive. The direction is Sanity with an Astro visual-editing preview. On `feature/sanity` the Studio, the migration and the site's Sanity read path are built (S5 to S7); the content is imported and the Studio deployed (2026-11-18). Click-to-edit works as a local preview on the maintainer's computer (S9) and Dávid approved it (S8 outcome); polishing it, hosting it and the publish rebuild are next. Do not apply the old decisions below as instructions for the port without checking this status and the brief.
+
+| Area | Original PoC | Sanity port status |
+|---|---|---|
+| Content/editor | JSON in GitHub, Pages CMS forms | Sanity, Studio hosted by Sanity (S3); schemas refined (S5); content imported by Dávid 2026-11-18 (S7; photos need one re-import, S9) |
+| Public site | Static Astro on GitHub Pages | Static; built from Sanity documents, from Sanity or from the JSON files (S6); hosting not finalized |
+| Visual editing | None | Click-to-edit preview (S9), locked, online on Cloudflare (S11) |
+| Languages | English and Hungarian side by side, with fallback | **Confirmed 2026-11-16:** kept (S1 below) |
+| Page content | Fixed fields and Markdown/HTML JSON bodies | **Confirmed 2026-11-16:** full page builder (S2 below) |
+| Images | Local uploads resized at build time | **Confirmed 2026-11-16:** Sanity image service (S4 below) |
+| Publishing | GitHub Actions on pushes to `main` | Sanity publish should trigger a rebuild; mechanism/provider not implemented |
+
+The only hard account constraint confirmed in the port brief is no subscription. Re-check the current Sanity free plan and Cloudflare terms before launch; old provider assumptions below are historical. The source brief is [SANITY-PORT-BRIEF.md](../SANITY-PORT-BRIEF.md); current task inventory is [SANITY-PORT-STATUS.md](SANITY-PORT-STATUS.md).
+
+## Sanity port decisions (confirmed by Dávid, 2026-11-16)
+
+These are settled. Do not ask about them again; build to them. The initial Studio and schemas are implemented under `studio/`; Astro pages still use the existing JSON content. Each choice can be changed later if it does not work for the admin.
+
+### S1. Languages: English and Hungarian side by side in each entry
+One entry per person or page, with the English and Hungarian fields next to each other. Things that are the same in both languages (name, photo, links) are entered once. If one language is empty, the page shows the other. Considered: a separate entry per language (photos and links entered twice; the two drift apart). Dávid: "we change later if it's not good".
+
+### S2. Page content: a full page builder
+Chosen because the exact pages and layouts are not known yet, so the admin should have the most freedom a block system can give. This goes further than the brief's proposal (blocks on the home and text pages only).
+- The admin can **create new pages** herself and add them to the menu.
+- **Every page is a list of blocks** she adds, removes and reorders. Core set to start with: heading, text, image, gallery, button, banner, a row of columns, embedded video, divider, people grid.
+- **Teachers and artists stay reusable entries** (name, photo, bio, links). They are placed on a page with the people grid block, so a person is entered once and the cards stay consistent.
+- **Each block has a few style options** from the site's design, such as background colour (red, cream, dark) and alignment.
+
+Limits, stated to Dávid: her freedom is within the blocks that exist. There is no free drag-to-any-position as in Wix, and a new kind of block is a code change. Do not guess further blocks now; add them when the admin's drawings arrive.
+Considered: fixed fields everywhere (as in the PoC); blocks only on the home and text pages; blocks everywhere with no reusable people entries (cards would become inconsistent).
+This replaces decision 6 (fixed content types) for the port.
+
+### S3. Editor: Sanity Studio hosted by Sanity
+The admin opens an address at Sanity (`<name>.sanity.studio`). Why: free, nothing to maintain, the site stays simpler. Considered: Studio embedded in the site at `/admin` (ties the editor to the site's hosting and makes the site more complicated).
+
+### S4. Photos: Sanity's image service
+The admin uploads, crops and sets the focus point in the editor; Sanity resizes for phones and desktops; visitors load photos from Sanity's servers. Why: simpler, and better for her. Cost: photos depend on Sanity's free plan, which Dávid accepts as long as there is no subscription. Considered: downloading and resizing at build time so everything is served from our own host (more code, less cropping convenience); it can be switched to later without the admin noticing.
+This replaces decisions 9 (own resize step) and 10 (no third-party requests) for the port. Fonts stay self-hosted.
+
+### S5. Content model refinements (Claude, 2026-11-17, for Dávid to review)
+Made while mapping every JSON field to Sanity. Each keeps today's site and makes the editor simpler for the admin:
+- **Program, Teachers and Artists are ordinary pages** (`program`, `teachers`, `artists`) made of blocks, not built-in templates. The admin can edit, reorder or hide them like any page; nothing is reserved under `/festival/`. The People block shows everyone in its group when no one is picked, so a new teacher appears without touching the page.
+- **The two home pages hold their blocks themselves** (`homeBlocks` in Festival and Community home page), instead of pointing at a separate page document that must not be deleted. `programPage` and `homePage` references were removed.
+- **Pages have a colour (red, cream, dark), an optional big heading and an optional top photo**, which reproduce the old red pages (program, people) and cream text pages.
+- **Text blocks have a style (Normal, Large, Statement)** for the festival introduction and the numbers line. **Buttons link to a chosen page** (the label defaults to its name) or to an address. **Images** can be wide, text width or full width; **columns** can have a photo.
+- **Names are entered once** (community, festival, person), as S1 says for things the same in both languages. The phone banner photo was added to the festival.
+- **Video** embeds YouTube through youtube-nocookie.com and Vimeo with `dnt=1`, loaded only when the block is used. This is the one exception to "no third-party requests" besides Sanity's photos.
+Revisit when the admin has tried it.
+
+### S6. One rendering path; the JSON files become Sanity documents
+The site only knows Sanity documents. The JSON files are converted to the same documents (`src/lib/from-json.ts`) at build time, and the same conversion writes the import file. Why: the existing test suite (forgiving content, warnings, base paths) now tests the Sanity rendering and the migration mapping at once, and a test proves the import file and the JSON files give an identical site. `CONTENT_SOURCE` picks the source; it stays `json` by default until Sanity holds the imported content, then the build switches with one setting. Considered: a separate Sanity-only code path (two renderers to keep in step), and switching straight to Sanity (the site could not be built or tested before the import).
+Text that the old editor saved as Markdown is converted to Sanity rich text. An image written inside Markdown text is not a rich-text feature in Sanity; use an Image block.
+
+### S7. Migration by import file, run by Dávid
+`npm run sanity:import` imports with `--missing`: it only creates documents that are not in Sanity yet, so a repeat never overwrites the admin's work, and nothing is deleted. Ids are fixed and contain no dots (Sanity hides dotted ids from public reads). Why an import file and not a script with a write token: no token is needed anywhere but Dávid's own signed-in computer, and the file can be read before it is sent. `--replace` resets documents to the JSON content and is only for before the admin starts.
+
+### S8. Click-to-edit before hosting (Dávid, 2026-11-18)
+After seeing the Sanity editor, Dávid found it still "just forms", like Pages CMS. Gains so far (page builder, photo cropping, drafts and history, a tidier editor) do not answer the original complaint (USER-NEEDS N9). So click-to-edit is built next, first on his computer, before hosting or the publish rebuild: it is the cheapest test of whether Sanity solves the problem. If it does not feel clearly better, reconsider the editor before investing further. Click-to-edit is a computer workflow; on a phone she uses the forms.
+**Outcome (2026-11-18, evening):** Dávid tried it on his computer, clicked texts and photos, edited, and made a community page in the Studio unaided: "works pretty awesome". **Sanity stays.** He wants it polished as far as Sanity allows, then hosted for a live demo; the polish list (A-G) is at the top of `BACKLOG.md`.
+
+### S9. How click-to-edit is built (Claude, 2026-11-18, for Dávid to review)
+- **A separate preview mode, not a change to the public build.** `npm run preview:edit` runs Astro's dev server with `PREVIEW=1` on its own port, 4322 (Astro 7 otherwise reuses an already running `npm run dev` without telling); only then is `astro.config.mjs` switched to on-request rendering (`output: 'server'`), the `.env` file read and the editing script added. The public `npm run build` is byte-for-byte the same as before (compared on 2026-11-18) and `npm run check` [6] [7] proves it carries no script, click targets or markers. Locally no adapter is needed; a hosted preview will need one (`@astrojs/cloudflare` is installed).
+- **Fresh drafts on every request.** `src/middleware.ts` loads all documents with the `drafts` perspective (drafts over published) for each page request and hands them to `useDocuments()` in `content.ts`, which rebuilds the lists every helper reads. Pages are unchanged; the two page routes look their page up by address instead of taking it from `getStaticPaths`. The documents are swapped for the whole module, not per request: every request loads the complete set, so a request running alongside another can only see the same or newer content. About 20 documents load in well under a second.
+- **How a click finds its field.** Texts carry Sanity's invisible "stega" markers (`@sanity/client`, now a declared dependency, pinned to the 8.16.0 that was already installed). Only fields ending in `_en`/`_hu` (and their rich text) and names get markers; values the code compares or uses as addresses (tone, group, section, slug, links, e-mail) never do, or the site would break. Photos cannot carry markers, so in preview each photo object is noted with its document and field, and its `<img>` gets a `data-sanity` attribute. Markers survive the Markdown step of rich text (checked on the Location page).
+- **The editing script** is `@sanity/visual-editing`, bundled by Astro and served by the preview itself (no outside request), added by a small integration in `astro.config.mjs` that exists only in preview. Putting it in `Base.astro`, even behind a condition, made the public build bundle it into `dist/_astro`, so it was moved out.
+- **After an edit the page updates without reloading** (since 2026-11-18, S11; at first it reloaded): `refresh` in `src/lib/preview-client.ts` fetches the page again and swaps its content.
+- **Access.** Locked with Sanity's preview secret since 2026-11-18 (S11): drafts only for a browser that opened the preview from the signed-in Studio; otherwise published content only.
+- **Studio:** a second tool, "Edit on the page" (Presentation), next to "Content", which stays first so a deployed Studio opens on the familiar lists. Its address comes from `SANITY_STUDIO_PREVIEW_URL` (default `http://localhost:4322`). Until the preview is hosted, use the local Studio (`npm run studio`, `http://localhost:3333`, already allowed by the project's CORS settings); deploying this Studio now would give the admin a tab that cannot load.
+- **Photo import fix.** The first import (2026-11-18) stored every photo as a photo within a photo: the import file put the upload marker inside `asset` instead of on the photo. `make-sanity-import.mjs` is fixed and checked ([5]); the site still shows the old shape, with a `[content-warning]`. `npm run sanity:import-replace` re-imports the 20 documents with the fixed file. On 2026-11-18 no published document had been changed since the import, so nothing is lost; drafts are not touched.
+
+### S10. Sanity plan and the admin's role (Dávid, 2026-11-18)
+Stay on Sanity's **Free plan**. The admin gets the **Administrator** role; Dávid stays Administrator too, so either can recover access. Why: on Free the only roles are Administrator and Viewer (no Editor; Editor starts on Growth at about $15 per seat per month), and she is the owner of the site, so full rights are right for her. Mistakes are undone with Sanity's document history. Considered: Growth for an Editor-only role (a subscription, against the no-subscription constraint). Later: possibly move ownership/billing of the Sanity organization to her.
+Source: web search of sanity.io/pricing and the roles docs on 2026-11-18 (Free: 20 seats, Viewers do not use a seat, roles Administrator and Viewer; custom roles Enterprise only). Confirmed the same day from Dávid's screenshot of the organization's plan page: Free is "up to 20 user seats, 2 permission roles, 2 datasets (public only), live previews and visual editing tools", and the organization is on a Growth trial that downgrades to Free automatically (no charge; the end date is not shown). So build only on what Free offers: Administrator and Viewer roles, a public dataset (published content is readable by anyone, drafts are not; no private details in content), and check that the publish webhook works on Free.
+
+### S11. Hosting the preview and the test site; the preview lock (Claude, 2026-11-18; lock and polish A chosen by Dávid)
+- **Both on Cloudflare Workers, free plan**, built by Cloudflare's Workers Builds from `feature/sanity`: `forro-budapest-preview` (`wrangler.jsonc`, `npm run preview:build`, the `@astrojs/cloudflare` 14.4.8 adapter, on-request rendering) and `forro-bp-website` (`wrangler.site.jsonc`, the normal static build with `CONTENT_SOURCE=sanity`, files only). Setup steps for Dávid: `HOSTING.md`. Why Workers and not Pages: the installed adapter supports only Workers; one product for both keeps the dashboard simple; Workers Builds has deploy hooks (since 2026-04). Free plan, checked by web search 2026-11-18: 3,000 build minutes a month, 1 build at a time, 100,000 requests a day. Considered: Cloudflare Pages for the test site (works too, but a second product); GitHub Pages for the test site (no deploy hook a Sanity webhook can call without a token).
+- **The public build is unchanged** (byte-for-byte compared 2026-11-18). The adapter is loaded only for the hosted preview (`astro.config.mjs`, `hosted`); `npm run preview:edit` still runs on Node on Dávid's computer.
+- **No file reads in the preview**: content comes only from Sanity (the JSON files and `from-json.ts` are imported only by a build that uses them), photos from `/uploads/` are linked as they are. Settings come from Cloudflare at run time: `SANITY_VIEWER_TOKEN` (secret), `SANITY_STUDIO_URL` (in `wrangler.jsonc`); `PREVIEW` is written into the code at build time.
+- **One content set per request.** On Cloudflare one Worker serves several requests at once, and with the lock some see drafts and some do not, so the module-wide swap of S9 was not safe any more: each request now renders inside `withDocuments()` (AsyncLocalStorage) with its own documents, and the page is rendered completely before it is sent. Tested with 16 mixed requests at once (`npm run check` [8]).
+- **The preview lock** (`src/lib/preview-lock.ts`, Dávid chose it 2026-11-18): the Studio's Presentation tool opens `/preview/enable/` with a one-hour secret it stores in the dataset; the preview checks it with Sanity (`@sanity/preview-url-secret` 4.1.5, with the Viewer token) and sets a cookie signed with a key derived from the token, valid 12 hours, `HttpOnly; SameSite=None; Secure; Partitioned` (Safari 18.4+ drops cross-site cookies in frames without `Partitioned`, per Sanity's draft-mode guide). Without a valid cookie the preview asks Sanity only for published content (no token used) and shows a strip saying drafts are hidden. Considered: Cloudflare Access (another login for the admin, against priority 1); a secret in the address (leaks when copied). Risk: a browser that blocks even partitioned cookies sees no drafts in the frame; workaround "Open preview" in a new tab (`HOSTING.md`).
+- **Polish A, no reload** (Dávid chose to do it before the review): after a save the page is fetched in the background and the content of `<body>` swapped, keeping Sanity's overlay element and the scroll position; the menu script is run again; any error falls back to a reload. Not letter by letter (Sanity saves after a pause).
+- **Studio**: `previewMode.enable` set; the deployed Studio gets the preview's address from `studio/.env.production`, and `npm run studio:deploy` refuses to deploy without an `https://` address there (`scripts/studio-deploy-check.mjs`), so the admin can never get a tab pointing at `localhost`.
+- **Verified 2026-11-23 by Dávid on the real setup:** Workers Builds, the Publish rebuild through the Sanity webhook (tested during Sanity's Growth trial; webhooks are not among the Growth features the trial lists, so they are expected to work on Free; publish one test change after the trial ends (around 2026-12-18) to confirm), and the lock in Safari (drafts inside the Studio, the strip outside).
+- **Originally not verified** (cloud sessions cannot reach Sanity or Cloudflare): the real Presentation handshake, the cookie inside the Studio's frame in Safari, Workers Builds and the deploy hook, and whether the Sanity webhook is available on Free. Tested instead with a stand-in for Sanity in Cloudflare's local runtime (`scripts/check-preview.mjs`).
+
+### S12. Sanity is the site; `main` carries it (Dávid, 2026-11-23)
+Dávid committed to Sanity: `feature/sanity` was merged into `main`, which is now the branch both Cloudflare Workers build. The Pages CMS proof of concept is retired: its GitHub Pages workflow (`deploy.yml`, `scripts/ci-build.mjs`) and forms (`.pages.yml`) were removed, and its last state is kept as the Git tag `pages-cms-poc` (release "Pages CMS proof of concept"). Why: Sanity's editor and click-to-edit fit the admin far better than Pages CMS did (priority 1), and one main branch is simpler. The JSON files in `src/content` stay as the import source and test content. Supersedes decisions 3, 13 and 14 for the live setup.
+
+### Still open for the port
+- Whether Cloudflare also hosts the real public site at launch (the test site is there, S11).
+- The invited-editor sign-in. The publish webhook after the trial ends: webhooks are not among the Growth features the trial lists, so they are expected to work on Free; publish one test change after the trial ends (around 2026-12-18) to confirm.
+- The admin's own trial of the editor; click-to-edit is expected to be a desktop workflow.
+
 ## Context and priorities
 
 The Forró Budapest community wants one website. Today it has only a festival site on Wix (forrobudapest.com, Budapest Forró Festival). The plan:
@@ -100,7 +195,7 @@ A text page is one JSON file with `body_en` and `body_hu`. The body is rendered 
 Why: both languages must live in one entry (decision 5), which a Markdown file with a single body cannot do. And it is not yet known whether the Pages CMS rich-text field saves Markdown or HTML; this works with either.
 
 ### 18. Documentation
-`EDITING-GUIDE.md` is for the admin. `CLAUDE.md` holds the rules for a Claude session working for the maintainer. `README.md` covers setup and deployment. `docs/` explains the design. The Claude project holds copies of `docs/`; the repository is the source of truth.
+For the original PoC, root `EDITING-GUIDE.md` was the admin guide. It now applies only to Pages CMS; `docs/EDITING-GUIDE.md` is the provisional Sanity guide. `CLAUDE.md` holds maintainer-session rules, `README.md` covers setup and deployment, and `docs/` is the repository's design and handoff record.
 
 ## Assumptions not yet verified
 
@@ -134,6 +229,22 @@ See `HANDOFF.md`, "Status", for the current test record. In short: the build, th
 - Who receives build-failure emails.
 
 ## History
+
+**2026-11-18, late evening: ready to go online.** Preview on Cloudflare with the preview lock, test site rebuilt on Publish, no reload after an edit (S11). Waiting for Dávid to create the two Workers (`HOSTING.md`).
+
+**2026-11-18, evening: click-to-edit approved; polish next.** Dávid ran the photo repair (`npm run sanity:import-replace`; all photos now stored correctly) and tried click-to-edit with drafts: approved (S8 outcome). Next: polish A-G, then a hosted preview for a demo (`BACKLOG.md`). He also asked for Events, Contact and About Us on the community level (backlog item 26).
+
+**2026-11-18, click-to-edit built (local).** Preview mode, Studio "Edit on the page", photo click targets, checks that public builds carry none of it (S9). Found and fixed the photo shape of the import file. Confirmed against the real project: content imported (20 documents, 6 photos), Studio deployed, dataset readable without a token, `CONTENT_SOURCE=sanity npm run build` passes. Waiting for Dávid's verdict on click-to-edit (S8).
+
+**2026-11-18, click-to-edit first.** Dávid's review of the editor; S8. Backlog reordered.
+
+**2026-11-17, proof of concept on Sanity.** Schemas refined (S5); the site renders Sanity documents and the JSON files are converted to them (S6); import file and command (S7); `npm run check` gained a schema check and two sections for the import file and Sanity-shaped content; admin guide written (`docs/EDITING-GUIDE.md`). Not run against the real Sanity project: this session had no network access to Sanity.
+
+**2026-11-16, Sanity port choices confirmed.** Dávid confirmed four choices: languages side by side, a full page builder (more freedom than the brief proposed), Studio hosted by Sanity, photos from Sanity's image service. See "Sanity port decisions" above.
+
+**2026-11-17, Stage 1 Studio and schemas.** Added a Sanity-hosted Studio for project `8hc671sk` / dataset `production`, with side-by-side English/Hungarian fields, singleton site/community/festival settings, reusable people, pages with the agreed block types, and Sanity image fields with hotspot cropping. The work uses standard Studio features and the pinned Sanity packages. It does not change Astro page rendering, migration, preview, or publishing workflows.
+
+**2026-11-15, Sanity port proposed.** Pages CMS was connected to the live proof of concept and found unintuitive for the admin. Sanity with click-to-edit was selected for exploration. This changes the direction of decisions 1, 3, 6, 9, 10, 13 and 17, but the detailed choices remain subject to owner confirmation. See the current port status above and `SANITY-PORT-STATUS.md`. No port implementation was present at this checkpoint.
 
 **2026-11-11, first prototype (built by another Claude session).** A generic festival site: English only, events as structured data with client-side hiding of past events, events linked to people by file path, a "links" collection, system fonts, a placeholder design, and a deployment that ran the whole test suite before every publish and blocked on warnings.
 
