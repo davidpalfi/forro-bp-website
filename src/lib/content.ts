@@ -520,6 +520,23 @@ export function getImage(image: unknown): ResolvedImage | undefined {
   return undefined;
 }
 
+/**
+ * A photo as a browser-tab icon: a PNG (Safari shows no WebP tab icons), at most 192 px for a
+ * Sanity upload, the original file for a /uploads/ path. Nothing when the photo is missing.
+ */
+export function getIconUrl(image: unknown): string | undefined {
+  const resolved = getImage(image);
+  if (!resolved) return undefined;
+  const o = asObj(image);
+  const asset = asObj(o.asset);
+  const ref = typeof asset._ref === 'string' ? o : typeof asObj(asset.asset)._ref === 'string' ? { ...asset, ...o, asset: asset.asset } : undefined;
+  if (ref) return sanityImages.image(ref as never).width(192).height(192).fit('max').format('png').url();
+  const pending = /^image@file:\/\/\.\/images\/(.+)$/.exec(str(o._sanityAsset));
+  const local = typeof image === 'string' ? image : typeof o._upload === 'string' ? o._upload : pending ? `/uploads/${pending[1]}` : '';
+  if (local && !/^https?:\/\//i.test(local)) return withBase('/' + local.replace(/^\/+/, ''));
+  return resolved.src;
+}
+
 /* ---------- Videos ---------- */
 
 const VIDEO_TYPES: Record<string, string> = { mp4: 'video/mp4', webm: 'video/webm', m4v: 'video/mp4' };

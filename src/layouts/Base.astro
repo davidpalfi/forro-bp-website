@@ -11,7 +11,7 @@ import '@fontsource-variable/inter/index.css';
 import '@fontsource-variable/manrope/index.css';
 import '@fontsource-variable/bricolage-grotesque/index.css';
 import '../styles/global.css';
-import { getSite, getPalette, getFontCss, knownColour, getFestival, getCommunity, getPages, getFestivalMenuLink, getImage, safeUrl, href, trFirst, editAttr, withBase } from '../lib/content';
+import { getSite, getPalette, getFontCss, knownColour, getFestival, getCommunity, getPages, getFestivalMenuLink, getImage, getIconUrl, safeUrl, href, trFirst, editAttr, withBase } from '../lib/content';
 import { LANGS, LANG_LABEL, LANG_NAME, UI, tr, type Lang } from '../lib/i18n';
 
 interface Props {
@@ -88,12 +88,11 @@ const headerLogoField = inFestival
     : festival.logo
   : communityLogoField;
 const logo = getImage(headerLogoField);
-// The browser-tab icon, in its smallest size: the section's own tab icon, else on festival pages
+// The browser-tab icon, as a PNG: the section's own tab icon, else on festival pages
 // the big banner logo (then the small one), on community pages the community logo.
-const tabIconImg = inFestival
-  ? getImage(festival.tabIcon) || getImage(festival.logo) || getImage(festival.headerLogo)
-  : getImage(community.tabIcon) || footerLogo;
-const tabIcon = tabIconImg && (tabIconImg.srcset ? tabIconImg.srcset.split(', ')[0].split(' ')[0] : tabIconImg.src);
+const tabIcon = inFestival
+  ? getIconUrl(festival.tabIcon) || getIconUrl(festival.logo) || getIconUrl(festival.headerLogo)
+  : getIconUrl(community.tabIcon) || getIconUrl(communityLogoField);
 const ticketUrl = inFestival ? safeUrl(festival.ticketUrl) : '';
 const headerDate = inFestival ? tr(festival, 'dateLine', lang) : '';
 const instagram = safeUrl((inFestival && festival.instagram) || site.instagram || festival.instagram);

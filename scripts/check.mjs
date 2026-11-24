@@ -409,7 +409,7 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
       const home = read(dir, 'en/festival/index.html');
       const brand = /<img[^>]*class="brand-logo"[^>]*>/.exec(home)?.[0] ?? '';
       check(brand.includes('b'.repeat(40)) && home.includes('a'.repeat(40)) && !brand.includes('a'.repeat(40)), 'the top bar shows the small logo and the banner the big one');
-      check(/<link rel="icon" href="[^"]*d{40}/.test(home) && /<link rel="icon" href="[^"]*forro-budapest-logo/.test(read(dir, 'en/index.html')), 'the festival tab icon is its own upload; the community one falls back to the community logo');
+      check(/<link rel="icon" href="[^"]*d{40}[^"]*fm=png/.test(home) && read(dir, 'en/index.html').includes('<link rel="icon" href="/uploads/forro-budapest-logo.png">'), 'the festival tab icon is its own upload; the community one falls back to the community logo; both as PNG');
       const video = /<video[^>]*class="hero-video"[^>]*>/.exec(home)?.[0] ?? '';
       check(video.includes(`data-hero-video="https://cdn.sanity.io/files/8hc671sk/production/${'c'.repeat(40)}.mp4"`) && video.includes('data-type="video/mp4"') && video.includes('preload="none"') && video.includes('muted') && !/\s(?:src|autoplay)=?/.test(video) && home.includes('class="hero-photo"') && home.includes('video[data-hero-video]'), 'the banner video is in the banner over the photo, loaded only by the script (so phones never download it)');
       check(!read(dir, 'en/festival/program/index.html').includes('<video'), 'the banner video is only on the festival home');
