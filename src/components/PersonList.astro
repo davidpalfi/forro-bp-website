@@ -7,19 +7,21 @@ import { UI, tr, type Lang } from '../lib/i18n';
 interface Props {
   people: Person[];
   lang: Lang;
+  /** Click-to-edit targets of the cards, in the same order (preview only, chosen people). */
+  edits?: (string | undefined)[];
 }
 
-const { people, lang } = Astro.props;
+const { people, lang, edits = [] } = Astro.props;
 ---
 
 <ul class="people">
   {
-    people.map((p) => {
+    people.map((p, i) => {
       const role = tr(p, 'role', lang);
       const bio = paragraphs(tr(p, 'bio', lang));
       const ig = safeUrl(p.instagram);
       return (
-        <li class="person">
+        <li class="person" data-sanity={edits[i]}>
           {p.photo && <Picture image={p.photo} lang={lang} class="person-photo" sizes="(min-width: 860px) 460px, 100vw" />}
           <div class="person-text">
             {role && <p class="person-role">{role}</p>}

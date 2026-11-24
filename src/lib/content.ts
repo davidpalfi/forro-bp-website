@@ -36,8 +36,8 @@ const loaded = isPreview() ? { source: 'sanity' as const, docs: [] } : await loa
 export const contentSource = loaded.source;
 
 /** The documents being shown, and the lists made from them (see useDocuments at the end). */
-type State = { byId: Map<string, Obj>; people: Person[]; pages: Page[]; menuLinks: MenuLink[]; photoTargets: WeakMap<object, string> };
-const emptyState = (): State => ({ byId: new Map(), people: [], pages: [], menuLinks: [], photoTargets: new WeakMap() });
+type State = { byId: Map<string, Obj>; people: Person[]; pages: Page[]; menuLinks: MenuLink[]; editTargets: WeakMap<object, string> };
+const emptyState = (): State => ({ byId: new Map(), people: [], pages: [], menuLinks: [], editTargets: new WeakMap() });
 let shared: State = emptyState();
 // In the preview each request renders with its own documents, so two requests running at the
 // same time (one with drafts, one without) can never see each other's content.
@@ -561,31 +561,50 @@ export function getVideo(file: unknown): { src: string; type: string } | undefin
   return { src: `https://cdn.sanity.io/files/${SANITY.projectId}/${SANITY.dataset}/${m[1]}.${m[2]}`, type };
 }
 
-/* ---------- Click-to-edit targets for photos (preview only) ---------- */
+/* ---------- Click-to-edit targets for photos and list items (preview only) ---------- */
 
-// Texts carry invisible markers that say which field they come from; photos cannot, so in
-// the preview every photo object is noted with its document and field, and the <img> gets a
-// data-sanity attribute. Public builds note nothing and print no attribute.
-function notePhotos(doc: Obj, photoTargets: WeakMap<object, string>) {
+// Texts carry invisible markers that say which field they come from; photos and the items of a
+// list (blocks, gallery photos, columns, chosen people) cannot, so in the preview each of them
+// is noted with its document and path, and its element gets a data-sanity attribute. A click
+// on it opens it in the Studio; elements of items of the same list can be dragged into a new
+// order (Sanity's editing script saves the new order). Public builds note nothing and print
+// no attribute.
+function noteTargets(doc: Obj, targets: WeakMap<object, string>) {
   const edit = createDataAttribute({ id: String(doc._id), type: String(doc._type), baseUrl: STUDIO_URL });
   const walk = (value: unknown, path: (string | { _key: string })[]) => {
     if (Array.isArray(value)) {
       // Items without a key cannot be addressed reliably, so they get no click target.
       for (const item of value) {
         const key = item && typeof item === 'object' ? (item as Obj)._key : undefined;
-        if (typeof key === 'string') walk(item, [...path, { _key: key }]);
+        if (typeof key !== 'string') continue;
+        targets.set(item as object, edit([...path, { _key: key }] as never).toString());
+        walk(item, [...path, { _key: key }]);
       }
     } else if (value && typeof value === 'object') {
       const o = value as Obj;
-      if (path.length && o.asset && typeof o.asset === 'object') photoTargets.set(o, edit(path as never).toString());
+      if (path.length && o.asset && typeof o.asset === 'object') targets.set(o, edit(path as never).toString());
       for (const [k, v] of Object.entries(o)) if (!k.startsWith('_') && k !== 'asset') walk(v, [...path, k]);
     }
   };
   walk(doc, []);
 }
 
-/** The data-sanity attribute that makes a photo clickable in the preview; nothing otherwise. */
-export const editAttr = (image: unknown) => (image && typeof image === 'object' ? S().photoTargets.get(image) : undefined);
+/**
+ * The data-sanity attribute that makes a photo or a list item (a block, a column, a chosen
+ * person) clickable, and list items draggable, in the preview; nothing otherwise.
+ */
+export const editAttr = (value: unknown) => (value && typeof value === 'object' ? S().editTargets.get(value) : undefined);
+
+/**
+ * For a People block with chosen people: the click target of each card, in the order of
+ * peopleForBlock, so the cards can be dragged into a new order. Nothing when the block shows a
+ * whole group (its order comes from each person's Display order).
+ */
+export function peopleEditAttrs(block: Obj, people: Person[]) {
+  const refs = list(block.people);
+  if (!refs.some((r) => people.some((p) => p.id === r._ref))) return [];
+  return people.map((p) => editAttr(refs.find((r) => r._ref === p.id)));
+}
 
 /** The description of a photo for screen readers, in the visitor's language. */
 export const altOf = (image: unknown, lang: Lang) => tr(asObj(image), 'alt', lang);
@@ -628,7 +647,7 @@ export function videoEmbed(url: unknown) {
 function makeState(docs: unknown[]): State {
   const st = emptyState();
   for (const d of docs) if (d && typeof d === 'object' && typeof (d as Obj)._id === 'string') st.byId.set((d as Obj)._id as string, d as Obj);
-  if (isPreview()) for (const d of st.byId.values()) notePhotos(d, st.photoTargets);
+  if (isPreview()) for (const d of st.byId.values()) noteTargets(d, st.editTargets);
   st.people = makePeople(st.byId);
   st.pages = makePages(st.byId);
   st.menuLinks = makeMenuLinks(st.byId);

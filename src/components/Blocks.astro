@@ -11,6 +11,8 @@ import {
   trRich,
   blockLink,
   peopleForBlock,
+  peopleEditAttrs,
+  editAttr,
   calendarMonths,
   monthName,
   videoEmbed,
@@ -53,6 +55,12 @@ const widthOf = (b: Block | undefined) => {
   return 'b-text';
 };
 const images = (b: Block) => (Array.isArray(b.images) ? (b.images as unknown[]).filter((i) => getImage(i)) : []);
+// Click-to-edit (preview only, nothing in public builds): each block's outer element carries the
+// block's place in the page's list, so a click on its edge opens the whole block (with its Style
+// tab) and blocks can be dragged into a new order on the page. Where a photo fills the block, the
+// photo carries it instead. Texts directly in such an element get their own <span>, so the block
+// and the text stay two separate targets.
+const edit = (b: Block) => editAttr(b);
 const link = (b: Block) => {
   const l = blockLink(b, lang);
   return { ...l, label: tr(b, 'label', lang) || l.label };
@@ -76,13 +84,13 @@ const link = (b: Block) => {
             case 'textBlock': {
               const value = trRich(b, 'body', lang);
               if (!value) return null;
-              if (look(b) === 'statement') return <p class="b-text b-statement stats">{richPlain(value)}</p>;
-              return <div class:list={['b-text', 'prose', look(b) === 'large' && 'b-large intro']} set:html={renderRich(value, lang)} />;
+              if (look(b) === 'statement') return <p class="b-text b-statement stats" data-sanity={edit(b)}>{edit(b) ? <span>{richPlain(value)}</span> : richPlain(value)}</p>;
+              return <div class:list={['b-text', 'prose', look(b) === 'large' && 'b-large intro']} data-sanity={edit(b)} set:html={renderRich(value, lang)} />;
             }
             case 'headingBlock': {
               const t = tr(b, 'heading', lang);
               const Tag = headingTag(b);
-              return t ? <Tag class:list={[widthOf(g.blocks[bi + 1]), 'b-heading', `b-heading--${Tag}`]}>{t}</Tag> : null;
+              return t ? <Tag class:list={[widthOf(g.blocks[bi + 1]), 'b-heading', `b-heading--${Tag}`]} data-sanity={edit(b)}>{edit(b) ? <span>{t}</span> : t}</Tag> : null;
             }
             case 'imageBlock': {
               const img = getImage(b.image);
@@ -92,7 +100,7 @@ const link = (b: Block) => {
               return (
                 <figure class:list={['b-image', imageWidth(b)]}>
                   <a class="gallery-open image-open" href={img.src} data-srcset={img.srcset} data-phone-src={phone?.src} data-phone-srcset={phone?.srcset}>
-                    <Picture image={b.image} phone={b.imagePhone} lang={lang} class="b-image-photo" sizes={b.width === 'text' ? '(min-width: 760px) 704px, 100vw' : '(min-width: 1200px) 1150px, 100vw'} />
+                    <Picture image={b.image} phone={b.imagePhone} lang={lang} edit={edit(b)} class="b-image-photo" sizes={b.width === 'text' ? '(min-width: 760px) 704px, 100vw' : '(min-width: 1200px) 1150px, 100vw'} />
                   </a>
                   {caption && <figcaption>{caption}</figcaption>}
                 </figure>
@@ -103,7 +111,7 @@ const link = (b: Block) => {
               if (list.length === 0) return null;
               const caption = tr(b, 'caption', lang);
               return (
-                <figure class="b-wide b-gallery">
+                <figure class="b-wide b-gallery" data-sanity={edit(b)}>
                   <ul class:list={['gallery', b.layout === 'mosaic' && 'gallery--mosaic']}>
                     {list.map((i, n) => {
                       const big = getImage(i);
@@ -125,7 +133,7 @@ const link = (b: Block) => {
               const l = link(b);
               if (!l.url || !l.label) return null;
               return (
-                <p class="b-text b-button">
+                <p class="b-text b-button" data-sanity={edit(b)}>
                   <a class="button" href={l.url} target={l.external ? '_blank' : undefined} rel={l.external ? 'noopener' : undefined}>
                     {l.label}
                   </a>
@@ -138,8 +146,8 @@ const link = (b: Block) => {
               const body = renderRich(trRich(b, 'body', lang), lang);
               const l = link(b);
               return (
-                <div class:list={['b-wide', 'b-banner', !photo && 'b-banner--plain']}>
-                  {photo && <Picture image={b.image} lang={lang} class="b-banner-photo" sizes="(min-width: 1100px) 1088px, 100vw" />}
+                <div class:list={['b-wide', 'b-banner', !photo && 'b-banner--plain']} data-sanity={photo ? undefined : edit(b)}>
+                  {photo && <Picture image={b.image} lang={lang} edit={edit(b)} class="b-banner-photo" sizes="(min-width: 1100px) 1088px, 100vw" />}
                   <div class="b-banner-inner">
                     {title && <h2 class="b-banner-title">{title}</h2>}
                     {body && <div class="prose" set:html={body} />}
@@ -156,12 +164,12 @@ const link = (b: Block) => {
               const cols = Array.isArray(b.columns) ? (b.columns as Record<string, unknown>[]) : [];
               if (cols.length === 0) return null;
               return (
-                <div class="b-wide b-columns" style={`--cols: ${Math.min(Math.max(cols.length, 1), 4)}`}>
+                <div class="b-wide b-columns" style={`--cols: ${Math.min(Math.max(cols.length, 1), 4)}`} data-sanity={edit(b)}>
                   {cols.map((c) => {
                     const h = tr(c, 'heading', lang);
                     const body = renderRich(trRich(c, 'body', lang), lang);
                     return (
-                      <div class="b-column">
+                      <div class="b-column" data-sanity={editAttr(c)}>
                         {c.image ? <Picture image={c.image} lang={lang} class="b-column-photo" sizes="(min-width: 900px) 30vw, 100vw" /> : null}
                         {h && <h3 class="b-heading b-heading--h3">{h}</h3>}
                         {body && <div class="prose" set:html={body} />}
@@ -179,7 +187,7 @@ const link = (b: Block) => {
                 return null;
               }
               return (
-                <figure class="b-wide b-video">
+                <figure class="b-wide b-video" data-sanity={edit(b)}>
                   <div class="b-video-frame">
                     <iframe src={embed} title={caption || 'Video'} loading="lazy" allow="fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" />
                   </div>
@@ -188,12 +196,12 @@ const link = (b: Block) => {
               );
             }
             case 'dividerBlock':
-              return b.style === 'space' ? <div class="b-space" aria-hidden="true" /> : <hr class="b-text b-divider" />;
+              return b.style === 'space' ? <div class="b-space" aria-hidden="true" data-sanity={edit(b)} /> : <hr class="b-text b-divider" data-sanity={edit(b)} />;
             case 'peopleGridBlock': {
               const people = peopleForBlock(b);
               return people.length ? (
-                <div class="b-people">
-                  <PersonList people={people} lang={lang} />
+                <div class="b-people" data-sanity={edit(b)}>
+                  <PersonList people={people} lang={lang} edits={peopleEditAttrs(b, people)} />
                 </div>
               ) : null;
             }
@@ -204,7 +212,7 @@ const link = (b: Block) => {
               const months = calendarMonths(b);
               const arrow = (d: string) => <svg viewBox="0 0 24 24" aria-hidden="true"><path d={d} fill="none" stroke="currentColor" stroke-width="2" /></svg>;
               return (
-                <div class="b-wide b-calendar" data-calendar>
+                <div class="b-wide b-calendar" data-calendar data-sanity={edit(b)}>
                   <p class="cal-empty" data-cal-empty hidden={months.length > 0}>{UI[lang].noEvents}</p>
                   <div class="cal-nav" data-cal-nav hidden>
                     <button type="button" class="cal-arrow" data-cal-step="-1" aria-label={UI[lang].prevMonth}>{arrow('M15 4l-8 8 8 8')}</button>

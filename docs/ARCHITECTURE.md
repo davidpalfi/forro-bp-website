@@ -36,7 +36,9 @@ the preview: PREVIEW=1, output 'server'             astro.config.mjs; injects pr
    |                            -> loadPreviewDocuments() -> withDocuments(docs, render the page)
    +- src/lib/source.ts         client, Viewer token (drafts only), stega markers (filter)
    +- src/lib/content.ts        same helpers; per-request documents (AsyncLocalStorage);
-   |                            photos noted -> editAttr() -> data-sanity on <img>
+   |                            photos and list items (blocks, gallery photos, columns,
+   |                            chosen people) noted -> editAttr() -> data-sanity on their
+   |                            element (Blocks.astro, Picture.astro, PersonList.astro)
    +- src/lib/preview-client.ts @sanity/visual-editing: outlines, clicks; after an edit fetches
                                 the page again and swaps <body> content (no reload)
 ```

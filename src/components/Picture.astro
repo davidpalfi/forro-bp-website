@@ -16,9 +16,12 @@ interface Props {
   sizes?: string;
   class?: string;
   eager?: boolean;
+  /** Click-to-edit target to use instead of the photo's own (preview only), e.g. its whole block. */
+  edit?: string;
 }
 
-const { image, phone, lang, alt, sizes = '100vw', class: className, eager = false } = Astro.props;
+const { image, phone, lang, alt, sizes = '100vw', class: className, eager = false, edit } = Astro.props;
+const target = edit ?? editAttr(image);
 const img = getImage(image);
 const small = img ? getImage(phone) : undefined;
 const description = alt ?? (lang ? altOf(image, lang) : '');
@@ -39,7 +42,7 @@ const description = alt ?? (lang ? altOf(image, lang) : '');
         style={img.position ? `object-position: ${img.position}` : undefined}
         loading={eager ? 'eager' : 'lazy'}
         decoding="async"
-        data-sanity={editAttr(image)}
+        data-sanity={target}
       />
     </picture>
   )
@@ -57,7 +60,7 @@ const description = alt ?? (lang ? altOf(image, lang) : '');
       style={img.position ? `object-position: ${img.position}` : undefined}
       loading={eager ? 'eager' : 'lazy'}
       decoding="async"
-      data-sanity={editAttr(image)}
+      data-sanity={target}
     />
   )
 }

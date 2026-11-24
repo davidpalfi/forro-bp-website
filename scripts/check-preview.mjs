@@ -103,6 +103,26 @@ try {
   const editScript = (unlocked.html.match(/src="(\/_astro\/[^"]+\.js)"/) || [])[1];
   check(Boolean(editScript), 'the click-to-edit script is on preview pages');
 
+  // Click targets on blocks and list items (clicking a block's edge opens it; items of one list
+  // can be dragged into a new order). Each item is marked once, or dragging would get confused.
+  const paths = (html) =>
+    [...html.matchAll(/data-sanity="([^"]*)"/g)].map((m) => (/path=([^;]*)/.exec(m[1]) || [])[1] || '');
+  const every = paths((await page('/en/festival/everything/')).html);
+  const item = (p) => `:${p}`;
+  const shown = ['b01', 'b02', 'b03', 'b03h', 'b04', 'b05', 'b07', 'b08', 'b09', 'b11', 'b12', 'b13', 'b14'];
+  const blockPaths = every.filter((p) => /^blocks:[^.]+$/.test(p));
+  check(
+    shown.every((k) => blockPaths.includes(`blocks${item(k)}`)) && blockPaths.length === shown.length,
+    `every block shown has a click target, and only those${blockPaths.length !== shown.length ? ` (found ${blockPaths.length}: ${blockPaths.join(' ')})` : ''}`,
+  );
+  check(new Set(blockPaths).size === blockPaths.length, 'each block is marked only once');
+  const inBlock = (b, field, keys) => keys.every((k) => every.includes(`blocks${item(b)}.${field}${item(k)}`));
+  check(inBlock('b04', 'images', ['g1', 'g2']), 'gallery photos can be dragged within their gallery');
+  check(inBlock('b08', 'columns', ['c1', 'c2', 'c3']), 'columns can be dragged within their block');
+  check(inBlock('b13', 'people', ['p1', 'p2']), 'chosen people can be dragged within their People block');
+  const home = paths(locked.html);
+  check(home.some((p) => /^homeBlocks:[^.]+$/.test(p)), 'the blocks of the festival home page have click targets too');
+
   // In a browser: an edit shows up without reloading the page.
   let playwright;
   try {

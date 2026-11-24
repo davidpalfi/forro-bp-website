@@ -1,8 +1,9 @@
 // Click-to-edit in the Studio's Presentation view. Added to every page only in the preview
 // (PREVIEW=1, by the "click-to-edit" integration in astro.config.mjs); public builds never
 // include or even bundle it. Bundled from @sanity/visual-editing and served by the preview
-// itself, it talks only to the Studio window showing the page: it outlines texts and photos,
-// and a click opens that field in the Studio.
+// itself, it talks only to the Studio window showing the page: it outlines texts, photos and
+// blocks, a click opens that field in the Studio, and blocks, gallery photos, columns and chosen
+// people can be dragged into a new order (Sanity's script saves it as a draft).
 import { enableVisualEditing } from '@sanity/visual-editing';
 
 // Sanity's own overlay element lives in <body> too; it must survive a swap.
@@ -50,9 +51,14 @@ async function swapInNewVersion() {
 // in the capture phase, so it runs before the overlays' own handlers on the elements. Link texts
 // are edited in the form instead. Same-page links (#...), other sites (the photo viewer's
 // photos) and modified clicks are left alone.
+// Where the mouse went down: a click that ends a drag (blocks, photos, people are dragged into
+// a new order on the page) is not a click on a link.
+let down = { x: 0, y: 0 };
+window.addEventListener('mousedown', (event) => (down = { x: event.clientX, y: event.clientY }), { capture: true });
 window.addEventListener(
   'click',
   (event) => {
+    if (Math.hypot(event.clientX - down.x, event.clientY - down.y) > 5) return;
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
     if (!(link instanceof HTMLAnchorElement) || (link.target && link.target !== '_self') || link.hasAttribute('download')) return;
