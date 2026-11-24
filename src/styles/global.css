@@ -94,7 +94,8 @@ p { margin: 0 0 1em; }
 }
 .lang summary::-webkit-details-marker { display: none; }
 .lang img { width: 1.5rem; height: 1.5rem; }
-.lang-chevron { display: block; margin-left: 0.35rem; transition: transform 0.15s; }
+.lang-chevron { display: block; flex-shrink: 0; margin-left: 0.35rem; transition: transform 0.15s; }
+.lang, .lang img { flex-shrink: 0; }
 .lang[open] .lang-chevron { transform: rotate(180deg); }
 .lang-list {
   position: absolute; right: 0; top: 100%; z-index: 25; margin: 0.25rem 0 0; padding: 0.35rem 0; list-style: none;
@@ -326,6 +327,11 @@ p { margin: 0 0 1em; }
 .foot { background: var(--footer); color: var(--white); text-align: center; padding: 2.5rem var(--gutter); }
 .foot p { margin: 0 0 0.9rem; }
 .foot a { text-underline-offset: 0.2em; }
+/* The community logo and name in the footer: the way back to the community home. */
+.foot-copy { display: flex; align-items: center; justify-content: center; gap: 0.75rem; flex-wrap: wrap; }
+.foot-brand { display: inline-flex; align-items: center; gap: 0.6rem; text-decoration: none; font-size: 1rem; }
+.foot-brand img { width: 2.75rem; height: 2.75rem; }
+.foot-brand:hover strong, .foot-brand:focus-visible strong { text-decoration: underline; text-underline-offset: 0.2em; }
 .foot .small { font-size: 0.9375rem; }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -459,3 +465,8 @@ figcaption { font-size: 0.9375rem; margin-top: 0.6rem; opacity: 0.85; }
 /* The round Forró Budapest logo needs more height than the festival's wide logo to be readable. */
 .in-community .brand-logo { height: 4rem; margin-block: -0.4rem; }
 @media (min-width: 1180px) { .in-community .brand-logo { height: 5rem; margin-block: -0.5rem; } }
+/* Between 1180 and 1400 px the one-row header is tight: a little less space between items. */
+@media (min-width: 1180px) and (max-width: 1399.98px) {
+  .top { gap: 0.5rem 0.9rem; }
+  .menu a { padding-inline: 0.4rem; }
+}
