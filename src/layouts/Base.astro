@@ -79,17 +79,21 @@ const paletteCss =
   scrollbarCss(scrollbarColour) +
   getFontCss();
 // The scroll bar: the colour as the track, a mix of it and its text colour as the part you drag.
-// Safari and Chrome get ::-webkit-scrollbar, which every Safari colours. Only browsers without it
-// (Firefox) get scrollbar-color: Safari 26.2+ understands it but colours the bar only on macOS 26,
-// and like Chrome it then drops ::-webkit-scrollbar, so on older macOS the bar would stay grey.
+// Scroll bars that stay on screen (the script in <head> adds .classic-scrollbars) are styled with
+// ::-webkit-scrollbar in Safari and Chrome, which every Safari colours; scrollbar-color would not
+// do (Safari 26.2+ colours with it only on macOS 26, and then drops ::-webkit-scrollbar). Scroll
+// bars that hide until you scroll (Mac trackpads, phones) only get scrollbar-color, so they keep
+// hiding: ::-webkit-scrollbar would make them always shown. Firefox always gets scrollbar-color.
 function scrollbarCss(id: string) {
   const track = `var(--c-${id})`;
   const thumb = `color-mix(in srgb,var(--c-${id}-text) 40%,${track})`;
+  const standard = `scrollbar-color:${thumb} ${track}`;
   return (
-    `@supports not selector(::-webkit-scrollbar){html:root{scrollbar-color:${thumb} ${track}}}` +
-    `html::-webkit-scrollbar{width:14px;height:14px;background:${track}}` +
-    `html::-webkit-scrollbar-thumb{background:${thumb};border:3px solid ${track};border-radius:7px}` +
-    `html::-webkit-scrollbar-corner{background:${track}}`
+    `html:root:not(.classic-scrollbars){${standard}}` +
+    `@supports not selector(::-webkit-scrollbar){html:root{${standard}}}` +
+    `html.classic-scrollbars::-webkit-scrollbar{width:14px;height:14px;background:${track}}` +
+    `html.classic-scrollbars::-webkit-scrollbar-thumb{background:${thumb};border:3px solid ${track};border-radius:7px}` +
+    `html.classic-scrollbars::-webkit-scrollbar-corner{background:${track}}`
   );
 }
 // The top bar and the language list, from Site settings → Colours (else the usual colours).
@@ -143,6 +147,17 @@ const barColour = (palette.find((c) => c.id === (knownColour(inFestival ? site.f
     {shareUrl && <meta name="twitter:card" content="summary_large_image" />}
     <meta name="theme-color" content={barColour} />
     <style is:inline set:html={paletteCss} />
+    <script is:inline>
+      // Scroll bars that stay on screen (a mouse, Windows, "always show" on a Mac) get the
+      // coloured bar; ones that hide until you scroll are left to hide (scrollbarCss above).
+      (function () {
+        var d = document.createElement('div');
+        d.style.cssText = 'position:absolute;top:-99px;width:50px;height:50px;overflow:scroll';
+        document.documentElement.appendChild(d);
+        if (d.offsetWidth > d.clientWidth) document.documentElement.classList.add('classic-scrollbars');
+        d.remove();
+      })();
+    </script>
     {site.noindex && <meta name="robots" content="noindex, nofollow" />}
   </head>
   <body class={inFestival ? 'in-festival' : 'in-community'}>
