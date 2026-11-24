@@ -9,7 +9,7 @@ If you are picking this project up with no other context, read this file and `SA
 - **The Studio deploys itself** when its code changes on `main` (S19). Dávid no longer runs `npm run studio:deploy`. After a Studio change, tell him to reload the Studio tab about two minutes later. The run can be checked at github.com/davidpalfi/forro-bp-website/actions (public API: `curl https://api.github.com/repos/davidpalfi/forro-bp-website/actions/runs`).
 - **Content lives in Sanity; the agent cannot reach it** (sanity.io and the workers.dev sites are blocked from cloud sessions). For content, give Dávid click-by-click Studio steps (menu paths as in `docs/EDITING-GUIDE.md`, e.g. "Community → Pages"). To check a change visually, build locally with test content: `CONTENT_SOURCE=file:<some.ndjson> npm run build`, made from `scripts/lib/sanity-fixture.mjs` plus the documents you need, then serve `dist/` and screenshot with Playwright.
 - **Screenshots from Dávid's phone or Mac carry a colour profile** (Display P3): convert to sRGB before measuring colours (PIL `ImageCms`), or the values come out wrong (this happened with the first mustard).
-- **Open for Dávid in the Studio** and **parked ideas:** `BACKLOG.md`, top. The admin has not seen anything yet (13a on hold).
+- **Still open before the admin sees it** (Code of Conduct page, embedded map) and **parked ideas:** `BACKLOG.md`, top. The admin has not seen anything yet (13a on hold).
 
 ## Earlier handoff (2026-11-23)
 

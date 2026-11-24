@@ -35,7 +35,7 @@ Built and verified on 2026-11-18 (late evening, cloud session, no access to Sani
 
 ## Next steps, in order
 
-0. **Look polish** (in progress, top of `BACKLOG.md`): Dávid sends what bothers him; the agent fixes it on `main`. Then his content steps in the Studio ("Open for Dávid in the Studio" there).
+0. **Look polish** (in progress, top of `BACKLOG.md`): Dávid sends what bothers him; the agent fixes it on `main`. The Studio content steps are done (2026-11-24) except the Code of Conduct page; the embedded map on the Location page is still to build.
 1. **Send it to the admin when Dávid is ready** (`BACKLOG.md` 13a): his phone check of the forms, invite test, a clean copy of the guide, invite her, send.
 2. **Her trial** (`BACKLOG.md` 13), then polish B-H, her design corrections, real content.
 3. ✅ `main` is the Sanity version (2026-11-23, S12).

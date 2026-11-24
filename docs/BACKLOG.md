@@ -1,6 +1,6 @@
 # Project backlog
 
-Built on 2026-11-17 (last updated 2026-11-23, evening) from `HANDOFF.md`, `SANITY-PORT-STATUS.md`, `GO-LIVE-CHECKLIST.md`, `DECISIONS.md`, `SPEC.md` and `USER-NEEDS.md`. It only lists work those documents describe. When an item is done, tick it here and update the status file it came from.
+Built on 2026-11-17 (last updated 2026-11-24) from `HANDOFF.md`, `SANITY-PORT-STATUS.md`, `GO-LIVE-CHECKLIST.md`, `DECISIONS.md`, `SPEC.md` and `USER-NEEDS.md`. It only lists work those documents describe. When an item is done, tick it here and update the status file it came from.
 
 Priority:
 - **P0**: blocks the Sanity port; do in this order.
@@ -30,12 +30,13 @@ Dávid prefers to give the admin a more mature version first (first impressions 
 - ✅ 2026-11-23/24, community level (S14-S18): Forró Budapest palette (mustard `#c28f32` from the round logo, light cream, dark grey text); round logo in the top bar and with the bold name in the footer (`public/uploads/forro-budapest-logo.png`, cropped from a screenshot: replace with the original file under Community > Home page > Logo); headline banner with short line and two buttons, on mustard with the big logo when there is no photo (S17); pages cream by default, mustard as accent; Home first in the community menu; the festival button is a page entry ("Menu button goes to: the festival home page", S16); event calendar block, one picture per month (S15); Mustard as a page and block colour; readable text on dark pages.
 - ✅ 2026-11-24: colours are a palette in Site settings → Colours (change codes, add colours, top bar and language list colours per part of the site, S18); Studio menu grouped into Festival and Community; the Studio deploys itself from GitHub (S19).
 
-**Open for Dávid in the Studio (content, no code):** remove the community banner photo if wanted; fill in the community headline, short line and buttons; delete the Contact page (or untick Show in the menu); create the festival menu entry (Community > Pages, "Menu button goes to"); set existing community pages to Cream; add the Event calendar months; Location gallery (Layout: Mosaic); community Instagram address in Site settings; Hungarian ticket button text and Code of Conduct title (suggested: "Vedd meg a jegyed!", "Magatartási kódex"); the original round logo file if he has one.
+**Studio content steps:** ✅ done 2026-11-24 (community headline and buttons, menu entries, page colours, event calendar, Location gallery, Instagram address, Hungarian ticket text). Still open: tidy up the Code of Conduct page (Hungarian title, suggested "Magatartási kódex", and its text).
+
+**Before showing it to the admin:** an embedded map on the Location page (click-to-load Google map recommended: nothing is loaded from Google until the visitor clicks, so no privacy note is needed).
 
 **Ideas raised and parked (not decided):**
 - New row after a person in the people grid: item 34.
 - "Upload several photos" button for galleries on phones (on a computer, dragging several files onto the field works): about an hour.
-- Embedded map on the Location page: click-to-load Google map recommended (item above).
 - A slim "‹ Forró Budapest" strip above the festival header was mocked up 2026-11-24 and rejected by Dávid ("not nice"); the way back is the footer logo and name.
 
 **Ideas for the look polish, raised 2026-11-23 (not yet decided):**
