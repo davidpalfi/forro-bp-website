@@ -61,9 +61,9 @@
       "id": "FB-2",
       "title": "Fill in the Code of Conduct page in both languages",
       "type": "content",
-      "status": "todo",
-      "priority": "P1",
-      "milestone": "M1",
+      "status": "rejected",
+      "priority": "P3",
+      "milestone": "later",
       "owner": "david",
       "labels": ["festival", "content", "i18n"],
       "estimate": "S",
@@ -75,7 +75,7 @@
         "Published, and both languages read correctly on the test site"
       ],
       "refs": ["docs/EDITING-GUIDE.md"],
-      "notes": "Studio: Festival → Pages → Code of Conduct."
+      "notes": "Rejected 2026-11-24: the Wix site has no Hungarian version of this page either, so the English text stays (shown on /hu/ as the fallback). Studio: Festival → Pages → Code of Conduct."
     },
     {
       "id": "FB-3",
@@ -219,24 +219,6 @@
       "notes": "On 2026-11-24: five claude/* session branches and feature/drag-blocks-on-page."
     },
     {
-      "id": "FB-10",
-      "title": "Publish a change from a phone",
-      "type": "test",
-      "status": "todo",
-      "priority": "P1",
-      "milestone": "M2",
-      "owner": "david",
-      "labels": ["studio", "admin"],
-      "estimate": "S",
-      "goal": "The admin will often edit on her phone; check it works before she tries.",
-      "acceptance": [
-        "Signed in at https://forro-budapest.sanity.studio on a phone",
-        "A text changed and published",
-        "The change appears on the test site within a few minutes",
-        "Anything awkward written down as a ticket"
-      ]
-    },
-    {
       "id": "FB-11",
       "title": "Test the Studio invitation on a second e-mail address",
       "type": "test",
@@ -288,7 +270,7 @@
         "She has the guide, https://forro-budapest.sanity.studio and https://forro-bp-website.pdavid92.workers.dev",
         "She is asked to note what is unclear"
       ],
-      "depends_on": ["FB-10", "FB-11", "FB-12"],
+      "depends_on": ["FB-11", "FB-12"],
       "blocked_by": "Dávid decides M1 is reached"
     },
     {
