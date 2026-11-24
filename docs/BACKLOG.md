@@ -39,7 +39,7 @@ Dávid prefers to give the admin a more mature version first (first impressions 
 - A slim "‹ Forró Budapest" strip above the festival header was mocked up 2026-11-24 and rejected by Dávid ("not nice"); the way back is the footer logo and name.
 
 **Ideas for the look polish, raised 2026-11-23 (not yet decided):**
-- **Video banner on the festival home**: built 2026-11-24 on branch `feature/video-banner`, not merged (`DECISIONS.md` S21). Festival → Home page → Banner video; plays on computers only, photo on phones and with "reduce motion". Before merging: Dávid tries it on the preview with a real clip (best the original from the admin; it could not be found in the Wix page's inspector), including clicking the video in Edit on the page.
+- **Video banner on the festival home**: ✅ built 2026-11-24 and merged into `main` (`DECISIONS.md` S21). Festival → Home page → Banner video; plays on computers only, photo on phones and with "reduce motion". Still to do: Dávid tries it on the preview with a real clip (best the original from the admin; it could not be found in the Wix page's inspector), including clicking the video in Edit on the page.
 - **More text choices in the editor** as fixed options, not free settings: text size (Small/Normal/Large) on text blocks, text colour from the site's palette, maybe one or two font styles. Today fonts, sizes and colours are set in `src/styles/global.css`; the editor offers text styles (Normal, Heading, Small heading, Quote), heading sizes, block background and alignment, page colour. Decide with the admin, who made the design.
 
 **Working agreement:** work starts only when Dávid gives a clear go; planning questions get answers and plans only.
