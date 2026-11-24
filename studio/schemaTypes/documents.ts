@@ -156,9 +156,12 @@ const page = defineType({
             .slice(0, 60),
       },
       group: 'settings',
+      hidden: ({ document }) => Boolean((document as { goesTo?: string } | undefined)?.goesTo),
       validation: (rule) =>
-        rule.required().custom((value, context) => {
+        rule.custom((value, context) => {
+          if ((context.document as { goesTo?: string } | undefined)?.goesTo) return true
           const s = (value as { current?: string } | undefined)?.current ?? ''
+          if (!s) return 'Required'
           if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s)) return 'Use lowercase letters, numbers and hyphens only'
           const section = (context.document as { section?: string } | undefined)?.section ?? 'festival'
           if ((RESERVED_SLUGS[section] ?? []).includes(s)) return `"${s}" is already used by the site`
@@ -183,6 +186,15 @@ const page = defineType({
       initialValue: 'red',
       group: 'settings',
     }),
+    defineField({
+      name: 'goesTo',
+      title: 'Menu button goes to',
+      description: 'Leave empty for a normal page. "The festival home page" makes this the menu button that opens the festival home page: its title (or menu label) is the button\'s name and its menu order is its place in the menu. It has no page of its own.',
+      type: 'string',
+      options: { list: [{ title: 'The festival home page', value: 'festival' }], layout: 'radio' },
+      hidden: ({ document }) => (document as { section?: string } | undefined)?.section !== 'community',
+      group: 'settings',
+    }),
     defineField({ name: 'showInMenu', title: 'Show in the menu', type: 'boolean', initialValue: true, group: 'settings' }),
     defineField({ name: 'order', title: 'Menu order', description: 'Smaller numbers come first.', type: 'number', initialValue: 50, group: 'settings' }),
     ...menuLabel.fields.map((f) => ({ ...f, group: 'settings' })),
@@ -190,10 +202,10 @@ const page = defineType({
   ],
   orderings: [{ title: 'Menu order', name: 'menuOrder', by: [{ field: 'section', direction: 'desc' }, { field: 'order', direction: 'asc' }] }],
   preview: {
-    select: { en: 'title_en', hu: 'title_hu', slug: 'slug.current', section: 'section', media: 'coverImage' },
-    prepare: ({ en, hu, slug, section, media }) => ({
+    select: { en: 'title_en', hu: 'title_hu', slug: 'slug.current', section: 'section', media: 'coverImage', goesTo: 'goesTo' },
+    prepare: ({ en, hu, slug, section, media, goesTo }) => ({
       title: en || hu || 'Untitled page',
-      subtitle: slug ? `/${section === 'community' ? '' : 'festival/'}${slug}/` : 'no address yet',
+      subtitle: goesTo === 'festival' ? 'Menu button to the festival home page' : slug ? `/${section === 'community' ? '' : 'festival/'}${slug}/` : 'no address yet',
       media,
     }),
   },
