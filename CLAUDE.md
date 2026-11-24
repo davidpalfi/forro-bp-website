@@ -43,6 +43,7 @@ These apply to the JSON files (the import source and test content). Content on t
 2. For visible changes, look at the result in a browser at phone and desktop width (`docs/HANDOFF.md`, "How to check things").
 3. Tell the user in plain language what changed and what to look at on the live site.
 4. Code changes are pushed straight to `main` once `npm run check` passes (Dávid, 2026-11-23: revert if something breaks). Commit only when asked. Every push to `main` rebuilds both Cloudflare sites.
+5. Work that is tried before it goes to `main` (for example click-to-edit polish) goes on a feature branch with a descriptive name: `feature/<what-it-does>`, lowercase with hyphens, such as `feature/drag-blocks-on-page`. Not a generated session name.
 
 ## Commit messages
 
