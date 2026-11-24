@@ -47,9 +47,10 @@ const festivalItem = festivalLink
     ? [{ path: '/festival/', label: trFirst(festivalLink, ['menuLabel', 'title'], lang) || festival.name, order: festivalLink.order }]
     : []
   : [{ path: '/festival/', label: festival.name, order: -Infinity }];
-// Both menus start with Home; the festival menu ends with the way up to the community site.
+// Both menus start with Home. The way from the festival up to the community site is the
+// logo and name in the footer.
 const nav = inFestival
-  ? [{ path: '/festival/', label: t.home }, ...menuPages, { path: '/', label: site.name }]
+  ? [{ path: '/festival/', label: t.home }, ...menuPages]
   : [{ path: '/', label: t.home }, ...[...festivalItem, ...menuPages].sort((a, b) => a.order - b.order)];
 
 const brandPath = inFestival ? '/festival/' : '/';
