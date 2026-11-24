@@ -382,7 +382,7 @@ p { margin: 0 0 1em; }
 .b-heading--h2 { font-size: clamp(1.5rem, 5vw, 1.8rem); }
 .b-heading--h3 { font-size: 1.35rem; font-family: var(--sans); font-weight: 800; }
 .b-heading--h4 { font-size: 1.1rem; }
-.b-button { margin: 0; }
+.b-button { margin-block: 0; }
 .blocks.align-left .b-button, .blocks.align-right .b-button { padding-block: 0.25rem; }
 
 .b-image { margin-inline: auto; }

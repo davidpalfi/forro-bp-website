@@ -128,7 +128,7 @@ export default defineConfig({
         title: 'Page in section',
         schemaType: 'page',
         parameters: [{ name: 'section', type: 'string' }],
-        value: (params: { section?: string }) => ({ section: params.section ?? 'festival', tone: 'red', showInMenu: true, order: 50 }),
+        value: (params: { section?: string }) => ({ section: params.section ?? 'festival', tone: params.section === 'community' ? 'cream' : 'red', showInMenu: true, order: 50 }),
       },
     ],
   },

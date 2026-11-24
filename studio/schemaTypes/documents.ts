@@ -60,6 +60,13 @@ const communitySettings = defineType({
   type: 'document',
   fieldsets: [communityTitle.fieldset, communitySubtitle.fieldset],
   fields: [
+    defineField({
+      name: 'showHero',
+      title: 'Show the headline banner',
+      description: 'The headline, short line and buttons at the top of the home page. Untick to start the page directly with the blocks below.',
+      type: 'boolean',
+      initialValue: true,
+    }),
     ...communityTitle.fields,
     ...communitySubtitle.fields,
     defineField({
@@ -195,7 +202,7 @@ const page = defineType({
     defineField({
       name: 'tone',
       title: 'Page colour',
-      description: 'On community pages Red shows as mustard, the Forró Budapest colour.',
+      description: 'On community pages Red shows as mustard, the Forró Budapest colour. New community pages start as Cream, which is easiest to read; use mustard for accents.',
       type: 'string',
       options: { list: [{ title: 'Red', value: 'red' }, { title: 'Mustard', value: 'gold' }, { title: 'Cream', value: 'cream' }, { title: 'Dark', value: 'dark' }], layout: 'radio', direction: 'horizontal' },
       initialValue: 'red',

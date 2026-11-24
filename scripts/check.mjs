@@ -376,6 +376,7 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
       check(nav.indexOf('href="/en/classes/"') > -1 && nav.indexOf('href="/en/classes/"') < nav.indexOf('>Festival<') && (nav.match(/href="\/en\/festival\/"/g) || []).length === 1, 'a community page set to go to the festival is the festival button in the menu, with its own order and label');
       check(!read(dir, 'en/index.html').includes('class="band band--red band--center"'), 'the community home has no festival section');
       const home = read(dir, 'en/index.html');
+      check(/<main id="main" class="tone-cream"/.test(home) && home.includes('class="chero '), 'the community home is cream under its mustard headline banner');
       check(home.includes('>Headline for the community</h1>') && home.includes('A short line under it.') && /href="\/en\/festival\/location\/"[^>]*>\s*First button/.test(home) && home.includes('button--ghost') && !home.includes('Third button'), 'the community home banner shows the headline, the short line and at most two buttons');
     }
     check(fs.existsSync(dist(dir, 'en/classes/index.html')) && read(dir, 'en/index.html').includes('href="/en/classes/"'), 'a community page gets its own address and appears in the community menu');
