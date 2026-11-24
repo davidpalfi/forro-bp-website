@@ -34,8 +34,8 @@ const loaded = isPreview() ? { source: 'sanity' as const, docs: [] } : await loa
 export const contentSource = loaded.source;
 
 /** The documents being shown, and the lists made from them (see useDocuments at the end). */
-type State = { byId: Map<string, Obj>; people: Person[]; pages: Page[]; menuLinks: MenuLink[]; photoTargets: WeakMap<object, string> };
-const emptyState = (): State => ({ byId: new Map(), people: [], pages: [], menuLinks: [], photoTargets: new WeakMap() });
+type State = { byId: Map<string, Obj>; people: Person[]; pages: Page[]; photoTargets: WeakMap<object, string> };
+const emptyState = (): State => ({ byId: new Map(), people: [], pages: [], photoTargets: new WeakMap() });
 let shared: State = emptyState();
 // In the preview each request renders with its own documents, so two requests running at the
 // same time (one with drafts, one without) can never see each other's content.
@@ -275,27 +275,6 @@ export function monthName(m: EventMonth, lang: Lang) {
   return new Intl.DateTimeFormat(lang === 'hu' ? 'hu-HU' : 'en-GB', { year: 'numeric', month: 'long', timeZone: 'UTC' }).format(Date.UTC(m.year, m.month - 1, 1));
 }
 
-/* ---------- Menu buttons that are not pages ---------- */
-
-/**
- * Community "pages" whose "Menu button goes to" is the festival: a menu button with the page's
- * title or menu label and its menu order, linking to the festival home. Only the first is used.
- */
-const makeMenuLinks = (byId: Map<string, Obj>) => {
-  const links = ofType('page', byId)
-    .filter((d) => str(d.section) === 'community' && str(d.goesTo) === 'festival')
-    .map((d) => ({ ...d, id: String(d._id), path: '/festival/', order: num.parse(d.order) ?? 100, showInMenu: flag(true).parse(d.showInMenu) }))
-    .sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
-  if (links.length > 1) warnOnce('more than one community page is a menu button to the festival; only the first is shown');
-  return links.slice(0, 1);
-};
-export type MenuLink = ReturnType<typeof makeMenuLinks>[number];
-
-/** The community menu's button to the festival, when one is set up as a page; else undefined. */
-export function getFestivalMenuLink() {
-  return S().menuLinks[0];
-}
-
 /* ---------- Pages ---------- */
 
 export type Section = 'community' | 'festival';
@@ -312,8 +291,6 @@ const makePages = (byId: Map<string, Obj>) => {
     const slug = str(asObj(d.slug).current).toLowerCase();
     const section: Section = str(d.section) === 'community' ? 'community' : 'festival';
     const name = trFirst(d, ['title'], 'en') || slug || String(d._id);
-    // A menu button to the festival, not a page of its own (see makeMenuLinks).
-    if (section === 'community' && str(d.goesTo) === 'festival') continue;
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
       warnOnce(`page "${name}" has no usable address and was skipped`);
       continue;
@@ -539,7 +516,6 @@ function makeState(docs: unknown[]): State {
   if (isPreview()) for (const d of st.byId.values()) notePhotos(d, st.photoTargets);
   st.people = makePeople(st.byId);
   st.pages = makePages(st.byId);
-  st.menuLinks = makeMenuLinks(st.byId);
   return st;
 }
 
