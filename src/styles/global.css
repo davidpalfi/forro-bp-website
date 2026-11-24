@@ -392,6 +392,10 @@ p { margin: 0 0 1em; }
 .b-heading--h3 { font-size: 1.35rem; font-family: var(--sans); font-weight: 800; }
 .b-heading--h4 { font-size: 1.1rem; }
 .b-button { margin-block: 0; }
+/* A button block is a call to action: larger than the other buttons, with more room above it
+   (gap + margin about the same as the space under the last block), as on the Wix site. */
+.b-button .button { font-size: 1.35rem; padding: 0.95rem 2.25rem; }
+.blocks > :not(.b-button) + .b-button { margin-top: 2rem; }
 .blocks.align-left .b-button, .blocks.align-right .b-button { padding-block: 0.25rem; }
 
 .b-image { margin-inline: auto; }
