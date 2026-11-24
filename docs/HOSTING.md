@@ -190,6 +190,8 @@ npm run studio:deploy
 
 It prints `"Edit on the page" will open https://forro-budapest-preview...` and deploys the Studio.
 
+Since 2026-11-24 this happens by itself: `.github/workflows/studio-deploy.yml` deploys the Studio whenever its code changes on `main` (secret `SANITY_AUTH_TOKEN` in the repository's Actions secrets). The steps above remain the manual way.
+
 **6.4** Open https://forro-budapest.sanity.studio > **Edit on the page** (top). The page appears **without** the dark strip. Click a text and type a word: about a second later the page shows it, without flashing or jumping to the top. Nothing is published unless you click Publish.
 
 **6.5** Do 6.4 in **Safari** too and tell the agent whether the dark strip is gone there (Safari is the browser most likely to block the preview's cookie).

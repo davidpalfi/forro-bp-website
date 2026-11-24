@@ -1,0 +1,39 @@
+# Deploys the Sanity Studio (https://forro-budapest.sanity.studio) when its code changes on
+# main, so nobody has to run `npm run studio:deploy` by hand. Needs the repository secret
+# SANITY_AUTH_TOKEN: a Sanity API token with the "Deploy Studio" permission (sanity.io/manage
+# > project > API > Tokens). The preview address the Studio needs is in studio/.env.production.
+# Can also be started by hand: Actions > Deploy Studio > Run workflow.
+name: Deploy Studio
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'studio/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'scripts/studio-deploy-check.mjs'
+      - '.github/workflows/studio-deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deploy at a time; a newer push replaces a deploy that has not started yet.
+concurrency:
+  group: studio-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+      - run: npm ci
+      - name: Deploy the Studio
+        run: npm run studio:deploy -- --yes
+        env:
+          SANITY_AUTH_TOKEN: ${{ secrets.SANITY_AUTH_TOKEN }}

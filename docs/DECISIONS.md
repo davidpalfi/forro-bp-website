@@ -112,6 +112,9 @@ The community home starts with a headline that says what Forró Budapest is, a s
 ### S18. Colours are a palette edited in Site settings (Dávid, 2026-11-24)
 Colours are global: Site settings → Colours lists them (name, code, text colour), the built-in ones can be changed and new ones added, and every colour choice in the Studio offers them as swatches, storing the colour's id. The page carries the palette as CSS variables, so a change applies everywhere at once. Chosen over a colour code on every block, which would let the same brand colour drift between sections and make a later change a hunt through every block. Readability is a warning, never a block. The top bar and the language list colours can be chosen per part of the site. The pickers are attached in `studio/sanity.config.ts` (form.components) rather than in the schema files, because npm run check loads the schema in plain Node.
 
+### S19. The Studio deploys itself from GitHub (Dávid, 2026-11-24)
+A GitHub workflow runs `npm run studio:deploy` when Studio code or the dependencies change on `main`, with a Sanity token limited to "Deploy Studio" stored as the repository secret `SANITY_AUTH_TOKEN` (never in the repository). Why: deploying needed a computer with the project and a Sanity sign-in, and was easy to forget after a Studio change. The site itself is still built by Cloudflare.
+
 ### Still open for the port
 - Whether Cloudflare also hosts the real public site at launch (the test site is there, S11).
 - The invited-editor sign-in. The publish webhook after the trial ends: webhooks are not among the Growth features the trial lists, so they are expected to work on Free; publish one test change after the trial ends (around 2026-12-18) to confirm.

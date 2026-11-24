@@ -101,6 +101,7 @@ Nothing runs on a server. Browser JavaScript is two small inline scripts: the me
 | `scripts/check-schema.mjs`, `scripts/lib/` | Documents vs Studio schema; Node loader for Studio files; Sanity-shaped test content |
 | `scripts/optimize-images.mjs` | Photo resizing before every build |
 | `.github/workflows/check.yml` | Runs `npm run check` on pull requests and code pushes to `main`. (The Pages CMS forms and the GitHub Pages deploy were removed 2026-11-23; see tag `pages-cms-poc`) |
+| `.github/workflows/studio-deploy.yml` | Deploys the Studio (`npm run studio:deploy -- --yes`) when `studio/` or the dependencies change on `main`, or by hand (Actions > Deploy Studio > Run workflow). Uses the repository secret `SANITY_AUTH_TOKEN` (a Sanity token with "Deploy Studio" permission) |
 | `astro.config.mjs` | Reads `SITE_URL` and `SITE_BASE`; trailing slashes. With `PREVIEW=1`: on-request rendering, `.env`, the editing script |
 | `.env.example` | Names the preview's setting (`SANITY_VIEWER_TOKEN`); the real `.env` is git-ignored |
 
@@ -185,4 +186,4 @@ Change the exact versions in `package.json` and `.node-version` (Cloudflare's bu
 
 ### Change the Sanity content model
 
-Edit `studio/schemaTypes/`, then `cd studio && npx sanity schema validate`, `npm run studio:build` and `npm run check` (its section 0 compares the converted documents with the schema). A field renamed or removed in the schema keeps its old value in Sanity documents until they are edited or migrated; keep the site tolerant of both, or write a migration. Deploy the Studio with `npm run studio:deploy` (needs Sanity sign-in).
+Edit `studio/schemaTypes/`, then `cd studio && npx sanity schema validate`, `npm run studio:build` and `npm run check` (its section 0 compares the converted documents with the schema). A field renamed or removed in the schema keeps its old value in Sanity documents until they are edited or migrated; keep the site tolerant of both, or write a migration. The Studio deploys itself when the change reaches `main` (`.github/workflows/studio-deploy.yml`, since 2026-11-24); by hand: `npm run studio:deploy` (needs Sanity sign-in) or Actions > Deploy Studio > Run workflow.
