@@ -56,7 +56,7 @@ Out of scope: content for the community level (not designed), a structured (text
 
 ### 4.2 Community home (`/<lang>/`)
 
-A headline banner: the headline (`title_*`, else the community name), an optional short line (`subtitle_*`) and up to two buttons (`heroButtons`: text and a page or address; the first solid, the second outlined). With a banner photo, all of it sits on the photo in cream; without one, on mustard with dark grey text and the big community logo beside it (above it on phones). The banner can be switched off (`showHero: false`; the headline then stays as a hidden heading for screen readers). Then the blocks from `communitySettings.homeBlocks`, on cream by default (mustard only for the banner and blocks set to it) (the festival section that used to follow was removed 2026-11-24; the festival is reached from the menu).
+A headline banner: the headline (`title_*`, else the community name), an optional short line (`subtitle_*`) and up to two buttons (`heroButtons`: text and a page or address; the first solid, the second outlined). With a banner photo, all of it sits on the photo in cream; without one, on mustard with dark grey text and the big community logo beside it (above it on phones). Then the blocks from `communitySettings.homeBlocks`, on cream by default (mustard only for the banner and blocks set to it) (the festival section that used to follow was removed 2026-11-24; the festival is reached from the menu).
 
 ### 4.3 Festival home
 

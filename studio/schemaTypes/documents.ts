@@ -60,13 +60,6 @@ const communitySettings = defineType({
   type: 'document',
   fieldsets: [communityTitle.fieldset, communitySubtitle.fieldset],
   fields: [
-    defineField({
-      name: 'showHero',
-      title: 'Show the headline banner',
-      description: 'The headline, short line and buttons at the top of the home page. Untick to start the page directly with the blocks below.',
-      type: 'boolean',
-      initialValue: true,
-    }),
     ...communityTitle.fields,
     ...communitySubtitle.fields,
     defineField({
