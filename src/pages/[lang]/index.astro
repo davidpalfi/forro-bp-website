@@ -1,11 +1,11 @@
 ---
-// The community home page: the banner (only when a banner photo is set) and the blocks from
-// "Community home page".
+// The community home page: the headline banner (on the banner photo, or on mustard with the
+// big logo) and the blocks from "Community home page".
 // The way to the festival is the festival button in the menu.
 import Base from '../../layouts/Base.astro';
-import Hero from '../../components/Hero.astro';
+import CommunityHero from '../../components/CommunityHero.astro';
 import Blocks from '../../components/Blocks.astro';
-import { getSite, getCommunity, getImage } from '../../lib/content';
+import { getSite, getCommunity } from '../../lib/content';
 import { LANGS, tr, type Lang } from '../../lib/i18n';
 
 export function getStaticPaths() {
@@ -18,12 +18,13 @@ const community = getCommunity();
 ---
 
 <Base lang={lang} section="community" pagePath="/">
-  {
-    getImage(community.heroImage) ? (
-      <Hero image={community.heroImage} title={tr(community, 'title', lang) || site.name} />
-    ) : (
-      <h1 class="sr-only">{tr(community, 'title', lang) || site.name}</h1>
-    )
-  }
+  <CommunityHero
+    image={community.heroImage}
+    logo={community.logo || '/uploads/forro-budapest-logo.png'}
+    title={tr(community, 'title', lang) || site.name}
+    subtitle={tr(community, 'subtitle', lang)}
+    buttons={community.heroButtons}
+    lang={lang}
+  />
   <Blocks blocks={community.homeBlocks} lang={lang} tone="red" />
 </Base>

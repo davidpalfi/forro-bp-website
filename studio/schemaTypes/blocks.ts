@@ -360,6 +360,19 @@ const eventCalendarBlock = defineType({
   },
 })
 
+/** A button on the community home page's banner: text and where it goes. */
+const heroButton = defineType({
+  name: 'heroButton',
+  title: 'Button',
+  type: 'object',
+  fieldsets: [label.fieldset],
+  fields: [...label.fields, ...linkFields(true).map((f) => ({ ...f, group: undefined }))],
+  preview: {
+    select: { en: 'label_en', hu: 'label_hu', page: 'page.title_en', url: 'url' },
+    prepare: ({ en, hu, page: p, url }) => ({ title: en || hu || p || 'Button', subtitle: `→ ${p || url || '?'}` }),
+  },
+})
+
 export const blockTypes = [
   richText,
   imageWithAlt,
@@ -376,6 +389,7 @@ export const blockTypes = [
   peopleGridBlock,
   calendarMonth,
   eventCalendarBlock,
+  heroButton,
 ]
 
 export const BLOCK_TYPES = [

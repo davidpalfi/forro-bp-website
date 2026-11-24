@@ -470,3 +470,30 @@ figcaption { font-size: 0.9375rem; margin-top: 0.6rem; opacity: 0.85; }
   .top { gap: 0.5rem 0.9rem; }
   .menu a { padding-inline: 0.4rem; }
 }
+
+/* ---------- Community home: the headline banner ---------- */
+.chero { position: relative; isolation: isolate; overflow: hidden; background: var(--gold); color: var(--footer); }
+.chero--photo { color: var(--cream); min-height: min(70vh, 40rem); display: grid; align-items: center; }
+.chero--photo::after { content: ''; position: absolute; inset: 0; background: rgb(0 0 0 / 0.38); z-index: -1; }
+.chero-inner {
+  max-width: 68rem; margin-inline: auto; padding: 3rem var(--gutter) 3.5rem;
+  display: flex; flex-direction: column-reverse; align-items: center; gap: 1.5rem; text-align: center;
+}
+.chero-title {
+  margin: 0; font-family: var(--serif); font-weight: 700; line-height: 1.1;
+  font-size: clamp(2rem, 7vw, 3.25rem); text-wrap: balance;
+}
+.chero--photo .chero-title { text-shadow: 0 2px 16px rgb(0 0 0 / 0.45); }
+.chero-sub { margin: 1rem 0 0; font-size: 1.1rem; line-height: 1.5; max-width: 34rem; margin-inline: auto; }
+.chero-buttons { margin: 1.75rem 0 0; display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
+.chero-buttons .button { min-width: 0; }
+.button--ghost { background: transparent !important; color: inherit !important; box-shadow: inset 0 0 0 2px currentColor; }
+.button--ghost:hover, .button--ghost:focus-visible { background: rgb(0 0 0 / 0.08) !important; }
+.chero-logo { width: min(40vw, 9.5rem); height: auto; }
+@media (min-width: 900px) {
+  .chero-inner { flex-direction: row; justify-content: space-between; text-align: left; padding-block: 4.5rem 5rem; gap: 3rem; }
+  .chero-sub { margin-inline: 0; }
+  .chero-buttons { justify-content: flex-start; }
+  .chero-logo { width: 21rem; flex-shrink: 0; }
+  .chero--photo .chero-inner { justify-content: flex-start; }
+}

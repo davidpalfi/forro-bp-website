@@ -51,19 +51,29 @@ const siteSettings = defineType({
 
 /* ---------- Community home ---------- */
 
-const communityTitle = localizedFields('title', 'Title on the banner')
+const communityTitle = localizedFields('title', 'Headline', 'string', 'The big line at the top of the home page: what Forró Budapest is, e.g. "Brazilian forró dancing in Budapest". Without it, the community name.')
+const communitySubtitle = localizedFields('subtitle', 'Short line under the headline (optional)', 'text')
 
 const communitySettings = defineType({
   name: 'communitySettings',
   title: 'Community home page',
   type: 'document',
-  fieldsets: [communityTitle.fieldset],
+  fieldsets: [communityTitle.fieldset, communitySubtitle.fieldset],
   fields: [
     ...communityTitle.fields,
+    ...communitySubtitle.fields,
+    defineField({
+      name: 'heroButtons',
+      title: 'Buttons under the headline (optional)',
+      description: 'Up to two, e.g. "Try a class" and "Event calendar". The first is the main one.',
+      type: 'array',
+      of: [{ type: 'heroButton' }],
+      validation: (rule) => rule.max(2),
+    }),
     defineField({
       name: 'heroImage',
       title: 'Banner photo (optional)',
-      description: 'A big photo with the title at the top of the community home page. Without it, the page starts directly with the blocks below.',
+      description: 'Behind the headline at the top of the home page. Without it, the headline sits on the mustard background next to the big logo.',
       type: 'imageWithAlt',
     }),
     defineField({

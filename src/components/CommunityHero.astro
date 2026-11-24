@@ -1,0 +1,65 @@
+---
+// The top of the community home page: a headline that says what Forró Budapest is, a short
+// line and up to two buttons. On the banner photo when one is set; otherwise on the mustard
+// background, with the big community logo beside the text (as in the community's posts).
+import { getImage, editAttr, blockLink, type Block } from '../lib/content';
+import { tr, type Lang } from '../lib/i18n';
+
+interface Props {
+  image?: unknown;
+  logo?: unknown;
+  title: string;
+  subtitle?: string;
+  buttons?: Block[];
+  lang: Lang;
+}
+
+const { image, logo, title, subtitle, buttons = [], lang } = Astro.props;
+const photo = getImage(image);
+const bigLogo = photo ? undefined : getImage(logo);
+const links = buttons
+  .slice(0, 2)
+  .map((b) => {
+    const l = blockLink(b, lang);
+    return { ...l, label: tr(b, 'label', lang) || l.label };
+  })
+  .filter((l) => l.url && l.label);
+---
+
+<section class:list={['chero', photo ? 'chero--photo' : 'chero--plain']}>
+  {
+    photo && (
+      <img
+        class="hero-photo"
+        src={photo.src}
+        srcset={photo.srcset}
+        sizes="100vw"
+        width={photo.width}
+        height={photo.height}
+        alt=""
+        style={photo.position ? `object-position: ${photo.position}` : undefined}
+        loading="eager"
+        fetchpriority="high"
+        data-sanity={editAttr(image)}
+      />
+    )
+  }
+  <div class="chero-inner">
+    <div class="chero-text">
+      <h1 class="chero-title">{title}</h1>
+      {subtitle && <p class="chero-sub">{subtitle}</p>}
+      {
+        links.length > 0 && (
+          <p class="chero-buttons">
+            {links.map((l, i) => (
+              <a class:list={['button', i > 0 && 'button--ghost']} href={l.url} target={l.external ? '_blank' : undefined} rel={l.external ? 'noopener' : undefined}>
+                {l.label}
+              </a>
+            ))}
+          </p>
+        )
+      }
+    </div>
+    {bigLogo && <img class="chero-logo" src={bigLogo.src} srcset={bigLogo.srcset} sizes="(min-width: 900px) 22rem, 12rem" alt="" />}
+  </div>
+</section>

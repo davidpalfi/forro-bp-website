@@ -65,7 +65,7 @@ export function getSite() {
 
 export function getCommunity() {
   const c = asObj(S().byId.get('communitySettings'));
-  return { ...c, heroImage: c.heroImage, homeBlocks: list(c.homeBlocks) };
+  return { ...c, heroImage: c.heroImage, homeBlocks: list(c.homeBlocks), heroButtons: list(c.heroButtons) as Block[] };
 }
 
 export function getFestival() {

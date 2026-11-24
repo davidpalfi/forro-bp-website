@@ -309,6 +309,16 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
     background: 'default',
     alignment: 'center',
   });
+  // The community home's headline banner: headline, short line, a page button and an address button.
+  Object.assign(docs.find((d) => d._type === 'communitySettings'), {
+    title_en: 'Headline for the community',
+    subtitle_en: 'A short line under it.',
+    heroButtons: [
+      { _key: 'h1', _type: 'heroButton', label_en: 'First button', page: { _type: 'reference', _ref: 'page-location' } },
+      { _key: 'h2', _type: 'heroButton', label_en: 'Second button', url: '/festival/' },
+      { _key: 'h3', _type: 'heroButton', label_en: 'Third button', url: '/festival/' },
+    ],
+  });
   // A mustard page.
   Object.assign(docs.find((d) => d._type === 'page' && d.slug?.current === 'location'), { tone: 'gold' });
   // The festival button in the community menu as a page: after the other community pages, with its own name.
@@ -365,6 +375,8 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
       const nav = /<nav id="menu"[\s\S]*?<\/nav>/.exec(read(dir, 'en/index.html'))?.[0] ?? '';
       check(nav.indexOf('href="/en/classes/"') > -1 && nav.indexOf('href="/en/classes/"') < nav.indexOf('>Festival<') && (nav.match(/href="\/en\/festival\/"/g) || []).length === 1, 'a community page set to go to the festival is the festival button in the menu, with its own order and label');
       check(!read(dir, 'en/index.html').includes('class="band band--red band--center"'), 'the community home has no festival section');
+      const home = read(dir, 'en/index.html');
+      check(home.includes('>Headline for the community</h1>') && home.includes('A short line under it.') && /href="\/en\/festival\/location\/"[^>]*>\s*First button/.test(home) && home.includes('button--ghost') && !home.includes('Third button'), 'the community home banner shows the headline, the short line and at most two buttons');
     }
     check(fs.existsSync(dist(dir, 'en/classes/index.html')) && read(dir, 'en/index.html').includes('href="/en/classes/"'), 'a community page gets its own address and appears in the community menu');
     check(read(dir, 'en/festival/index.html').includes('href="/en/festival/everything/"'), 'a new festival page appears in the festival menu');
