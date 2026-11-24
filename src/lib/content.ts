@@ -520,6 +520,30 @@ export function getImage(image: unknown): ResolvedImage | undefined {
   return undefined;
 }
 
+/* ---------- Videos ---------- */
+
+const VIDEO_TYPES: Record<string, string> = { mp4: 'video/mp4', webm: 'video/webm', m4v: 'video/mp4' };
+
+/**
+ * A video file uploaded to Sanity (a `file` field), as an address on Sanity's file server and
+ * a type for <source>. Nothing when it is missing; a warning when it is not a video.
+ */
+export function getVideo(file: unknown): { src: string; type: string } | undefined {
+  const ref = str(asObj(asObj(file).asset)._ref);
+  if (!ref) return undefined;
+  const m = /^file-([A-Za-z0-9]+)-([a-z0-9]+)$/.exec(ref);
+  if (!m) {
+    warnOnce(`a video has an unexpected reference (${ref}) and was left out`);
+    return undefined;
+  }
+  const type = VIDEO_TYPES[m[2]];
+  if (!type) {
+    warnOnce(`a video is a .${m[2]} file, not an MP4 or WebM video, and was left out`);
+    return undefined;
+  }
+  return { src: `https://cdn.sanity.io/files/${SANITY.projectId}/${SANITY.dataset}/${m[1]}.${m[2]}`, type };
+}
+
 /* ---------- Click-to-edit targets for photos (preview only) ---------- */
 
 // Texts carry invisible markers that say which field they come from; photos cannot, so in

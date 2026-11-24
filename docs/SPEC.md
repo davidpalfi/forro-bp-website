@@ -61,7 +61,7 @@ A headline banner: the headline (`title_*`, else the community name), an optiona
 
 ### 4.3 Festival home
 
-1. **Banner.** Banner photo (on phones the phone banner photo, when one is uploaded); the big logo (`logo`, or festival name as text); the ticket button (needs a safe `ticketUrl`; label falls back to "Tickets"/"Jegyek"; new tab); the date line. Centred on phones; from 900 px the block sits to the left over the photo.
+1. **Banner.** Banner photo (on phones the phone banner photo, when one is uploaded); over it, when one is uploaded, the banner video: muted, looping, loaded by a script only on screens 720 px and wider without "reduce motion" or data saver, faded in once it plays (the photo shows otherwise; a file that is not MP4 or WebM is left out with a warning); the big logo (`logo`, or festival name as text); the ticket button (needs a safe `ticketUrl`; label falls back to "Tickets"/"Jegyek"; new tab); the date line. Centred on phones; from 900 px the block sits to the left over the photo.
 2. **Intro.** Each blank-line-separated block is a paragraph. Left out when empty.
 3. **Closing block.** The line of numbers (`stats`); one button per text page with `showOnHome`. No second ticket link (removed 2026-11-23: the banner and the header have one).
 
@@ -108,6 +108,7 @@ All content is plain JSON files under `src/content/`. **Form** = what the editin
 | `headerLogo` | image | Small logo in the header of every festival page (2026-11-23) |
 | `heroImage` | image | Festival banner; default sharing image |
 | `heroImagePhone` | image | Optional taller banner used below 720 px |
+| `heroVideo` | file (MP4, WebM; Sanity only) | Optional silent looping banner video over the photo, from 720 px, not with "reduce motion" or data saver (S21) |
 | `dateLine_*` | | Banner; also on the community home |
 | `ticketUrl`, `ticketLabel_*` | https only | Ticket buttons |
 | `intro_*` | multi-line | Festival home |

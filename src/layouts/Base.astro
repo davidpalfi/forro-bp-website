@@ -257,6 +257,34 @@ const year = new Date().getFullYear();
       })();
     </script>
     <script is:inline>
+      // Banner video (festival home): loaded and played only on wide screens, without "reduce
+      // motion" or data saver, so phones never download it. It fades in over the banner photo once
+      // it plays; until then, and if it cannot play, the photo shows.
+      (function () {
+        var v = document.querySelector('video[data-hero-video]');
+        if (!v || v.dataset.started) return;
+        var wide = window.matchMedia('(min-width: 720px) and (prefers-reduced-motion: no-preference)');
+        var saver = navigator.connection && navigator.connection.saveData;
+        function start() {
+          if (!wide.matches || saver) return;
+          if (!v.dataset.started) {
+            v.dataset.started = '1';
+            var s = document.createElement('source');
+            s.src = v.dataset.heroVideo;
+            s.type = v.dataset.type;
+            v.appendChild(s);
+            v.addEventListener('playing', function () { v.classList.add('is-playing'); }, { once: true });
+            v.muted = true;
+            v.load();
+          }
+          var p = v.play();
+          if (p && p.catch) p.catch(function () {});
+        }
+        wide.addEventListener('change', function () { wide.matches ? start() : v.pause(); });
+        start();
+      })();
+    </script>
+    <script is:inline>
       // Event calendar blocks: drop the months that are over (the site is only rebuilt on
       // publish), then show one month at a time with arrows, starting with the current month
       // or the one in the address (#2026-12). Without JavaScript every month is listed.

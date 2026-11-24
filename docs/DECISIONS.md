@@ -118,10 +118,13 @@ A GitHub workflow runs `npm run studio:deploy` when Studio code or the dependenc
 ### S20. A phone version on the Image block (Dávid, 2026-11-24)
 The Wix program page shows a different picture on narrow screens than on wide ones. The Image block got an optional "Phone version": below 720 px wide (the same breakpoint as the festival banner's phone photo) the page and the photo viewer show it instead. A field on the existing block rather than a separate "adaptive image" block: it works on every page without code changes, and the editor does not have to choose between two nearly identical blocks or rebuild a block to add a phone version later. Other photo fields (galleries, banner and columns blocks) have none yet; add the same field there if it is asked for.
 
-### S21. Page titles use Platypi (2026-11-24)
+### S21. A banner video on the festival home (Dávid, 2026-11-24)
+As on the Wix site, the festival banner can show a short silent looping video instead of the photo. The admin uploads an MP4 (or WebM) in Festival → Home page → Banner video; it is stored in Sanity and served from Sanity's file server (`cdn.sanity.io/files/...`), like the photos (S4). It plays on screens 720 px and wider only, never with "reduce motion" or data saver, and never without JavaScript: the page carries the address in a `data-` attribute and a small inline script in `Base.astro` loads it, so phones never download it. The banner photo stays underneath and shows until the video plays, and whenever it cannot. Why Sanity and not a file on Cloudflare: one place to upload, no code change to replace it. Cost: Sanity's free plan includes a monthly bandwidth quota for assets (100 GB at the Growth plan's announcement; check sanity.io/pricing); a 5 MB clip on computers only stays well inside it for this site's traffic. If it ever does not, serve the file from Cloudflare instead (the field stays, only `getVideo` changes). Considered: `<video autoplay>` in the HTML (simpler, but phones would download it and it would ignore "reduce motion"); a YouTube or Vimeo background (third-party requests, branding, slower).
+
+### S22. Page titles use Platypi (2026-11-24)
 The Wix site sets its page titles (the red band at the top of inner pages, e.g. "Your daily rhythm...") in Platypi Bold (its CSS names `orig_platypi_bold`). Only those titles use it, through the `--title` variable; every other heading and the large intro text keep Fraunces. Self-hosted from `@fontsource-variable/platypi` like the other fonts (decision 10); free under the SIL Open Font License.
 
-### S22. Fonts are chosen in Site settings, from a fixed list (2026-11-24)
+### S23. Fonts are chosen in Site settings, from a fixed list (2026-11-24)
 Site settings → Fonts chooses one font for each of the four kinds of text the design already uses: page titles, headings and large text, menu/buttons/bold labels, body text. Each maps onto an existing CSS variable, so the stylesheet barely changed and a choice applies everywhere at once. The list is eight self-hosted fonts picked to work together (three serifs, five sans-serifs); a browser downloads only the ones in use. Sizes, weights and text colours are not settable: free choices are how a modern look drifts, and text colour already follows the background colour (S18), so a second text colour setting would fight it. Font files cannot be uploaded: they would be served from Sanity, a third-party request for fonts (decision 10). A new font in the list is a small code change (`ARCHITECTURE.md`).
 
 ### Still open for the port
@@ -196,7 +199,7 @@ Known cost: original photos live in Git, and every build re-encodes all of them.
 
 ### 10. Fonts are self-hosted; no third-party requests at all
 The Wix look needs a serif and two sans-serif fonts. They are installed as npm packages (`@fontsource-variable/platypi` for page titles, `fraunces`, `libre-franklin`, `open-sans`) and served from the site itself. No external fonts, scripts, trackers or embeds.
-Why: independence, speed, no cookie banner. Page titles use Platypi, the font the Wix site uses for them (S21); the other serif (Fraunces) and the two sans-serif fonts are still a **visual match by eye**, not confirmed; ask the admin which fonts the Wix design uses.
+Why: independence, speed, no cookie banner. Page titles use Platypi, the font the Wix site uses for them (S22); the other serif (Fraunces) and the two sans-serif fonts are still a **visual match by eye**, not confirmed; ask the admin which fonts the Wix design uses.
 
 ### 11. Link safety
 Only `https://`, `http://`, `mailto:` and site-relative links are rendered (`safeUrl`). The forms also require `https://`.
@@ -252,7 +255,7 @@ See `HANDOFF.md`, "Status", for the current test record. In short: the build, th
 
 - What the community level should contain (classes, events, people?), and its design details.
 - The real image files: logo, banner photo, program graphics, people photos, location photos.
-- The fonts used in the Wix design, apart from the page titles (Platypi, S21).
+- The fonts used in the Wix design, apart from the page titles (Platypi, S22).
 - Where the domain is registered and when the Wix plan renews. Do not cancel Wix until the new site is live and the domain points to it.
 - Whether the repository may stay public after launch (decision 13).
 - Who owns the GitHub repository and the Pages CMS installation. It should be the admin or a community organisation account, not one developer's personal account.
