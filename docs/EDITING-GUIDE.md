@@ -68,6 +68,13 @@ If a dark strip at the bottom says "unpublished changes are hidden", the page wa
 
 The dates also appear in the header on wide screens.
 
+### Add or change the banner video
+1. Open **Festival → Home page**, tab **Banner and tickets**.
+2. Under **Banner video**, upload a short MP4 file (a few seconds, silent, under 10 MB). To remove it, click the three dots next to the file and choose **Remove**.
+3. **Publish**.
+
+The video plays in a loop on computers only. Phones, and visitors who have turned off motion on their device, see the **Banner photo**, so keep a banner photo too.
+
 ### Change the festival introduction or the numbers line
 1. Open **Festival → Home page** and go to the **Page content** tab.
 2. Click a block (for example the introduction text) to open it, edit, and close it.

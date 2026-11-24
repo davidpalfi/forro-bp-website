@@ -67,7 +67,7 @@ npm run build
 dist/   plain static files
 ```
 
-Nothing runs on a server. Browser JavaScript is small inline scripts, no libraries: in `Base.astro` the phone menu button and Escape/click-outside for the language drop-down, the event calendar's month switcher, and the photo viewer for galleries and Image blocks; and the language redirect on `/` (`pages/index.astro`). The site works without any of them (all months listed, photos open as plain images, the drop-down is a `<details>`).
+Nothing runs on a server. Browser JavaScript is small inline scripts, no libraries: in `Base.astro` the phone menu button and Escape/click-outside for the language drop-down, the festival banner video (started only on wide screens without "reduce motion"), the event calendar's month switcher, and the photo viewer for galleries and Image blocks; and the language redirect on `/` (`pages/index.astro`). The site works without any of them (all months listed, photos open as plain images, the drop-down is a `<details>`).
 
 ## File map
 
@@ -84,7 +84,7 @@ Nothing runs on a server. Browser JavaScript is small inline scripts, no librari
 | `src/middleware.ts` | Preview only: loads the latest drafts before every page; does nothing in a build |
 | `src/lib/preview-client.ts` | Preview only: the click-to-edit script in the page (reload after edits, address sync with the Studio) |
 | `src/lib/from-json.ts` | JSON files -> Sanity documents. Used by the site and the import file; runs in plain Node too |
-| `src/lib/content.ts` | The only place pages get content from: `getSite`, `getFestival`, `getCommunity`, `getPages`, `getFestivalMenuLink`, `getPeople`, `peopleForBlock`, `calendarMonths`, `monthName`, `getPalette`, `knownColour`, `blockLink`, `groupBlocks`, `renderRich`, `paragraphs`, `getImage`, `href`, `withBase`, `safeUrl`, `trFirst`, `warnOnce` |
+| `src/lib/content.ts` | The only place pages get content from: `getSite`, `getFestival`, `getCommunity`, `getPages`, `getFestivalMenuLink`, `getPeople`, `peopleForBlock`, `calendarMonths`, `monthName`, `getPalette`, `knownColour`, `blockLink`, `groupBlocks`, `renderRich`, `paragraphs`, `getImage`, `getVideo`, `href`, `withBase`, `safeUrl`, `trFirst`, `warnOnce` |
 | `src/lib/palette.ts` | The built-in colours and colour maths (contrast, readable text colour) |
 | `src/lib/schema.ts` | Forgiving field types: `text`, `flag`, `num`, `textList` |
 | `src/lib/i18n.ts` | `LANGS`, the fixed wording (`UI`), `tr(obj, 'field', lang)` |
@@ -118,7 +118,7 @@ Nothing runs on a server. Browser JavaScript is small inline scripts, no librari
 4. **Every page takes its language from the address** (`Astro.params.lang`) and passes `lang`, `section` and `pagePath` to `Base`. `pagePath` is the address without the language (`/festival/program/`); the language switch, the menu marker and `hreflang` depend on it.
 5. **Never write an address by hand.** Use `href(lang, '/festival/...')` for pages and `withBase()` for anything else; `safeUrl()`, `getImage()` and `renderRich()` already apply the base path (and the language, for site links written without one).
 6. **Links go through `safeUrl` or `blockLink`; photos through `getImage` or `Picture`.**
-7. **Outside requests: only Sanity's photos and, when a Video block is used, YouTube without cookies or Vimeo** (`DECISIONS.md` S4, S5). Fonts come from the `@fontsource-variable` packages.
+7. **Outside requests: only Sanity's photos (and the festival banner video, also from Sanity) and, when a Video block is used, YouTube without cookies or Vimeo** (`DECISIONS.md` S4, S5). Fonts come from the `@fontsource-variable` packages.
 8. **The JSON conversion and the Studio schema stay in step.** `npm run check` [0] fails when a converted document has a field the schema does not.
 
 ## Astro 7 specifics (this repo uses Astro 7.4)

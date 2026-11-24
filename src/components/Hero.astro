@@ -1,11 +1,14 @@
 ---
 // The big banner: photo behind, then logo or name, ticket button and date line.
 // An optional second photo is used on phones (the Wix site shows a taller picture there).
-import { getImage, editAttr } from '../lib/content';
+// An optional video plays over the photo on computers; the script that starts it is in
+// Base.astro. Phones, "reduce motion" and visitors without JavaScript keep the photo.
+import { getImage, getVideo, editAttr } from '../lib/content';
 
 interface Props {
   image?: unknown;
   imagePhone?: unknown;
+  video?: unknown;
   logo?: unknown;
   title: string;
   dateLine?: string;
@@ -14,11 +17,12 @@ interface Props {
   buttonNewTab?: boolean;
 }
 
-const { image, imagePhone, logo, title, dateLine, buttonUrl, buttonLabel, buttonNewTab = false } = Astro.props;
+const { image, imagePhone, video, logo, title, dateLine, buttonUrl, buttonLabel, buttonNewTab = false } = Astro.props;
 const main = getImage(image);
 const wide = main ?? getImage(imagePhone);
 const phone = main ? getImage(imagePhone) : undefined;
 const logoImg = getImage(logo);
+const clip = getVideo(video);
 ---
 
 <section class="hero">
@@ -40,6 +44,22 @@ const logoImg = getImage(logo);
           data-sanity={editAttr(main ? image : imagePhone)}
         />
       </picture>
+    )
+  }
+  {
+    clip && (
+      <video
+        class="hero-video"
+        muted
+        loop
+        playsinline
+        preload="none"
+        aria-hidden="true"
+        tabindex="-1"
+        data-hero-video={clip.src}
+        data-type={clip.type}
+        data-sanity={editAttr(video)}
+      />
     )
   }
   <div class="hero-inner">

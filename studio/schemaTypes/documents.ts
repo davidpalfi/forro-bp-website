@@ -127,6 +127,15 @@ const festivalSettings = defineType({
       type: 'imageWithAlt',
       group: 'banner',
     }),
+    defineField({
+      name: 'heroVideo',
+      title: 'Banner video (optional)',
+      description:
+        'A short silent video that plays in a loop instead of the banner photo, on computers only. Phones, and visitors who turn off motion, see the banner photo. Use an MP4 file of a few seconds, under 10 MB; it has no sound.',
+      type: 'file',
+      options: { accept: 'video/mp4,video/webm' },
+      group: 'banner',
+    }),
     ...dateLine.fields.map((f) => ({ ...f, group: 'banner' })),
     defineField({ name: 'ticketUrl', title: 'Ticket shop address', type: 'string', validation: (rule) => rule.custom(linkRule), group: 'banner' }),
     ...ticketLabel.fields.map((f) => ({ ...f, group: 'banner' })),
