@@ -1,11 +1,11 @@
 ---
-// The community home page. Deliberately almost empty for now: the same banner and frame
-// as the festival, the blocks from "Community home page" if any, and the way to the festival.
+// The community home page: the banner and the blocks from "Community home page".
+// The way to the festival is the festival button in the menu.
 import Base from '../../layouts/Base.astro';
 import Hero from '../../components/Hero.astro';
 import Blocks from '../../components/Blocks.astro';
-import { getSite, getCommunity, getFestival, href } from '../../lib/content';
-import { LANGS, UI, tr, type Lang } from '../../lib/i18n';
+import { getSite, getCommunity } from '../../lib/content';
+import { LANGS, tr, type Lang } from '../../lib/i18n';
 
 export function getStaticPaths() {
   return LANGS.map((lang) => ({ params: { lang } }));
@@ -14,15 +14,9 @@ export function getStaticPaths() {
 const lang = Astro.params.lang as Lang;
 const site = getSite();
 const community = getCommunity();
-const festival = getFestival();
 ---
 
 <Base lang={lang} section="community" pagePath="/">
   <Hero image={community.heroImage} title={tr(community, 'title', lang) || site.name} />
   <Blocks blocks={community.homeBlocks} lang={lang} tone="red" />
-  <section class="band band--red band--center">
-    <p class="stats">{festival.name}</p>
-    {tr(festival, 'dateLine', lang) && <p class="lead">{tr(festival, 'dateLine', lang)}</p>}
-    <a class="button" href={href(lang, '/festival/')}>{UI[lang].toFestival}</a>
-  </section>
 </Base>

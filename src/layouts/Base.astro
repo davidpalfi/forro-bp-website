@@ -5,7 +5,7 @@ import '@fontsource-variable/fraunces/index.css';
 import '@fontsource-variable/libre-franklin/index.css';
 import '@fontsource-variable/open-sans/index.css';
 import '../styles/global.css';
-import { getSite, getFestival, getCommunity, getPages, getImage, safeUrl, href, trFirst, editAttr, withBase } from '../lib/content';
+import { getSite, getFestival, getCommunity, getPages, getFestivalMenuLink, getImage, safeUrl, href, trFirst, editAttr, withBase } from '../lib/content';
 import { LANGS, LANG_LABEL, LANG_NAME, UI, tr, type Lang } from '../lib/i18n';
 
 interface Props {
@@ -36,16 +36,20 @@ const share = getImage(shareImage || (inFestival ? festival.heroImage : communit
 const shareUrl = share ? new URL(share.src, Astro.site).href : '';
 
 // The menu: the section's pages marked "Show in the menu", in their menu order. In the
-// community menu the festival link takes its place by "Festival link: menu order" (default first).
+// community menu the button to the festival is a community page set to "goes to the
+// festival", with its own name and order; without one, a festival button comes first.
 const menuPages = getPages(section)
   .filter((p) => p.showInMenu)
   .map((p) => ({ path: p.path, label: trFirst(p, ['menuLabel', 'title'], lang), order: p.order }));
-const festivalOrder = typeof community.festivalMenuOrder === 'number' && Number.isFinite(community.festivalMenuOrder) ? community.festivalMenuOrder : 0;
+const festivalLink = getFestivalMenuLink();
+const festivalItem = festivalLink
+  ? festivalLink.showInMenu
+    ? [{ path: '/festival/', label: trFirst(festivalLink, ['menuLabel', 'title'], lang) || festival.name, order: festivalLink.order }]
+    : []
+  : [{ path: '/festival/', label: festival.name, order: -Infinity }];
 const nav = inFestival
   ? [{ path: '/festival/', label: t.home }, ...menuPages]
-  : [{ path: '/festival/', label: trFirst(community, ['festivalMenuLabel'], lang) || festival.name, order: festivalOrder }, ...menuPages].sort(
-      (a, b) => (a.order ?? 0) - (b.order ?? 0),
-    );
+  : [...festivalItem, ...menuPages].sort((a, b) => a.order - b.order);
 
 const brandPath = inFestival ? '/festival/' : '/';
 // The top bar uses the small logo; without one, the big banner logo.

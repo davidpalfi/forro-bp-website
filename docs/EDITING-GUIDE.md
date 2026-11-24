@@ -148,7 +148,7 @@ Blocks next to each other with the same background and alignment are joined into
    - **Page colour**: Red (like Program), Mustard (the Forró Budapest colour), Cream (like Location) or Dark. On community pages Red shows as mustard.
    - **Show in the menu** and **Menu order** (smaller numbers first; Program is 1, Teachers 2, Artists 3, Location 11).
    - **Menu label**: a different, shorter name for the menu button, in both languages. Without it, the page name is used.
-   - In the community menu, the link to the festival is not a page: its position and name are in **Community home page** (**Festival link: menu order** and **Festival link: menu label**). It is first by default (order 0).
+   - The festival button in the community menu is a community page too: in its **Settings**, **Menu button goes to** is set to **The festival**. Rename it with its title or **Menu label**, move it with **Menu order**, hide it with **Show in the menu**, like any page. It has no page of its own. (Without such a page, a festival button with the festival's name comes first.)
    - Optional: a shorter **Menu label**, and a **Short description** for Google and link previews.
 6. **Publish**.
 

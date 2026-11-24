@@ -53,25 +53,15 @@ const siteSettings = defineType({
 
 const communityTitle = localizedFields('title', 'Title on the banner')
 
-const festivalMenuLabel = localizedFields('festivalMenuLabel', 'Festival link: menu label (optional)', 'string', 'The word for the festival in the community menu. Without it, the festival name is used.')
-
 const communitySettings = defineType({
   name: 'communitySettings',
   title: 'Community home page',
   type: 'document',
-  fieldsets: [communityTitle.fieldset, festivalMenuLabel.fieldset],
+  fieldsets: [communityTitle.fieldset],
   fields: [
     ...communityTitle.fields,
     defineField({ name: 'heroImage', title: 'Banner photo', type: 'imageWithAlt' }),
     homeBlocks('Home page blocks'),
-    defineField({
-      name: 'festivalMenuOrder',
-      title: 'Festival link: menu order',
-      description: 'Where the link to the festival sits in the community menu, among the community pages (their "Menu order" is in each page\'s Settings tab). Smaller numbers come first; 0 puts it first.',
-      type: 'number',
-      initialValue: 0,
-    }),
-    ...festivalMenuLabel.fields,
   ],
   preview: { prepare: () => ({ title: 'Community home page' }) },
 })
@@ -160,9 +150,12 @@ const page = defineType({
             .slice(0, 60),
       },
       group: 'settings',
+      hidden: ({ document }) => Boolean((document as { goesTo?: string } | undefined)?.goesTo),
       validation: (rule) =>
-        rule.required().custom((value, context) => {
+        rule.custom((value, context) => {
+          if ((context.document as { goesTo?: string } | undefined)?.goesTo) return true
           const s = (value as { current?: string } | undefined)?.current ?? ''
+          if (!s) return 'Required'
           if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s)) return 'Use lowercase letters, numbers and hyphens only'
           const section = (context.document as { section?: string } | undefined)?.section ?? 'festival'
           if ((RESERVED_SLUGS[section] ?? []).includes(s)) return `"${s}" is already used by the site`
@@ -187,6 +180,15 @@ const page = defineType({
       initialValue: 'red',
       group: 'settings',
     }),
+    defineField({
+      name: 'goesTo',
+      title: 'Menu button goes to',
+      description: 'Leave empty for a normal page. "The festival" makes this a menu button to the festival: give it a title or menu label and a menu order like any page; it has no page of its own.',
+      type: 'string',
+      options: { list: [{ title: 'The festival', value: 'festival' }], layout: 'radio' },
+      hidden: ({ document }) => (document as { section?: string } | undefined)?.section !== 'community',
+      group: 'settings',
+    }),
     defineField({ name: 'showInMenu', title: 'Show in the menu', type: 'boolean', initialValue: true, group: 'settings' }),
     defineField({ name: 'order', title: 'Menu order', description: 'Smaller numbers come first.', type: 'number', initialValue: 50, group: 'settings' }),
     ...menuLabel.fields.map((f) => ({ ...f, group: 'settings' })),
@@ -194,10 +196,10 @@ const page = defineType({
   ],
   orderings: [{ title: 'Menu order', name: 'menuOrder', by: [{ field: 'section', direction: 'desc' }, { field: 'order', direction: 'asc' }] }],
   preview: {
-    select: { en: 'title_en', hu: 'title_hu', slug: 'slug.current', section: 'section', media: 'coverImage' },
-    prepare: ({ en, hu, slug, section, media }) => ({
+    select: { en: 'title_en', hu: 'title_hu', slug: 'slug.current', section: 'section', media: 'coverImage', goesTo: 'goesTo' },
+    prepare: ({ en, hu, slug, section, media, goesTo }) => ({
       title: en || hu || 'Untitled page',
-      subtitle: slug ? `/${section === 'community' ? '' : 'festival/'}${slug}/` : 'no address yet',
+      subtitle: goesTo === 'festival' ? 'Menu button to the festival' : slug ? `/${section === 'community' ? '' : 'festival/'}${slug}/` : 'no address yet',
       media,
     }),
   },
