@@ -117,6 +117,15 @@ Every colour choice (a page's colour, a block's background, the top bar, the lan
 - **Top bar and language list:** under the list, choose a colour for each part of the site, or leave **Default**.
 - If text would be hard to read on a colour, the maintainer sees a warning; nothing breaks. Deleting a colour that pages still use makes them fall back to the page or festival colour.
 
+### Fonts
+**Site settings → Fonts** (click the heading to open it) sets one font for each kind of text, everywhere on the site:
+- **Page titles**: the big title at the top of each page (usual: Platypi).
+- **Headings and large text**: headings in the page, people's names, the community headline and *Large* text (usual: Fraunces).
+- **Menu, buttons and bold labels**: the menu, buttons, banner titles, small headings and the numbers line (usual: Libre Franklin).
+- **Body text**: ordinary paragraphs and bios (usual: Open Sans).
+
+Pick a font from the list; clear the choice to go back to the usual one. The list holds fonts chosen to work together; sizes, boldness and colours stay as designed. A new font in the list needs the maintainer.
+
 ## 6. Building pages with blocks
 
 Every page is a list of **blocks**, one under the other. You can add, remove and reorder them.

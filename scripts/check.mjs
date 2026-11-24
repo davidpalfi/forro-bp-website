@@ -284,6 +284,8 @@ console.log('\n[5] Built from the Sanity import file (what npm run sanity:import
   const codes = (f) => [...fs.readFileSync(f, 'utf8').matchAll(/id: '(\w+)', name: '([^']+)', code: '(#\w+)', text: '(#\w+)'/g)].map((m) => m.slice(1).join(' ')).join(', ');
   const site = codes('src/lib/palette.ts');
   check(site !== '' && site === codes('studio/schemaTypes/palette.ts'), 'the built-in colours are the same on the site and in the Studio');
+  const fonts = (f) => [...fs.readFileSync(f, 'utf8').matchAll(/\{ id: '(\w+)', name: '([^']+)'/g)].map((m) => m.slice(1).join(' ')).join(', ');
+  check(fonts('src/lib/fonts.ts') !== '' && fonts('src/lib/fonts.ts') === fonts('studio/schemaTypes/fonts.ts'), 'the fonts are the same on the site and in the Studio');
 }
 
 console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor mistakes');
@@ -336,6 +338,10 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
       { _key: 'grey1', _type: 'paletteColour', name: 'Grey on grey', code: '#777777', text: '#888888' },
     ],
     communityLanguageListColour: 'light',
+    // Fonts: Inter for the menu and buttons, the usual font chosen by name, and an unknown one.
+    boldFont: 'inter',
+    headingFont: 'fraunces',
+    titleFont: 'comic-sans',
   });
   Object.assign(docs.find((d) => d._type === 'page' && d.slug?.current === 'code-of-conduct'), { tone: 'cpink1' });
   // A mustard page.
@@ -391,6 +397,8 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
       const coc = read(dir, 'en/festival/code-of-conduct/index.html');
       const home = read(dir, 'en/index.html');
       check(coc.includes('--c-gold:#d4a03a') && coc.includes('--c-cpink1:#f1d0c2') && /<main id="main" class="tone-cpink1"/.test(coc) && coc.includes('body .bg-cpink1,body main.tone-cpink1{') && !coc.includes('Broken'), 'the palette from Site settings: a changed code, a new colour used by a page, a bad code left out');
+      check(coc.includes("html:root{--sans:'Inter Variable', 'Helvetica Neue', Arial, sans-serif}") && !coc.includes('--serif:') && !coc.includes('--title:'), 'a font chosen in Site settings replaces the usual one; the usual one or an unknown one changes nothing');
+      check(output.includes('[content-warning] the font "comic-sans" chosen for page titles'), 'an unknown font is a warning');
       check(/<details class="lang" style="--langlist-bg:var\(--c-light\)/.test(home) && !/<details class="lang" style/.test(coc), 'the language list colour can be set per part of the site');
     }
     check(everything.includes('<p class="person-bio">First paragraph.</p>') && /<p class="person-bio">Second paragraph,\s+same paragraph\.<\/p>/.test(everything), 'in a bio an empty line (even one with an invisible character) starts a paragraph, a single line break does not');

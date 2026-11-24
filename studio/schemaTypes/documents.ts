@@ -2,6 +2,7 @@
 // (src/lib/sanity/model.ts); change both together. See docs/SPEC.md, section 11.
 import { defineField, defineType } from 'sanity'
 import { pageBlockMembers } from './blocks'
+import { fontFields } from './fonts'
 import { linkRule, localizedFields } from './shared'
 
 const homeBlocks = (title: string) =>
@@ -22,7 +23,7 @@ const siteSettings = defineType({
   name: 'siteSettings',
   title: 'Site settings',
   type: 'document',
-  fieldsets: [tagline.fieldset, footerNote.fieldset, { name: 'colours', title: 'Colours', options: { collapsible: true, collapsed: false } }],
+  fieldsets: [tagline.fieldset, footerNote.fieldset, { name: 'colours', title: 'Colours', options: { collapsible: true, collapsed: false } }, { name: 'fonts', title: 'Fonts', description: 'One font for each kind of text, from a list chosen to work together. Sizes and boldness stay as designed.', options: { collapsible: true, collapsed: true } }],
   fields: [
     defineField({ name: 'name', title: 'Community name', type: 'string' }),
     defineField({
@@ -50,6 +51,7 @@ const siteSettings = defineType({
     defineField({ name: 'festivalLanguageListColour', title: 'Festival: language list', type: 'string', options: { colourPicker: 'optional' } as never, description: 'The list that opens under EN/HU. Default: as the top bar.', fieldset: 'colours' }),
     defineField({ name: 'communityHeaderColour', title: 'Community: top bar', type: 'string', options: { colourPicker: 'optional' } as never, description: 'Default: Mustard.', fieldset: 'colours' }),
     defineField({ name: 'communityLanguageListColour', title: 'Community: language list', type: 'string', options: { colourPicker: 'optional' } as never, description: 'The list that opens under EN/HU. Default: as the top bar.', fieldset: 'colours' }),
+    ...fontFields,
     ...footerNote.fields,
     defineField({
       name: 'noindex',

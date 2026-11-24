@@ -86,6 +86,7 @@ Nothing runs on a server. Browser JavaScript is small inline scripts, no librari
 | `src/lib/from-json.ts` | JSON files -> Sanity documents. Used by the site and the import file; runs in plain Node too |
 | `src/lib/content.ts` | The only place pages get content from: `getSite`, `getFestival`, `getCommunity`, `getPages`, `getFestivalMenuLink`, `getPeople`, `peopleForBlock`, `calendarMonths`, `monthName`, `getPalette`, `knownColour`, `blockLink`, `groupBlocks`, `renderRich`, `paragraphs`, `getImage`, `href`, `withBase`, `safeUrl`, `trFirst`, `warnOnce` |
 | `src/lib/palette.ts` | The built-in colours and colour maths (contrast, readable text colour) |
+| `src/lib/fonts.ts` | The fonts Site settings → Fonts offers and the four kinds of text they apply to (`studio/schemaTypes/fonts.ts` has the same list, compared by `npm run check`) |
 | `src/lib/schema.ts` | Forgiving field types: `text`, `flag`, `num`, `textList` |
 | `src/lib/i18n.ts` | `LANGS`, the fixed wording (`UI`), `tr(obj, 'field', lang)` |
 | `src/components/Blocks.astro` | Renders a list of blocks in bands |
@@ -100,7 +101,7 @@ Nothing runs on a server. Browser JavaScript is small inline scripts, no librari
 | `src/content/` | The proof-of-concept content (JSON); the migration source |
 | `public/uploads/` | Photos of the JSON content, and the round Forró Budapest logo (`forro-budapest-logo.png`, the community default). `public/_img/` is generated; never edit it |
 | `public/icons/` | Flags, Instagram icons (grey footer, gold people cards) |
-| `src/styles/global.css` | All styling; default colours and fonts at the top (the palette overrides them from `Base.astro`); page blocks, event calendar, community level and headline banner at the end. Next to it: `ticket-red.png`, `ticket-cream.png` (the Wix ticket shapes without words) and `paper-cream.webp` (the paper texture) |
+| `src/styles/global.css` | All styling; default colours and fonts at the top (the palette and the fonts chosen in Site settings override them from `Base.astro`); page blocks, event calendar, community level and headline banner at the end. Next to it: `ticket-red.png`, `ticket-cream.png` (the Wix ticket shapes without words) and `paper-cream.webp` (the paper texture) |
 | `scripts/make-sanity-import.mjs` | `npm run sanity:import-file`: writes `sanity-import/` (ignored by Git) |
 | `scripts/check.mjs` | `npm run check`: schema check, six test builds, and that the preview stays out of public builds [7] |
 | `scripts/check-schema.mjs`, `scripts/lib/` | Documents vs Studio schema; Node loader for Studio files; Sanity-shaped test content |
@@ -181,6 +182,10 @@ A third language: add it to `LANGS`, `LANG_LABEL`, `LANG_NAME` and `UI`; add `_x
 Colours and fonts: the variables at the top of `src/styles/global.css`. Layout: that file and the markup in `src/components` and `src/pages`. Keep calling the same helpers and keep rules 3 to 6. Then run `npm run check` and the browser checks in `HANDOFF.md`.
 To change a font: install the `@fontsource-variable/<name>` package with an exact version, import it in `Base.astro`, and set the variable in `global.css`.
 Page titles (the red band) have their own variable, `--title`.
+
+### Add a font to the Site settings list
+
+Install the `@fontsource-variable/<name>` package with an exact version and import it in `Base.astro`; add it to `FONTS` in `src/lib/fonts.ts` (family name as in the package's CSS, `serif` or `sans`) and to `FONTS` and `KIND` in `studio/schemaTypes/fonts.ts` with the same id and name (`npm run check` compares them). Check it has `latin-ext` (Hungarian ő and ű). The four kinds of text are `FONT_ROLES` in `src/lib/fonts.ts`; each is a variable in `global.css`.
 
 ### Switch the site to Sanity, or change the host
 

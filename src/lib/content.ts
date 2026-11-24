@@ -14,6 +14,7 @@ import { createImageUrlBuilder } from '@sanity/image-url';
 import { marked } from 'marked';
 import { text, flag, num } from './schema.ts';
 import { isLang, tr, LANGS, type Lang } from './i18n.ts';
+import { FONT_ROLES, FONTS, fontStack } from './fonts.ts';
 import { BUILTIN_COLOURS, HEX, autoText, contrast, customId, type Colour } from './palette.ts';
 import { createDataAttribute } from '@sanity/visual-editing/create-data-attribute';
 import { loadDocuments, isPreview, SANITY, STUDIO_URL } from './source.ts';
@@ -324,6 +325,20 @@ export function getPalette(byId = S().byId): Colour[] {
     else if (str(item._key)) out.push({ id: customId(str(item._key)), name: label, code, text, builtin: false });
   }
   return out;
+}
+
+/** The fonts chosen in Site settings → Fonts, as CSS variables (empty when none is chosen). */
+export function getFontCss(byId = S().byId): string {
+  const site = asObj(byId.get('siteSettings'));
+  const vars: string[] = [];
+  for (const role of FONT_ROLES) {
+    const id = str(site[role.field]).trim();
+    if (!id || id === role.default) continue;
+    const stack = fontStack(id);
+    if (stack) vars.push(`${role.variable}:${stack}`);
+    else warnOnce(`the font "${id}" chosen for ${role.label.toLowerCase()} is not one of ${FONTS.map((f) => f.id).join(', ')}; the usual font is used`);
+  }
+  return vars.length ? `html:root{${vars.join(';')}}` : '';
 }
 
 /** A colour id the palette knows, else undefined. */

@@ -121,6 +121,9 @@ The Wix program page shows a different picture on narrow screens than on wide on
 ### S21. Page titles use Platypi (2026-11-24)
 The Wix site sets its page titles (the red band at the top of inner pages, e.g. "Your daily rhythm...") in Platypi Bold (its CSS names `orig_platypi_bold`). Only those titles use it, through the `--title` variable; every other heading and the large intro text keep Fraunces. Self-hosted from `@fontsource-variable/platypi` like the other fonts (decision 10); free under the SIL Open Font License.
 
+### S22. Fonts are chosen in Site settings, from a fixed list (2026-11-24)
+Site settings → Fonts chooses one font for each of the four kinds of text the design already uses: page titles, headings and large text, menu/buttons/bold labels, body text. Each maps onto an existing CSS variable, so the stylesheet barely changed and a choice applies everywhere at once. The list is eight self-hosted fonts picked to work together (three serifs, five sans-serifs); a browser downloads only the ones in use. Sizes, weights and text colours are not settable: free choices are how a modern look drifts, and text colour already follows the background colour (S18), so a second text colour setting would fight it. Font files cannot be uploaded: they would be served from Sanity, a third-party request for fonts (decision 10). A new font in the list is a small code change (`ARCHITECTURE.md`).
+
 ### Still open for the port
 - Whether Cloudflare also hosts the real public site at launch (the test site is there, S11).
 - The invited-editor sign-in. The publish webhook after the trial ends: webhooks are not among the Growth features the trial lists, so they are expected to work on Free; publish one test change after the trial ends (around 2026-12-18) to confirm.
