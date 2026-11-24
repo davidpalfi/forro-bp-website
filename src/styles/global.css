@@ -144,7 +144,7 @@ p { margin: 0 0 1em; }
   .menu, .js .menu, .js.menu-open .menu {
     display: flex; position: static; flex-direction: row; flex-basis: auto; order: 2;
     background: none; padding: 0; gap: 0; overflow: visible; align-items: center;
-    font-size: 0.75rem; font-weight: 900; text-transform: uppercase; white-space: nowrap;
+    font-size: 0.8125rem; font-weight: 900; text-transform: uppercase; white-space: nowrap;
   }
   .menu a { padding: 0.6rem 0.5rem; }
   .top-date { display: block; }
