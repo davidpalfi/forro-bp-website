@@ -6,6 +6,7 @@ import { schemaTypes } from './schemaTypes'
 import { SINGLETONS } from './schemaTypes/documents'
 import { ColourInput, BlockColourInput, OptionalColourInput } from './components/ColourInput'
 import { ColoursArrayInput } from './components/ColoursArrayInput'
+import { HexInput } from './components/HexInput'
 
 // The site preview shown in "Edit on the page" (click-to-edit). The deployed Studio uses the
 // preview on Cloudflare, whose address is in studio/.env.production (SANITY_STUDIO_PREVIEW_URL);
@@ -140,11 +141,12 @@ export default defineConfig({
     // rather than in the schema files, which plain Node also loads for npm run check.
     components: {
       input: (props) => {
-        const options = (props.schemaType.options ?? {}) as { colourPicker?: string; paletteList?: boolean }
+        const options = (props.schemaType.options ?? {}) as { colourPicker?: string; paletteList?: boolean; hexPicker?: boolean }
         if (options.colourPicker === 'page') return createElement(ColourInput, props as never)
         if (options.colourPicker === 'block') return createElement(BlockColourInput, props as never)
         if (options.colourPicker === 'optional') return createElement(OptionalColourInput, props as never)
         if (options.paletteList) return createElement(ColoursArrayInput, props as never)
+        if (options.hexPicker) return createElement(HexInput, props as never)
         return props.renderDefault(props)
       },
     },

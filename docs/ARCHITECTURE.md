@@ -73,8 +73,8 @@ Nothing runs on a server. Browser JavaScript is small inline scripts, no librari
 
 | Path | Responsibility |
 |---|---|
-| `studio/sanity.config.ts` | The Studio: menu (Festival and Community folders), "Edit on the page" (preview address, which address opens which document), fixed settings documents, new-document templates, and the colour pickers (`form.components`, by `options.colourPicker` / `options.paletteList`) |
-| `studio/components/ColourInput.tsx`, `ColoursArrayInput.tsx` | The palette as swatches in every colour choice (reads Site settings → Colours live, so new colours need no redeploy); the "add the built-in colours" button in Site settings |
+| `studio/sanity.config.ts` | The Studio: menu (Festival and Community folders), "Edit on the page" (preview address, which address opens which document), fixed settings documents, new-document templates, and the colour pickers (`form.components`, by `options.colourPicker` / `options.paletteList` / `options.hexPicker`) |
+| `studio/components/ColourInput.tsx`, `ColoursArrayInput.tsx`, `HexInput.tsx` | The palette as swatches in every colour choice (reads Site settings → Colours live, so new colours need no redeploy); the "add the built-in colours" button in Site settings; the browser's colour picker next to a palette colour's codes |
 | `studio/sanity.cli.ts` | Project `8hc671sk`, dataset `production`, Studio address `forro-budapest` |
 | `studio/schemaTypes/documents.ts` | Settings, page and person documents |
 | `studio/schemaTypes/blocks.ts` | The page blocks and `BLOCK_TYPES` |
