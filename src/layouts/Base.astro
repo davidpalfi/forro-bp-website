@@ -65,18 +65,32 @@ const brandPath = inFestival ? '/festival/' : '/';
 // that use it, and the old names (--red, --gold, ...) the stylesheet uses. On community pages
 // Festival red and Cream show as Mustard and Light cream (as they always did).
 const palette = getPalette();
+// The browser's scroll bar, per part of the site (Site settings → Colours; default Cream on the
+// festival, Light cream on the community). On community pages Festival red and Cream show as
+// Mustard and Light cream, as every colour choice there does.
+const scrollbarChoice = inFestival ? (knownColour(site.festivalScrollbarColour) ?? 'cream') : (knownColour(site.communityScrollbarColour) ?? 'light');
+const scrollbarColour = inFestival ? scrollbarChoice : (({ red: 'gold', cream: 'light' }) as Record<string, string>)[scrollbarChoice] ?? scrollbarChoice;
 const paletteCss =
   'html:root{' +
   palette.map((c) => `--c-${c.id}:${c.code};--c-${c.id}-text:${c.text};`).join('') +
   '--red:var(--c-red);--gold:var(--c-gold);--cream:var(--c-cream);--dark:var(--c-dark)}' +
   'body.in-community{--c-red:var(--c-gold);--c-red-text:var(--c-gold-text);--c-cream:var(--c-light);--c-cream-text:var(--c-light-text);--red:var(--c-gold);--cream:var(--c-light)}' +
   palette.map((c) => `body .bg-${c.id},body main.tone-${c.id}{background-color:var(--c-${c.id});color:var(--c-${c.id}-text)}`).join('') +
-  scrollbarCss(knownColour(site.scrollbarColour) ?? 'cream') +
+  scrollbarCss(scrollbarColour) +
   getFontCss();
-// The browser's scroll bar, from Site settings → Colours (default Cream): the colour as the track,
-// a mix of it and its text colour as the part you drag.
+// The scroll bar: the colour as the track, a mix of it and its text colour as the part you drag.
+// Safari and Chrome get ::-webkit-scrollbar, which every Safari colours. Only browsers without it
+// (Firefox) get scrollbar-color: Safari 26.2+ understands it but colours the bar only on macOS 26,
+// and like Chrome it then drops ::-webkit-scrollbar, so on older macOS the bar would stay grey.
 function scrollbarCss(id: string) {
-  return `html:root{scrollbar-color:color-mix(in srgb,var(--c-${id}-text) 40%,var(--c-${id})) var(--c-${id})}`;
+  const track = `var(--c-${id})`;
+  const thumb = `color-mix(in srgb,var(--c-${id}-text) 40%,${track})`;
+  return (
+    `@supports not selector(::-webkit-scrollbar){html:root{scrollbar-color:${thumb} ${track}}}` +
+    `html::-webkit-scrollbar{width:14px;height:14px;background:${track}}` +
+    `html::-webkit-scrollbar-thumb{background:${thumb};border:3px solid ${track};border-radius:7px}` +
+    `html::-webkit-scrollbar-corner{background:${track}}`
+  );
 }
 // The top bar and the language list, from Site settings → Colours (else the usual colours).
 const colourVars = (id: string | undefined, prefix: string) => (id ? `--${prefix}-bg:var(--c-${id});--${prefix}-text:var(--c-${id}-text)` : undefined);

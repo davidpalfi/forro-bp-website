@@ -49,9 +49,10 @@ const siteSettings = defineType({
     }),
     defineField({ name: 'festivalHeaderColour', title: 'Festival: top bar', type: 'string', options: { colourPicker: 'optional' } as never, description: 'Default: Festival red.', fieldset: 'colours' }),
     defineField({ name: 'festivalLanguageListColour', title: 'Festival: language list', type: 'string', options: { colourPicker: 'optional' } as never, description: 'The list that opens under EN/HU. Default: as the top bar.', fieldset: 'colours' }),
+    defineField({ name: 'festivalScrollbarColour', title: 'Festival: scroll bar', type: 'string', options: { colourPicker: 'optional' } as never, description: 'The bar at the right edge of the browser window. Default: Cream.', fieldset: 'colours' }),
     defineField({ name: 'communityHeaderColour', title: 'Community: top bar', type: 'string', options: { colourPicker: 'optional' } as never, description: 'Default: Mustard.', fieldset: 'colours' }),
     defineField({ name: 'communityLanguageListColour', title: 'Community: language list', type: 'string', options: { colourPicker: 'optional' } as never, description: 'The list that opens under EN/HU. Default: as the top bar.', fieldset: 'colours' }),
-    defineField({ name: 'scrollbarColour', title: 'Scroll bar', type: 'string', options: { colourPicker: 'optional' } as never, description: 'The bar at the right edge of the browser window, on every page. Default: Cream.', fieldset: 'colours' }),
+    defineField({ name: 'communityScrollbarColour', title: 'Community: scroll bar', type: 'string', options: { colourPicker: 'optional' } as never, description: 'The bar at the right edge of the browser window. Default: Light cream.', fieldset: 'colours' }),
     ...fontFields,
     ...footerNote.fields,
     defineField({

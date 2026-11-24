@@ -130,6 +130,9 @@ Site settings → Fonts chooses one font for each of the four kinds of text the 
 ### S24. A separate browser-tab icon field (Dávid, 2026-11-24)
 Festival home page and Community home page each have an optional "Browser tab icon", so a logo made just for the tab can be uploaded later. Until then the festival uses its big banner logo (else the small one) and the community its top-bar logo (else the round Forró Budapest logo).
 
+### S25. The scroll bar colour per part of the site, styled with ::-webkit-scrollbar (Dávid, 2026-11-24)
+Site settings → Colours has a scroll bar colour for the festival (default Cream) and one for the community (default Light cream; as everywhere on community pages, Festival red and Cream show as Mustard and Light cream), like the top bar and the language list. The single site-wide `scrollbarColour` is gone; a value left in Sanity shows as an unknown field to remove. The first version used only the standard `scrollbar-color`, which did nothing in Safari: Safari before 26.2 ignores it, and 26.2+ colours the bar only on macOS 26 (MDN browser-compat-data issue 29315) and, like Chrome, most likely ignores `::-webkit-scrollbar` once `scrollbar-color` is set. Not tested on a Mac; Chromium was. So Safari and Chrome get `::-webkit-scrollbar` on `html`, which every Safari colours, and `scrollbar-color` is given only where `@supports selector(::-webkit-scrollbar)` fails (Firefox). The styled bar is always shown, also on Macs that otherwise hide scroll bars until you scroll.
+
 ### Still open for the port
 - Whether Cloudflare also hosts the real public site at launch (the test site is there, S11).
 - The invited-editor sign-in. The publish webhook after the trial ends: webhooks are not among the Growth features the trial lists, so they are expected to work on Free; publish one test change after the trial ends (around 2026-12-18) to confirm.

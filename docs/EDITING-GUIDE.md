@@ -121,8 +121,7 @@ The calendar page shows one month's calendar picture at a time, with arrows to t
 Every colour choice (a page's colour, a block's background, the top bar, the language list, the scroll bar) offers the colours listed in **Site settings → Colours**.
 - **Change a colour everywhere:** click **Add the built-in colours to change their codes** once (if the button is there), then open a colour and click the square next to **Colour code** to pick a new colour, or type its code (e.g. `#c28f32`). Everything that uses it changes.
 - **Add a colour:** **Add item**, give it a **Name** and a **Colour code** (click the square to pick one, or type it). It then appears in every colour choice. The text colour on it is picked automatically (dark grey or cream); set **Text colour on it** to choose yourself.
-- **Top bar and language list:** under the list, choose a colour for each part of the site, or leave **Default**.
-- **Scroll bar:** the bar at the right edge of the browser window, for the whole site. **Default** is Cream.
+- **Top bar, language list and scroll bar:** under the list, choose a colour for each part of the site (Festival and Community), or leave **Default**. The scroll bar is the bar at the right edge of the browser window; its default is Cream on the festival and Light cream on the community.
 - If text would be hard to read on a colour, the maintainer sees a warning; nothing breaks. Deleting a colour that pages still use makes them fall back to the page or festival colour.
 
 ### Fonts
