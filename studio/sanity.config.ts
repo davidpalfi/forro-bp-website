@@ -22,6 +22,10 @@ const singleton = (S: StructureBuilder, id: string, title: string) =>
     .title(title)
     .child(S.document().schemaType(id).documentId(id).title(title))
 
+// A folder in the Content menu holding the items of one part of the site.
+const group = (S: StructureBuilder, id: string, title: string, items: ReturnType<StructureBuilder['listItem']>[]) =>
+  S.listItem().id(id).title(title).child(S.list().id(id).title(title).items(items))
+
 const peopleIn = (S: StructureBuilder, title: string, group: string) =>
   S.listItem()
     .id(`people-${group}`)
@@ -62,13 +66,16 @@ export default defineConfig({
         S.list()
           .title('Content')
           .items([
-            singleton(S, 'festivalSettings', 'Festival home page'),
-            pagesIn(S, 'Festival pages', 'festival'),
-            peopleIn(S, 'Teachers', 'Teacher'),
-            peopleIn(S, 'Artists', 'Artist'),
-            S.divider(),
-            singleton(S, 'communitySettings', 'Community home page'),
-            pagesIn(S, 'Community pages', 'community'),
+            group(S, 'festival', 'Festival', [
+              singleton(S, 'festivalSettings', 'Home page'),
+              pagesIn(S, 'Pages', 'festival'),
+              peopleIn(S, 'Teachers', 'Teacher'),
+              peopleIn(S, 'Artists', 'Artist'),
+            ]),
+            group(S, 'community', 'Community', [
+              singleton(S, 'communitySettings', 'Home page'),
+              pagesIn(S, 'Pages', 'community'),
+            ]),
             S.divider(),
             S.documentTypeListItem('person').title('Everyone (teachers and artists)'),
             singleton(S, 'siteSettings', 'Site settings'),

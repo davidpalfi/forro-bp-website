@@ -20,11 +20,11 @@ On the left is the **Content** menu:
 
 | In the menu | What it is |
 |---|---|
-| **Festival home page** | The big banner (photo, big logo, dates, ticket button), the small logo in the top-left corner and everything below it on the festival's front page |
-| **Festival pages** | Program, Teachers, Artists, Location, Code of Conduct, and any page you add |
-| **Teachers** / **Artists** | One entry per person |
-| **Community home page** | The front page of the community site |
-| **Community pages** | Pages of the community site |
+| **Festival → Home page** | The big banner (photo, big logo, dates, ticket button), the small logo in the top-left corner and everything below it on the festival's front page |
+| **Festival → Pages** | Program, Teachers, Artists, Location, Code of Conduct, and any page you add |
+| **Festival → Teachers** / **Artists** | One entry per person |
+| **Community → Home page** | The front page of the community site |
+| **Community → Pages** | Pages of the community site |
 | **Everyone (teachers and artists)** | All people in one list |
 | **Site settings** | Community name, contact email, social links, "Hide the site from Google" |
 
@@ -62,19 +62,19 @@ If a dark strip at the bottom says "unpublished changes are hidden", the page wa
 ## 5. Common tasks
 
 ### Change the festival dates, ticket link or banner photo
-1. Open **Festival home page**.
+1. Open **Festival → Home page**.
 2. On the **Banner and tickets** tab, change **Dates** (both languages), **Ticket shop address** or **Banner photo**.
 3. **Publish**.
 
 The dates also appear in the header on wide screens.
 
 ### Change the festival introduction or the numbers line
-1. Open **Festival home page** and go to the **Page content** tab.
+1. Open **Festival → Home page** and go to the **Page content** tab.
 2. Click a block (for example the introduction text) to open it, edit, and close it.
 3. **Publish**.
 
 ### Add a teacher or an artist
-1. Open **Teachers** (or **Artists**) and click the **+** (Create) button at the top of the list.
+1. Open **Festival → Teachers** (or **Artists**) and click the **+** (Create) button at the top of the list.
 2. Fill in **Name**, choose the **Group**, add a **Photo**, the **Role** (teachers only, e.g. "Dance Teacher" / "Tánctanár"), the **Biography** in both languages and the **Instagram address** (copy it from the browser, starting with https://).
 3. **Display order**: smaller numbers come first. Give the new person a number between the people they should sit between (e.g. 2.5 between 2 and 3).
 4. **Publish**. The person appears on the Teachers or Artists page by themselves.
@@ -92,13 +92,13 @@ Open the person, click the **⋯** menu next to **Publish** and choose **Unpubli
 3. Optional: under **Description for blind visitors**, write one short sentence about what the photo shows.
 
 ### Replace the program images
-1. Open **Festival pages** → **Program**.
+1. Open **Festival → Pages** → **Program**.
 2. Each program graphic is an **Image** block. Click one and upload a new photo over it, or add a new **Image** block with **Add item** at the bottom.
 3. Drag the blocks by their handle (⋮⋮) to change the order.
 4. **Publish**.
 
 ### Edit a text page (Location, Code of Conduct)
-1. Open **Festival pages** and choose the page.
+1. Open **Festival → Pages** and choose the page.
 2. Click the **Text** block. The toolbar gives you **bold**, *italic*, headings, lists and links.
 3. To add a link: select words, click the link button, and type the address: `https://…` for another website, or for a page of this site just the part after the language, such as `/festival/program/`.
 4. **Publish**.
@@ -139,7 +139,7 @@ Blocks next to each other with the same background and alignment are joined into
 
 ## 7. Making a new page
 
-1. Open **Festival pages** (or **Community pages**) and click **+**.
+1. Open **Festival → Pages** (or **Community → Pages**) and click **+**.
 2. **Page name** in both languages. It appears in the menu and the browser tab.
 3. Optional: a **Big heading** shown at the top of the page, and a **Photo above the page**.
 4. Add blocks under **Page content**.
