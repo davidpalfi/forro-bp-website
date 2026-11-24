@@ -68,7 +68,7 @@ A headline banner: the headline (`title_*`, else the community name), an optiona
 
 ### 4.4 Program
 
-Heading (`programHeading`, else "Program"). The `programImages` in order, one under the other at up to about 1150 px wide, the same in both languages. Then `programText` when written. Image alt text is "Program – festival name (n)".
+Heading (`programHeading`, else "Program"). The `programImages` in order, one under the other and touching, at up to about 1150 px wide (at most 80% of the screen width on screens 720 px and wider), the same in both languages; a page that starts with a picture sits close under its heading. Then `programText` when written. Image alt text is "Program – festival name (n)".
 
 ### 4.5 Teachers and Artists
 

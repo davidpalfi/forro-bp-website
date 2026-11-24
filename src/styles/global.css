@@ -26,7 +26,9 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; background: var(--bar, var(--red)); }
+/* The scroll bar takes the top bar's colour instead of the browser's white. */
+html { scrollbar-color: color-mix(in srgb, var(--bar, var(--red)) 55%, black) var(--bar, var(--red)); }
 
 body {
   margin: 0;
@@ -245,7 +247,7 @@ p { margin: 0 0 1em; }
 
 .title-band { background: transparent; padding: 2.75rem var(--gutter) 2rem; text-align: center; }
 .title-band h1, .page-title { font-family: var(--title); }
-.title-band h1 { font-size: clamp(1.75rem, 7vw, 2.9rem); max-width: 22ch; margin-inline: auto; text-wrap: balance; }
+.title-band h1 { font-size: clamp(1.75rem, 7vw, 3.6rem); max-width: 22ch; margin-inline: auto; text-wrap: balance; }
 
 .page { max-width: calc(var(--measure) + 2 * var(--gutter)); margin-inline: auto; padding: 2rem var(--gutter) 3rem; }
 .page--wide { max-width: 68rem; }
@@ -395,6 +397,12 @@ p { margin: 0 0 1em; }
 .blocks.align-left .b-button, .blocks.align-right .b-button { padding-block: 0.25rem; }
 
 .b-image { margin-inline: auto; }
+/* Wide pictures leave a margin on large screens, and pictures one under the other touch,
+   as on the Wix program page. A page that starts with a picture sits closer to its heading. */
+@media (min-width: 720px) { .b-image.b-xwide { max-width: min(72rem, 80vw); } }
+.b-image.b-xwide + .b-image.b-xwide { margin-top: -1.25rem; }
+.title-band:has(+ .blocks > .b-image:first-child) { padding-bottom: 0.5rem; }
+.title-band + .blocks.after-title:has(> .b-image:first-child) { padding-top: 0; }
 .b-image-photo { width: 100%; }
 figure { margin: 0; }
 figcaption { font-size: 0.9375rem; margin-top: 0.6rem; opacity: 0.85; }

@@ -99,10 +99,12 @@ const instagram = safeUrl((inFestival && festival.instagram) || site.instagram |
 const facebook = safeUrl(site.facebook);
 const footerNote = tr(site, 'footerNote', lang);
 const year = new Date().getFullYear();
+// The top bar's colour: the browser's theme colour and the page's scroll bar.
+const barColour = (palette.find((c) => c.id === (knownColour(inFestival ? site.festivalHeaderColour : site.communityHeaderColour) ?? (inFestival ? 'red' : 'gold'))) ?? palette[0]).code;
 ---
 
 <!doctype html>
-<html lang={lang}>
+<html lang={lang} style={`--bar: ${barColour}`}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -119,7 +121,7 @@ const year = new Date().getFullYear();
     <meta property="og:locale" content={lang === 'hu' ? 'hu_HU' : 'en_GB'} />
     {shareUrl && <meta property="og:image" content={shareUrl} />}
     {shareUrl && <meta name="twitter:card" content="summary_large_image" />}
-    <meta name="theme-color" content={(palette.find((c) => c.id === (knownColour(inFestival ? site.festivalHeaderColour : site.communityHeaderColour) ?? (inFestival ? 'red' : 'gold'))) ?? palette[0]).code} />
+    <meta name="theme-color" content={barColour} />
     <style is:inline set:html={paletteCss} />
     {site.noindex && <meta name="robots" content="noindex, nofollow" />}
   </head>
