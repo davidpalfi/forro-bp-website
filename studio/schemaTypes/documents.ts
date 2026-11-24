@@ -1,5 +1,5 @@
 // The documents the admin edits. Field names match the site's content model
-// (src/lib/sanity/model.ts); change both together. See docs/SPEC.md, section 11.
+// (src/lib/content.ts, src/lib/from-json.ts); change them together. See docs/SPEC.md, sections 6-7.
 import { defineField, defineType } from 'sanity'
 import { pageBlockMembers } from './blocks'
 import { fontFields } from './fonts'
