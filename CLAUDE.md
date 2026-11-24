@@ -4,13 +4,15 @@ A static Astro website for the Forró Budapest community, with the festival as a
 
 ## Before changing structure
 
-For content edits you can skip this. For anything structural (new fields, new page types, design, tooling, hosting), read `docs/HANDOFF.md`, then `docs/DECISIONS.md`, `docs/SPEC.md` and `docs/ARCHITECTURE.md` (its recipes list every place a change must touch). Record any new or changed decision in `docs/DECISIONS.md` and any changed behaviour in `docs/SPEC.md` in the same change.
+For content edits you can skip this. For anything structural (new fields, new page types, design, tooling, hosting), read `docs/HANDOFF.md`, then `docs/DECISIONS.md`, `docs/SPEC.md` and `docs/ARCHITECTURE.md` (its recipes list every place a change must touch). Record any new or changed decision in `docs/DECISIONS.md` and any changed behaviour in `docs/SPEC.md` in the same change, and delete a finished ticket from `docs/backlog.json` (its rules are at the top of the file).
+
+Keep the docs lean: each fact lives in one file (`docs/HANDOFF.md`, "The documents", says which). Update text that is no longer true instead of adding dated notes, "✅ done" lists or new handoff sections; git history keeps the past.
 
 ## Where things are
 
 - The live content is in Sanity (project `8hc671sk`, dataset `production`), edited in the Studio. The JSON files in `src/content/` (`settings/`, `people/`, `pages/`) are the original content: the source of the Sanity import and of the tests (`CONTENT_SOURCE` defaults to them). Editing them does not change the test site, which is built from Sanity.
 - Photos are in `public/uploads/`. Never edit or delete `public/_img/`; it is generated at build time.
-- The editor is `studio/` (Sanity Studio). The site renders Sanity documents; `src/lib/from-json.ts` converts the JSON files into the same documents, and `npm run check` fails if they stop matching the Studio schema. Hosting is on Cloudflare (`docs/HOSTING.md`); the Studio deploys itself from GitHub when `studio/` changes on `main` (`.github/workflows/studio-deploy.yml`). See `docs/SANITY-PORT-STATUS.md`.
+- The editor is `studio/` (Sanity Studio). The site renders Sanity documents; `src/lib/from-json.ts` converts the JSON files into the same documents, and `npm run check` fails if they stop matching the Studio schema. Hosting is on Cloudflare (`docs/HOSTING.md`); the Studio deploys itself from GitHub when `studio/` changes on `main` (`.github/workflows/studio-deploy.yml`).
 - Fixed wording in both languages is in `src/lib/i18n.ts`.
 - Page code is in `src/pages/[lang]/`, `src/components/`, `src/layouts/`; styles are in `src/styles/global.css`.
 

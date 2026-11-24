@@ -2,20 +2,20 @@
 
 How the code is organised and how to change it safely. For what the site does, see `SPEC.md`; for why it is built this way, see `DECISIONS.md`.
 
-## Current state (2026-11-23, `main`)
+## Overview
 
-The site renders **Sanity documents**. They come from Sanity, or from the JSON files in `src/content` converted to the same documents; `CONTENT_SOURCE` chooses (`SPEC.md` 11.1). The default is still the JSON files, so the site builds and is tested without Sanity access. The content is imported and the Studio deployed (2026-11-18). Click-to-edit runs as a preview on Cloudflare (and locally); the test site is built from Sanity on Cloudflare and rebuilt on Publish (below, `SPEC.md` 11.7, `DECISIONS.md` S9, S11, S12).
+The site renders **Sanity documents**. They come from Sanity, or from the JSON files in `src/content` converted to the same documents; `CONTENT_SOURCE` chooses (`SPEC.md` P2). The default is the JSON files, so the site builds and is tested without Sanity access; the test site on Cloudflare builds with `CONTENT_SOURCE=sanity`.
 
 ```text
 Admin -> hosted Sanity Studio -> published documents in Sanity ---------+
                                                                          |  CONTENT_SOURCE=sanity
 src/content/*.json --(src/lib/from-json.ts)--> the same documents -------+  (default: json)
         |                                                                |
-        +--> npm run sanity:import-file -> sanity-import/ -> npm run sanity:import (Dávid, signed in)
+        +--> npm run sanity:import-file -> sanity-import/ -> npm run sanity:import (signed in)
                                                                          v
-                                              npm run build -> dist/ (static) -> host (not chosen)
-Click-to-edit (local): Studio "Edit on the page" <-> npm run preview:edit (drafts, per request)
-Planned: hosted preview; Sanity webhook -> rebuild.
+                         npm run build -> dist/ (static) -> Worker forro-bp-website (test site)
+Publish in the Studio -> Sanity webhook -> Workers Builds deploy hook -> rebuild
+Studio "Edit on the page" <-> Worker forro-budapest-preview (drafts, per request; locally npm run preview:edit)
 ```
 
 ## Click-to-edit preview (`npm run preview:edit` locally, `npm run preview:build` for Cloudflare)
@@ -98,15 +98,15 @@ Nothing runs on a server. Browser JavaScript is small inline scripts, no librari
 | `src/pages/[lang]/index.astro`, `[lang]/[slug].astro` | Community home and community pages |
 | `src/pages/[lang]/festival/index.astro`, `festival/[slug].astro` | Festival home and every festival page |
 | `src/pages/404.astro` | Not found, both languages |
-| `src/content/` | The proof-of-concept content (JSON); the migration source |
+| `src/content/` | The original content (JSON): the import source and the test content |
 | `public/uploads/` | Photos of the JSON content, and the round Forró Budapest logo (`forro-budapest-logo.png`, the community default). `public/_img/` is generated; never edit it |
 | `public/icons/` | Flags, Instagram icons (grey footer, gold people cards) |
 | `src/styles/global.css` | All styling; default colours and fonts at the top (the palette and the fonts chosen in Site settings override them from `Base.astro`); page blocks, event calendar, community level and headline banner at the end. Next to it: `ticket-red.png`, `ticket-cream.png` (the Wix ticket shapes without words) and `paper-cream.webp` (the paper texture) |
 | `scripts/make-sanity-import.mjs` | `npm run sanity:import-file`: writes `sanity-import/` (ignored by Git) |
-| `scripts/check.mjs` | `npm run check`: schema check, six test builds, and that the preview stays out of public builds [7] |
+| `scripts/check.mjs` | `npm run check`: [0] schema, [1]-[6] test builds (real, broken, malformed, sub-path, import file, Sanity-shaped), [7] the preview stays out of public builds, [8] the Cloudflare preview (`scripts/check-preview.mjs`) |
 | `scripts/check-schema.mjs`, `scripts/lib/` | Documents vs Studio schema; Node loader for Studio files; Sanity-shaped test content |
 | `scripts/optimize-images.mjs` | Photo resizing before every build |
-| `.github/workflows/check.yml` | Runs `npm run check` on pull requests and code pushes to `main`. (The Pages CMS forms and the GitHub Pages deploy were removed 2026-11-23; see tag `pages-cms-poc`) |
+| `.github/workflows/check.yml` | Runs `npm run check` on pull requests and code pushes to `main` |
 | `.github/workflows/studio-deploy.yml` | Deploys the Studio (`npm run studio:deploy -- --yes`) when `studio/` or the dependencies change on `main`, or by hand (Actions > Deploy Studio > Run workflow). Uses the repository secret `SANITY_AUTH_TOKEN` (a Sanity token with "Deploy Studio" permission) |
 | `astro.config.mjs` | Reads `SITE_URL` and `SITE_BASE`; trailing slashes. With `PREVIEW=1`: on-request rendering, `.env`, the editing script |
 | `.env.example` | Names the preview's setting (`SANITY_VIEWER_TOKEN`); the real `.env` is git-ignored |
@@ -129,7 +129,6 @@ Nothing runs on a server. Browser JavaScript is small inline scripts, no librari
 - `from-json.ts`, `schema.ts` and `i18n.ts` also run in plain Node (Node strips the types). Import between them with the `.ts` ending, and use no Astro-only modules there.
 - `getStaticPaths` is hoisted; it cannot use variables declared outside it. Imports are fine.
 - Astro 7 needs Node 22.23.4 or newer.
-- `create-astro` templates could not be downloaded in the sandbox this was built in; the project was set up by hand.
 
 ## Gotchas
 
@@ -155,7 +154,7 @@ A string field with `options: { colourPicker: 'page' | 'block' | 'optional' }` s
 1. `studio/schemaTypes/`: add the field (a `localizedFields` pair if it has two languages). Give it a title and, if useful, a description the admin understands.
 2. The component that shows it: read it with `tr()` if it has two languages, `safeUrl` if it is a link, `getImage`/`Picture` if it is a photo.
 3. If the JSON files have a matching value, map it in `src/lib/from-json.ts`.
-4. `SPEC.md` section 11, the admin guide if she will use it, `npm run check`, `npm run studio:build`.
+4. `SPEC.md` (the section that describes it), the admin guide if she will use it, `npm run check`, `npm run studio:build`.
 
 ### Add a new block
 
@@ -187,9 +186,9 @@ Page titles (the red band) have their own variable, `--title`.
 
 Install the `@fontsource-variable/<name>` package with an exact version and import it in `Base.astro`; add it to `FONTS` in `src/lib/fonts.ts` (family name as in the package's CSS, `serif` or `sans`) and to `FONTS` and `KIND` in `studio/schemaTypes/fonts.ts` with the same id and name (`npm run check` compares them). Check it has `latin-ext` (Hungarian ő and ű). The four kinds of text are `FONT_ROLES` in `src/lib/fonts.ts`; each is a variable in `global.css`.
 
-### Switch the site to Sanity, or change the host
+### Change the host
 
-After the import (`SANITY-PORT-STATUS.md`), set `CONTENT_SOURCE=sanity` in the host's build settings. Build command `npm run build`, output `dist`, Node 22.23.4 or newer, `SITE_URL` set to the real address (`SITE_BASE` only under a sub-path). `SANITY_READ_TOKEN` only if the dataset is private, as a secret.
+Build command `CONTENT_SOURCE=sanity npm run build`, output `dist`, Node 22.23.4 or newer (`.node-version`), `SITE_URL` set to the real address (`SITE_BASE` only under a sub-path). `SANITY_READ_TOKEN` only if the dataset is ever private, as a secret. Then point the Sanity webhook at the new host's deploy hook (`HOSTING.md` part 5).
 
 ### Upgrade Astro, Node or another dependency
 
@@ -197,4 +196,4 @@ Change the exact versions in `package.json` and `.node-version` (Cloudflare's bu
 
 ### Change the Sanity content model
 
-Edit `studio/schemaTypes/`, then `cd studio && npx sanity schema validate`, `npm run studio:build` and `npm run check` (its section 0 compares the converted documents with the schema). A field renamed or removed in the schema keeps its old value in Sanity documents until they are edited or migrated; keep the site tolerant of both, or write a migration. The Studio deploys itself when the change reaches `main` (`.github/workflows/studio-deploy.yml`, since 2026-11-24); by hand: `npm run studio:deploy` (needs Sanity sign-in) or Actions > Deploy Studio > Run workflow.
+Edit `studio/schemaTypes/`, then `cd studio && npx sanity schema validate`, `npm run studio:build` and `npm run check` (its section 0 compares the converted documents with the schema). A field renamed or removed in the schema keeps its old value in Sanity documents until they are edited or migrated; keep the site tolerant of both, or write a migration. The Studio deploys itself when the change reaches `main` (`.github/workflows/studio-deploy.yml`); by hand: `npm run studio:deploy` (needs Sanity sign-in) or Actions > Deploy Studio > Run workflow.

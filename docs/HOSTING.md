@@ -1,8 +1,8 @@
 # Putting it online (Cloudflare, free plan)
 
-For Dávid. About 30 minutes. **Use a computer** (the dashboards are cramped on a phone). Nothing here touches forrobudapest.com, Wix or the `main` site, and nothing costs money.
+For Dávid. **Done 2026-11-23**; kept for setting it up again or for troubleshooting (see "If something goes wrong" at the end). About 30 minutes, on a computer. Nothing here touches forrobudapest.com or Wix, and nothing costs money.
 
-Every step starts with a link. Open it in the same browser where you are signed in to Cloudflare (with GitHub) or Sanity. Written 2026-11-19 (step 1.2 corrected 2026-11-22 from Dávid's screenshot) from Cloudflare's and Sanity's documentation; the agent could not open the dashboards itself. If a button has a slightly different name, take the nearest match. If a link does not land where the step says, use the "or" route given with it. If something is missing entirely, stop and tell the agent what you see.
+Every step starts with a link. Open it in the browser where you are signed in to Cloudflare (with GitHub) or Sanity. Written from Cloudflare's and Sanity's documentation and corrected from Dávid's screenshots; if a button has a slightly different name, take the nearest match.
 
 **Two secrets:** the Sanity token (part 2) and the deploy hook address (part 5). Paste them only into the boxes named in the steps: never into chat, e-mail or a file.
 
@@ -40,7 +40,7 @@ Leave all other fields alone. If you see a **Branch** / **Production branch** fi
 
 **1.7** If it asks you to choose a **workers.dev subdomain**: type something short, e.g. `davidpalfi`, and confirm. This word appears in both addresses.
 
-**1.8** You now see the build running. **It will probably fail** with a red cross, because Cloudflare builds the `main` branch first. That is expected. Go on.
+**1.8** You now see the build running. If it fails, go on: the branch is set next.
 
 **1.9** Open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-budapest-preview/production/settings
 (or: https://dash.cloudflare.com/?to=/:account/workers-and-pages > click **forro-budapest-preview** > the **Settings** tab).
@@ -102,7 +102,7 @@ Leave all other fields alone. If you see a **Branch** / **Production branch** fi
 | Build command | `CONTENT_SOURCE=sanity npm run build` |
 | Deploy command | `npx wrangler deploy --config wrangler.site.jsonc` |
 
-**3.3** **Create and deploy**. The build may fail again (wrong branch). Go on.
+**3.3** **Create and deploy**. If the build fails, go on.
 
 **3.4** Open https://dash.cloudflare.com/?to=/:account/workers/services/view/forro-bp-website/production/settings
 (or: Workers & Pages > **forro-bp-website** > **Settings**).
@@ -173,39 +173,13 @@ Click **Save**. If Sanity says webhooks are not available on your plan, stop and
 
 ---
 
-## Part 6. Send the agent the two addresses, then deploy the Studio
+## Part 6. The Studio
 
-**6.1** Send the agent the **preview address** and the **test address**.
+**6.1** The preview address goes into `studio/.env.production` (`SANITY_STUDIO_PREVIEW_URL=https://...`, not secret), and the test address into `docs/EDITING-GUIDE.md`. The agent does this when given the addresses.
 
-**6.2** The agent saves them in the project and tells you when it is pushed.
+**6.2** The Studio deploys itself when that change reaches `main` (`.github/workflows/studio-deploy.yml`, repository secret `SANITY_AUTH_TOKEN`). By hand: GitHub > Actions > Deploy Studio > Run workflow, or `npm run studio:deploy` on a computer.
 
-**6.3** On your computer, open Terminal and run, one line at a time:
-
-```
-cd ~/src/forro-budapest-site
-git pull
-npm ci
-npm run studio:deploy
-```
-
-It prints `"Edit on the page" will open https://forro-budapest-preview...` and deploys the Studio.
-
-Since 2026-11-24 this happens by itself: `.github/workflows/studio-deploy.yml` deploys the Studio whenever its code changes on `main` (secret `SANITY_AUTH_TOKEN` in the repository's Actions secrets). The steps above remain the manual way.
-
-**6.4** Open https://forro-budapest.sanity.studio > **Edit on the page** (top). The page appears **without** the dark strip. Click a text and type a word: about a second later the page shows it, without flashing or jumping to the top. Nothing is published unless you click Publish.
-
-**6.5** Do 6.4 in **Safari** too and tell the agent whether the dark strip is gone there (Safari is the browser most likely to block the preview's cookie).
-
----
-
-## Moving from `feature/sanity` to `main` (done once, 2026-11-23)
-
-The Workers were first set up on `feature/sanity`. When that branch was merged into `main`:
-
-1. Both Workers > **Settings** > **Builds** > **Production** > **Branch control**: production branch `main`, **Save**.
-2. `forro-bp-website` > **Settings** > **Builds** > **Deploy Hooks**: edit `Sanity publish` and set its branch to `main` (done this way; the address stays the same). If editing is not offered: delete it, add a new one on `main`, and do step 3.
-3. Only for a new hook: Sanity > API > **Webhooks** > `Rebuild test site` > edit: replace the URL with the new hook address, save.
-4. The agent pushes a change to `main`; both Workers build it. Then a test Publish in the Studio.
+**6.3** Open https://forro-budapest.sanity.studio > **Edit on the page** (top). The page appears **without** the dark strip. Click a text and type a word: a second or two later the page shows it, without flashing or jumping to the top. Nothing is published unless you click Publish. Try it in **Safari** too (the browser most likely to block the preview's cookie).
 
 ## If something goes wrong
 
