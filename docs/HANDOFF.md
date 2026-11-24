@@ -85,7 +85,7 @@ Placeholders, to be replaced:
 Not done:
 - Anything on GitHub: repository, Pages, the workflows' first run.
 - Connecting Pages CMS and the admin's trial (AC13 to AC15 in `SPEC.md`).
-- The admin's sign-off on the look (AC16). The fonts are a match by eye. The Wix site uses a different banner photo on desktop (people dancing) than on phones (the aerial view); both slots exist in the form (banner photo, banner photo for phones) and both hold a placeholder until her files arrive.
+- The admin's sign-off on the look (AC16). The serif font is Platypi, as on Wix; the sans-serif fonts are a match by eye. The Wix site uses a different banner photo on desktop (people dancing) than on phones (the aerial view); both slots exist in the form (banner photo, banner photo for phones) and both hold a placeholder until her files arrive.
 - The community level's content.
 - Domain move and redirects.
 - Browsers other than Chromium; a real accessibility review.

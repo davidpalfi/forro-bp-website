@@ -118,6 +118,9 @@ A GitHub workflow runs `npm run studio:deploy` when Studio code or the dependenc
 ### S20. A phone version on the Image block (Dávid, 2026-11-24)
 The Wix program page shows a different picture on narrow screens than on wide ones. The Image block got an optional "Phone version": below 720 px wide (the same breakpoint as the festival banner's phone photo) the page and the photo viewer show it instead. A field on the existing block rather than a separate "adaptive image" block: it works on every page without code changes, and the editor does not have to choose between two nearly identical blocks or rebuild a block to add a phone version later. Other photo fields (galleries, banner and columns blocks) have none yet; add the same field there if it is asked for.
 
+### S21. The serif font is Platypi (2026-11-24)
+The Wix site's headings use Platypi (its CSS names `orig_platypi_bold`), so it replaces Fraunces, which was a match by eye. Self-hosted from `@fontsource-variable/platypi` like the other fonts (decision 10); free under the SIL Open Font License. The sans-serif fonts are unchanged.
+
 ### Still open for the port
 - Whether Cloudflare also hosts the real public site at launch (the test site is there, S11).
 - The invited-editor sign-in. The publish webhook after the trial ends: webhooks are not among the Growth features the trial lists, so they are expected to work on Free; publish one test change after the trial ends (around 2026-12-18) to confirm.
@@ -189,8 +192,8 @@ Why not Astro's built-in image handling: it wants images under `src/`, and how P
 Known cost: original photos live in Git, and every build re-encodes all of them. Fine for tens of photos; revisit with hundreds.
 
 ### 10. Fonts are self-hosted; no third-party requests at all
-The Wix look needs a serif and two sans-serif fonts. They are installed as npm packages (`@fontsource-variable/fraunces`, `libre-franklin`, `open-sans`) and served from the site itself. No external fonts, scripts, trackers or embeds.
-Why: independence, speed, no cookie banner. The font choices are a **visual match by eye**, not confirmed; ask the admin which fonts the Wix design uses.
+The Wix look needs a serif and two sans-serif fonts. They are installed as npm packages (`@fontsource-variable/platypi`, `libre-franklin`, `open-sans`) and served from the site itself. No external fonts, scripts, trackers or embeds.
+Why: independence, speed, no cookie banner. The serif is Platypi, the font the Wix site's headings use (S21, replacing Fraunces); the two sans-serif fonts are still a **visual match by eye**, not confirmed; ask the admin which fonts the Wix design uses.
 
 ### 11. Link safety
 Only `https://`, `http://`, `mailto:` and site-relative links are rendered (`safeUrl`). The forms also require `https://`.
@@ -246,7 +249,7 @@ See `HANDOFF.md`, "Status", for the current test record. In short: the build, th
 
 - What the community level should contain (classes, events, people?), and its design details.
 - The real image files: logo, banner photo, program graphics, people photos, location photos.
-- The fonts used in the Wix design.
+- The sans-serif fonts used in the Wix design (the serif is Platypi, S21).
 - Where the domain is registered and when the Wix plan renews. Do not cancel Wix until the new site is live and the domain points to it.
 - Whether the repository may stay public after launch (decision 13).
 - Who owns the GitHub repository and the Pages CMS installation. It should be the admin or a community organisation account, not one developer's personal account.
