@@ -14,7 +14,8 @@
   --orange: #e8603c;
   --white: #ffffff;
 
-  --serif: 'Platypi Variable', Georgia, 'Times New Roman', serif;
+  --title: 'Platypi Variable', Georgia, 'Times New Roman', serif; /* page titles only */
+  --serif: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
   --sans: 'Libre Franklin Variable', 'Helvetica Neue', Arial, sans-serif;
   --text: 'Open Sans Variable', 'Segoe UI', Roboto, Arial, sans-serif;
 
@@ -237,6 +238,7 @@ p { margin: 0 0 1em; }
 .lead { font-family: var(--serif); font-weight: 700; font-size: 1.1rem; }
 
 .title-band { background: transparent; padding: 2.75rem var(--gutter) 2rem; text-align: center; }
+.title-band h1, .page-title { font-family: var(--title); }
 .title-band h1 { font-size: clamp(1.75rem, 7vw, 2.9rem); max-width: 22ch; margin-inline: auto; text-wrap: balance; }
 
 .page { max-width: calc(var(--measure) + 2 * var(--gutter)); margin-inline: auto; padding: 2rem var(--gutter) 3rem; }

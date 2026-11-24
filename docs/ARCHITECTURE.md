@@ -180,6 +180,7 @@ A third language: add it to `LANGS`, `LANG_LABEL`, `LANG_NAME` and `UI`; add `_x
 
 Colours and fonts: the variables at the top of `src/styles/global.css`. Layout: that file and the markup in `src/components` and `src/pages`. Keep calling the same helpers and keep rules 3 to 6. Then run `npm run check` and the browser checks in `HANDOFF.md`.
 To change a font: install the `@fontsource-variable/<name>` package with an exact version, import it in `Base.astro`, and set the variable in `global.css`.
+Page titles (the red band) have their own variable, `--title`.
 
 ### Switch the site to Sanity, or change the host
 

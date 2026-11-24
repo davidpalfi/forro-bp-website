@@ -198,7 +198,7 @@ A = automated by `npm run check`. M = by hand (see `HANDOFF.md`).
 | AC13 | All forms appear in Pages CMS with the described fields | M | not done |
 | AC14 | An invited editor without a GitHub account signs in on a phone, adds a person with a photo and both bios, and sees it live | M | not done |
 | AC15 | The workflows run on GitHub; a save in Pages CMS triggers a deployment; a failed build leaves the previous site live | M | not done |
-| AC16 | The admin confirms the look matches her design on phone and desktop | M | not done (built from phone and desktop screenshots of the Wix site; serif font is the Wix one, Platypi; sans-serif fonts matched by eye) |
+| AC16 | The admin confirms the look matches her design on phone and desktop | M | not done (built from phone and desktop screenshots of the Wix site; page-title font is the Wix one, Platypi; other fonts matched by eye) |
 
 ## 10. Not specified yet
 
