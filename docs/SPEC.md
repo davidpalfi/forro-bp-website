@@ -56,7 +56,7 @@ Out of scope: content for the community level (not designed), a structured (text
 
 ### 4.2 Community home (`/<lang>/`)
 
-Banner with the community title over the banner photo, then the blocks from `communitySettings.homeBlocks` (the festival section that used to follow was removed 2026-11-24; the festival is reached from the menu).
+Banner with the community title over the banner photo, only when a banner photo is set (otherwise the title is a hidden heading for screen readers and the page starts with its blocks), then the blocks from `communitySettings.homeBlocks` (the festival section that used to follow was removed 2026-11-24; the festival is reached from the menu).
 
 ### 4.3 Festival home
 

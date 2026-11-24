@@ -60,7 +60,12 @@ const communitySettings = defineType({
   fieldsets: [communityTitle.fieldset],
   fields: [
     ...communityTitle.fields,
-    defineField({ name: 'heroImage', title: 'Banner photo', type: 'imageWithAlt' }),
+    defineField({
+      name: 'heroImage',
+      title: 'Banner photo (optional)',
+      description: 'A big photo with the title at the top of the community home page. Without it, the page starts directly with the blocks below.',
+      type: 'imageWithAlt',
+    }),
     defineField({
       name: 'logo',
       title: 'Logo (top bar)',
