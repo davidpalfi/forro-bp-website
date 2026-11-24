@@ -5,7 +5,7 @@ import '@fontsource-variable/fraunces/index.css';
 import '@fontsource-variable/libre-franklin/index.css';
 import '@fontsource-variable/open-sans/index.css';
 import '../styles/global.css';
-import { getSite, getFestival, getCommunity, getPages, getFestivalMenuLink, getImage, safeUrl, href, trFirst, editAttr, withBase } from '../lib/content';
+import { getSite, getPalette, knownColour, getFestival, getCommunity, getPages, getFestivalMenuLink, getImage, safeUrl, href, trFirst, editAttr, withBase } from '../lib/content';
 import { LANGS, LANG_LABEL, LANG_NAME, UI, tr, type Lang } from '../lib/i18n';
 
 interface Props {
@@ -18,7 +18,8 @@ interface Props {
   /** Photo for link previews on social media (a Sanity image or a path like /uploads/x.jpg). */
   shareImage?: unknown;
   /** Background of the page body: red (default), dark or cream. */
-  tone?: 'red' | 'gold' | 'dark' | 'cream';
+  /** The page colour: a colour id from the palette. */
+  tone?: string;
 }
 
 const { lang, section, pagePath, title, description, shareImage, tone = 'red' } = Astro.props;
@@ -54,6 +55,20 @@ const nav = inFestival
   : [{ path: '/', label: t.home }, ...[...festivalItem, ...menuPages].sort((a, b) => a.order - b.order)];
 
 const brandPath = inFestival ? '/festival/' : '/';
+// The palette as CSS: each colour as --c-<id> and --c-<id>-text, the bands and page colours
+// that use it, and the old names (--red, --gold, ...) the stylesheet uses. On community pages
+// Festival red and Cream show as Mustard and Light cream (as they always did).
+const palette = getPalette();
+const paletteCss =
+  'html:root{' +
+  palette.map((c) => `--c-${c.id}:${c.code};--c-${c.id}-text:${c.text};`).join('') +
+  '--red:var(--c-red);--gold:var(--c-gold);--cream:var(--c-cream);--dark:var(--c-dark)}' +
+  'body.in-community{--c-red:var(--c-gold);--c-red-text:var(--c-gold-text);--c-cream:var(--c-light);--c-cream-text:var(--c-light-text);--red:var(--c-gold);--cream:var(--c-light)}' +
+  palette.map((c) => `body .bg-${c.id},body main.tone-${c.id}{background-color:var(--c-${c.id});color:var(--c-${c.id}-text)}`).join('');
+// The top bar and the language list, from Site settings → Colours (else the usual colours).
+const colourVars = (id: string | undefined, prefix: string) => (id ? `--${prefix}-bg:var(--c-${id});--${prefix}-text:var(--c-${id}-text)` : undefined);
+const headerStyle = colourVars(knownColour(inFestival ? site.festivalHeaderColour : site.communityHeaderColour), 'header');
+const langListStyle = colourVars(knownColour(inFestival ? site.festivalLanguageListColour : site.communityLanguageListColour), 'langlist');
 // The community logo: from "Community home page", else the round Forró Budapest logo. Used in
 // the community top bar and, on every page, in the footer.
 const communityLogoField = getImage(community.logo) ? community.logo : '/uploads/forro-budapest-logo.png';
@@ -91,13 +106,14 @@ const year = new Date().getFullYear();
     <meta property="og:locale" content={lang === 'hu' ? 'hu_HU' : 'en_GB'} />
     {shareUrl && <meta property="og:image" content={shareUrl} />}
     {shareUrl && <meta name="twitter:card" content="summary_large_image" />}
-    <meta name="theme-color" content={inFestival ? '#c80a2f' : '#c28f32'} />
+    <meta name="theme-color" content={(palette.find((c) => c.id === (knownColour(inFestival ? site.festivalHeaderColour : site.communityHeaderColour) ?? (inFestival ? 'red' : 'gold'))) ?? palette[0]).code} />
+    <style is:inline set:html={paletteCss} />
     {site.noindex && <meta name="robots" content="noindex, nofollow" />}
   </head>
   <body class={inFestival ? 'in-festival' : 'in-community'}>
     <a class="skip" href="#main">{t.skip}</a>
 
-    <header class="top">
+    <header class="top" style={headerStyle}>
       <a class="brand" href={href(lang, brandPath)}>
         {
           logo ? (
@@ -109,7 +125,7 @@ const year = new Date().getFullYear();
       </a>
       {headerDate && <p class="top-date">{headerDate}</p>}
 
-      <details class="lang">
+      <details class="lang" style={langListStyle}>
         <summary aria-label={`${t.language}: ${LANG_NAME[lang]}`}>
           <img src={withBase(`/icons/flag-${lang}.png`)} width="64" height="64" alt="" />
           <span>{LANG_LABEL[lang]}</span>

@@ -14,6 +14,7 @@ import { createImageUrlBuilder } from '@sanity/image-url';
 import { marked } from 'marked';
 import { text, flag, num } from './schema.ts';
 import { isLang, tr, LANGS, type Lang } from './i18n.ts';
+import { BUILTIN_COLOURS, HEX, autoText, contrast, customId, type Colour } from './palette.ts';
 import { createDataAttribute } from '@sanity/visual-editing/create-data-attribute';
 import { loadDocuments, isPreview, SANITY, STUDIO_URL } from './source.ts';
 
@@ -296,6 +297,41 @@ export function getFestivalMenuLink() {
   return S().menuLinks[0];
 }
 
+/* ---------- Colours ---------- */
+
+/**
+ * The palette: the built-in colours (src/lib/palette.ts) with the codes, names and text colours
+ * set in Site settings → Colours, then the colours added there. A code that is not a colour code
+ * is ignored with a warning; text that would be hard to read on its colour is a warning too.
+ */
+export function getPalette(byId = S().byId): Colour[] {
+  const out: Colour[] = BUILTIN_COLOURS.map((c) => ({ ...c, builtin: true }));
+  for (const item of list(asObj(byId.get('siteSettings')).colours)) {
+    const name = str(item.name).trim();
+    const code = str(item.code).trim();
+    const builtin = str(item.builtin);
+    const target = builtin ? out.find((c) => c.builtin && c.id === builtin) : undefined;
+    const label = name || target?.name || code || 'a colour';
+    if (!HEX.test(code)) {
+      warnOnce(`the colour "${label}" has no usable colour code ("${code}") and was ${target ? 'left at its usual code' : 'skipped'}`);
+      continue;
+    }
+    const textCode = str(item.text).trim();
+    if (textCode && !HEX.test(textCode)) warnOnce(`the text colour of "${label}" ("${textCode}") is not a colour code; a readable one is used`);
+    const text = HEX.test(textCode) ? textCode : autoText(code);
+    if (contrast(code, text) < 3) warnOnce(`text on the colour "${label}" is hard to read (${contrast(code, text).toFixed(1)}:1)`);
+    if (target) Object.assign(target, { name: name || target.name, code, text });
+    else if (str(item._key)) out.push({ id: customId(str(item._key)), name: label, code, text, builtin: false });
+  }
+  return out;
+}
+
+/** A colour id the palette knows, else undefined. */
+export function knownColour(id: unknown, byId = S().byId) {
+  const v = str(id);
+  return v && getPalette(byId).some((c) => c.id === v) ? v : undefined;
+}
+
 /* ---------- Pages ---------- */
 
 export type Section = 'community' | 'festival';
@@ -334,7 +370,7 @@ const makePages = (byId: Map<string, Obj>) => {
       slug,
       section,
       path: section === 'festival' ? `/festival/${slug}/` : `/${slug}/`,
-      tone: (['red', 'gold', 'cream', 'dark'].includes(tone) ? tone : 'red') as 'red' | 'gold' | 'cream' | 'dark',
+      tone: knownColour(tone, byId) ?? (tone && warnOnce(`page "${name}" uses a colour that is not in the palette (${tone}); Festival red is used`), 'red'),
       title_en: trFirst(d, ['title'], 'en') || slug,
       title_hu: trFirst(d, ['title'], 'hu') || slug,
       showInMenu: flag(true).parse(d.showInMenu),
@@ -511,7 +547,7 @@ export function groupBlocks(blocks: Obj[], tone: string) {
   for (const b of blocks) {
     if (typeof b._type !== 'string') continue;
     const bg = str(b.background);
-    const background = ['red', 'gold', 'cream', 'dark'].includes(bg) ? bg : tone;
+    const background = knownColour(bg) ?? (bg && bg !== 'default' && warnOnce(`a block uses a colour that is not in the palette (${bg}); the page colour is used`), tone);
     const al = str(b.alignment);
     const alignment = ['center', 'right'].includes(al) ? al : 'left';
     const last = groups[groups.length - 1];

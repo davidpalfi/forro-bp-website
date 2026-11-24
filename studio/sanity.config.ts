@@ -1,8 +1,11 @@
+import { createElement } from 'react'
 import { defineConfig } from 'sanity'
 import { structureTool, type StructureBuilder } from 'sanity/structure'
 import { presentationTool, defineDocuments, defineLocations } from 'sanity/presentation'
 import { schemaTypes } from './schemaTypes'
 import { SINGLETONS } from './schemaTypes/documents'
+import { ColourInput, BlockColourInput, OptionalColourInput } from './components/ColourInput'
+import { ColoursArrayInput } from './components/ColoursArrayInput'
 
 // The site preview shown in "Edit on the page" (click-to-edit). The deployed Studio uses the
 // preview on Cloudflare, whose address is in studio/.env.production (SANITY_STUDIO_PREVIEW_URL);
@@ -131,6 +134,20 @@ export default defineConfig({
         value: (params: { section?: string }) => ({ section: params.section ?? 'festival', tone: params.section === 'community' ? 'cream' : 'red', showInMenu: true, order: 50 }),
       },
     ],
+  },
+  form: {
+    // Colour choices show the palette as swatches (Site settings → Colours). Attached here
+    // rather than in the schema files, which plain Node also loads for npm run check.
+    components: {
+      input: (props) => {
+        const options = (props.schemaType.options ?? {}) as { colourPicker?: string; paletteList?: boolean }
+        if (options.colourPicker === 'page') return createElement(ColourInput, props as never)
+        if (options.colourPicker === 'block') return createElement(BlockColourInput, props as never)
+        if (options.colourPicker === 'optional') return createElement(OptionalColourInput, props as never)
+        if (options.paletteList) return createElement(ColoursArrayInput, props as never)
+        return props.renderDefault(props)
+      },
+    },
   },
   document: {
     // The three settings documents exist once each: they cannot be duplicated or deleted.

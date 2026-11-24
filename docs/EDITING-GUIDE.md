@@ -109,6 +109,13 @@ The calendar page shows one month's calendar picture at a time, with arrows to t
 2. Under **Months**, click **Add item**: choose the **Year** and **Month** and upload the **Calendar picture**.
 3. **Publish**. A new month appears with an arrow from the month before it.
 
+### Colours
+Every colour choice (a page's colour, a block's background, the top bar, the language list) offers the colours listed in **Site settings → Colours**.
+- **Change a colour everywhere:** click **Add the built-in colours to change their codes** once (if the button is there), then open a colour and type its new **Colour code** (e.g. `#c28f32`). Everything that uses it changes.
+- **Add a colour:** **Add item**, give it a **Name** and a **Colour code**. It then appears in every colour choice. The text colour on it is picked automatically (dark grey or cream); set **Text colour on it** to choose yourself.
+- **Top bar and language list:** under the list, choose a colour for each part of the site, or leave **Default**.
+- If text would be hard to read on a colour, the maintainer sees a warning; nothing breaks. Deleting a colour that pages still use makes them fall back to the page or festival colour.
+
 ## 6. Building pages with blocks
 
 Every page is a list of **blocks**, one under the other. You can add, remove and reorder them.
@@ -132,7 +139,7 @@ Every page is a list of **blocks**, one under the other. You can add, remove and
 
 Every block also has a **Style** tab:
 
-- **Background**: *Same as page*, Red, Mustard, Cream or Dark (on community pages Red shows as mustard too).
+- **Background**: *Same as page* or one of the colours from **Site settings → Colours** (Festival red, Mustard, Cream, Light cream, Dark and any you add). On community pages Festival red shows as Mustard and Cream as Light cream.
 - **Alignment**: Left, Center or Right.
 
 Blocks next to each other with the same background and alignment are joined into one band. For example, the numbers line and the Code of Conduct button on the festival home page are both "Center", so they sit together.
@@ -145,7 +152,7 @@ Blocks next to each other with the same background and alignment are joined into
 4. Add blocks under **Page content**.
 5. On the **Settings** tab:
    - **Address**: click **Generate** to make it from the English name, e.g. `workshops` gives `/en/festival/workshops/`. Lowercase letters, numbers and hyphens only. Do not change it later: links people saved would stop working.
-   - **Page colour**: Red (like Program), Mustard (the Forró Budapest colour), Cream (like Location) or Dark. On community pages Red shows as mustard.
+   - **Page colour**: one of the colours from **Site settings → Colours**: Festival red (like Program), Mustard (the Forró Budapest colour), Cream (like Location), Light cream, Dark, or one you added. On community pages Festival red shows as Mustard and Cream as Light cream.
    - **Show in the menu** and **Menu order** (smaller numbers first; Program is 1, Teachers 2, Artists 3, Location 11).
    - **Menu label**: a different, shorter name for the menu button, in both languages. Without it, the page name is used.
    - The festival button in the community menu is a community page too: in its **Settings**, **Menu button goes to** is set to **The festival home page**. Rename it with its title or **Menu label**, move it with **Menu order**, hide it with **Show in the menu**, like any page. It has no page of its own. (Without such a page, a festival button with the festival's name comes first.)

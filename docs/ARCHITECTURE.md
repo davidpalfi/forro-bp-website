@@ -139,6 +139,10 @@ Nothing runs on a server. Browser JavaScript is two small inline scripts: the me
 
 ## How to change things
 
+### Add a colour choice
+
+A string field with `options: { colourPicker: 'page' | 'block' | 'optional' }` shows the palette as swatches (`studio/components/ColourInput.tsx`, attached in `studio/sanity.config.ts`). On the site, check the value with `knownColour()` and use the classes `bg-<id>` / `tone-<id>` or the variables `--c-<id>` and `--c-<id>-text` (written into every page by `Base.astro`). The built-in colours are in `src/lib/palette.ts` and `studio/schemaTypes/palette.ts`; keep both the same.
+
 ### Add a field to something that exists
 
 1. `studio/schemaTypes/`: add the field (a `localizedFields` pair if it has two languages). Give it a title and, if useful, a description the admin understands.

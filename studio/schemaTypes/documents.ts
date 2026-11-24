@@ -22,7 +22,7 @@ const siteSettings = defineType({
   name: 'siteSettings',
   title: 'Site settings',
   type: 'document',
-  fieldsets: [tagline.fieldset, footerNote.fieldset],
+  fieldsets: [tagline.fieldset, footerNote.fieldset, { name: 'colours', title: 'Colours', options: { collapsible: true, collapsed: false } }],
   fields: [
     defineField({ name: 'name', title: 'Community name', type: 'string' }),
     defineField({
@@ -37,6 +37,19 @@ const siteSettings = defineType({
     defineField({ name: 'email', title: 'Contact email', type: 'string' }),
     defineField({ name: 'instagram', title: 'Instagram address', description: 'The community\'s Instagram, linked from the footer of the community pages, e.g. https://www.instagram.com/forrobudapest/. Festival pages use the festival\'s own address (Festival home page).', type: 'url' }),
     defineField({ name: 'facebook', title: 'Facebook address', type: 'url' }),
+    defineField({
+      name: 'colours',
+      title: 'Colours',
+      description: 'The colours every colour choice offers (page colour, block background, header, language list). Change a code here and it changes everywhere it is used. Add a colour with "Add item".',
+      type: 'array',
+      of: [{ type: 'paletteColour' }],
+      options: { paletteList: true } as never,
+      fieldset: 'colours',
+    }),
+    defineField({ name: 'festivalHeaderColour', title: 'Festival: top bar', type: 'string', options: { colourPicker: 'optional' } as never, description: 'Default: Festival red.', fieldset: 'colours' }),
+    defineField({ name: 'festivalLanguageListColour', title: 'Festival: language list', type: 'string', options: { colourPicker: 'optional' } as never, description: 'The list that opens under EN/HU. Default: as the top bar.', fieldset: 'colours' }),
+    defineField({ name: 'communityHeaderColour', title: 'Community: top bar', type: 'string', options: { colourPicker: 'optional' } as never, description: 'Default: Mustard.', fieldset: 'colours' }),
+    defineField({ name: 'communityLanguageListColour', title: 'Community: language list', type: 'string', options: { colourPicker: 'optional' } as never, description: 'The list that opens under EN/HU. Default: as the top bar.', fieldset: 'colours' }),
     ...footerNote.fields,
     defineField({
       name: 'noindex',
@@ -195,9 +208,9 @@ const page = defineType({
     defineField({
       name: 'tone',
       title: 'Page colour',
-      description: 'On community pages Red shows as mustard, the Forró Budapest colour. New community pages start as Cream, which is easiest to read; use mustard for accents.',
+      description: 'The colours come from Site settings → Colours. On community pages Festival red shows as Mustard and Cream as Light cream. New community pages start as Cream, which is easiest to read; use mustard for accents.',
       type: 'string',
-      options: { list: [{ title: 'Red', value: 'red' }, { title: 'Mustard', value: 'gold' }, { title: 'Cream', value: 'cream' }, { title: 'Dark', value: 'dark' }], layout: 'radio', direction: 'horizontal' },
+      options: { colourPicker: 'page' } as never,
       initialValue: 'red',
       group: 'settings',
     }),

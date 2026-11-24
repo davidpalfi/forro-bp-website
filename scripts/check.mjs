@@ -279,6 +279,12 @@ console.log('\n[5] Built from the Sanity import file (what npm run sanity:import
 }
 
 /* ------------------------------------------------------------------ */
+{
+  const codes = (f) => [...fs.readFileSync(f, 'utf8').matchAll(/id: '(\w+)', name: '([^']+)', code: '(#\w+)', text: '(#\w+)'/g)].map((m) => m.slice(1).join(' ')).join(', ');
+  const site = codes('src/lib/palette.ts');
+  check(site !== '' && site === codes('studio/schemaTypes/palette.ts'), 'the built-in colours are the same on the site and in the Studio');
+}
+
 console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor mistakes');
 {
   const dir = copyProject('sanity');
@@ -319,6 +325,18 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
       { _key: 'h3', _type: 'heroButton', label_en: 'Third button', url: '/festival/' },
     ],
   });
+  // The palette: Mustard with a new code, a new colour "Pink" used by a page and a block, the
+  // community language list in Light cream, a bad code and a colour with unreadable text.
+  Object.assign(docs.find((d) => d._type === 'siteSettings'), {
+    colours: [
+      { _key: 'gold', _type: 'paletteColour', builtin: 'gold', name: 'Mustard', code: '#d4a03a' },
+      { _key: 'pink1', _type: 'paletteColour', name: 'Pink', code: '#f1d0c2', text: '#2e2e2e' },
+      { _key: 'bad1', _type: 'paletteColour', name: 'Broken', code: 'mustard' },
+      { _key: 'grey1', _type: 'paletteColour', name: 'Grey on grey', code: '#777777', text: '#888888' },
+    ],
+    communityLanguageListColour: 'light',
+  });
+  Object.assign(docs.find((d) => d._type === 'page' && d.slug?.current === 'code-of-conduct'), { tone: 'cpink1' });
   // A mustard page.
   Object.assign(docs.find((d) => d._type === 'page' && d.slug?.current === 'location'), { tone: 'gold' });
   // The festival button in the community menu as a page: after the other community pages, with its own name.
@@ -342,6 +360,8 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
     ['photos in Sanity are stored the wrong way', 'a photo within a photo (first import)'],
     ['has no year or month and was skipped', 'an event calendar month without a month'],
     ['twice; only the first is shown', 'the same event calendar month twice'],
+    ['the colour "Broken" has no usable colour code', 'a colour with a bad code'],
+    ['text on the colour "Grey on grey" is hard to read', 'a colour whose text is hard to read'],
   ]) check(output.includes(text), `warning: ${what}`);
   if (code === 0) {
     const page = read(dir, 'en/festival/everything/index.html');
@@ -365,6 +385,12 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
     check(/<main id="main" class="tone-dark"/.test(page), 'the page colour is used');
     check(/<h2 class="b-wide b-heading[^"]*">Gallery heading</.test(page) && /<h3 class="b-text b-heading[^"]*">A small heading</.test(page), 'a heading takes the width of the block under it (gallery: wide, text: text width)');
     check(/<main id="main" class="tone-gold"/.test(read(dir, 'en/festival/location/index.html')), 'a page can be mustard');
+    {
+      const coc = read(dir, 'en/festival/code-of-conduct/index.html');
+      const home = read(dir, 'en/index.html');
+      check(coc.includes('--c-gold:#d4a03a') && coc.includes('--c-cpink1:#f1d0c2') && /<main id="main" class="tone-cpink1"/.test(coc) && coc.includes('body .bg-cpink1,body main.tone-cpink1{') && !coc.includes('Broken'), 'the palette from Site settings: a changed code, a new colour used by a page, a bad code left out');
+      check(/<details class="lang" style="--langlist-bg:var\(--c-light\)/.test(home) && !/<details class="lang" style/.test(coc), 'the language list colour can be set per part of the site');
+    }
     check(everything.includes('<p class="person-bio">First paragraph.</p>') && /<p class="person-bio">Second paragraph,\s+same paragraph\.<\/p>/.test(everything), 'in a bio an empty line (even one with an invisible character) starts a paragraph, a single line break does not');
     {
       const home = read(dir, 'en/festival/index.html');
