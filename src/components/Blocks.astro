@@ -43,6 +43,15 @@ const groups = groupBlocks(blocks, tone).map((g) => ({
 const look = (b: Block) => (['large', 'statement'].includes(String(b.look)) ? String(b.look) : 'normal');
 const headingTag = (b: Block) => (b.level === 3 ? 'h3' : b.level === 4 ? 'h4' : 'h2');
 const imageWidth = (b: Block) => (b.width === 'text' ? 'b-text' : b.width === 'full' ? 'b-full' : 'b-xwide');
+// A heading takes the width of the block under it, so a left-aligned heading above a gallery
+// starts where the photos start, and one above a paragraph where the text starts.
+const widthOf = (b: Block | undefined) => {
+  if (!b) return 'b-text';
+  if (b._type === 'imageBlock') return imageWidth(b) === 'b-full' ? 'b-xwide' : imageWidth(b);
+  if (b._type === 'peopleGridBlock') return 'b-people';
+  if (['galleryBlock', 'bannerBlock', 'columnsBlock', 'videoBlock', 'eventCalendarBlock'].includes(b._type)) return 'b-wide';
+  return 'b-text';
+};
 const images = (b: Block) => (Array.isArray(b.images) ? (b.images as unknown[]).filter((i) => getImage(i)) : []);
 const link = (b: Block) => {
   const l = blockLink(b, lang);
@@ -62,7 +71,7 @@ const link = (b: Block) => {
           gi === 0 && className,
         ]}
       >
-        {g.blocks.map((b) => {
+        {g.blocks.map((b, bi) => {
           switch (b._type) {
             case 'textBlock': {
               const value = trRich(b, 'body', lang);
@@ -73,7 +82,7 @@ const link = (b: Block) => {
             case 'headingBlock': {
               const t = tr(b, 'heading', lang);
               const Tag = headingTag(b);
-              return t ? <Tag class:list={['b-text', 'b-heading', `b-heading--${Tag}`]}>{t}</Tag> : null;
+              return t ? <Tag class:list={[widthOf(g.blocks[bi + 1]), 'b-heading', `b-heading--${Tag}`]}>{t}</Tag> : null;
             }
             case 'imageBlock': {
               const img = getImage(b.image);

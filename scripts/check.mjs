@@ -353,6 +353,7 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
     check(['A small heading', 'Banner title', 'Banner button', 'Column three', 'A caption', 'b-divider', 'b-space', 'A statement line'].every((t) => page.includes(t)), 'every kind of block is shown');
     check(page.indexOf('>Gisa<') > -1 && page.indexOf('>Gisa<') < page.indexOf('>Dóri Czakó<'), 'a People block with chosen people shows them in the chosen order');
     check(/<main id="main" class="tone-dark"/.test(page), 'the page colour is used');
+    check(/<h2 class="b-wide b-heading[^"]*">Gallery heading</.test(page) && /<h3 class="b-text b-heading[^"]*">A small heading</.test(page), 'a heading takes the width of the block under it (gallery: wide, text: text width)');
     check(/<main id="main" class="tone-gold"/.test(read(dir, 'en/festival/location/index.html')), 'a page can be mustard');
     check(everything.includes('<p class="person-bio">First paragraph.</p>') && /<p class="person-bio">Second paragraph,\s+same paragraph\.<\/p>/.test(everything), 'in a bio an empty line (even one with an invisible character) starts a paragraph, a single line break does not');
     {
