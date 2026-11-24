@@ -53,7 +53,7 @@ function Choice(props: { selected: boolean; label: string; code?: string; onClic
       border
       tone={props.selected ? 'primary' : 'default'}
       onClick={props.onClick}
-      style={{ cursor: 'pointer', outline: props.selected ? '2px solid currentColor' : undefined }}
+      style={{ cursor: 'pointer', width: 'auto', flex: '0 0 auto', display: 'inline-block' }}
     >
       <Flex align="center" gap={2}>
         <span
