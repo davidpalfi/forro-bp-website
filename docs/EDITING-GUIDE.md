@@ -2,7 +2,7 @@
 
 A guide for the person who updates the site. You need no technical knowledge, and nothing you do here can break the website.
 
-> **For the maintainer, before sending this guide** (updated 2026-11-23): publishing and editing on the page are built and work once the preview and test site are online (`docs/HOSTING.md`). Before sending: redeploy the Studio (`npm run studio:deploy`), test every step yourself in the deployed Studio on a computer and a phone, and fix anything that differs. Then delete this note.
+> **For the maintainer, before sending this guide** (updated 2026-11-24): publishing and editing on the page work (`docs/HOSTING.md`); the Studio deploys itself from GitHub. Many sections were added 2026-11-23/24 (logos, colours, event calendar, community headline, festival menu button) without a signed-in check of the wording. Before sending: test every step yourself in the deployed Studio on a computer and a phone, and fix anything that differs. Then delete this note.
 
 ---
 

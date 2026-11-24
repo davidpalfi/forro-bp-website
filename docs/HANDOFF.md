@@ -2,7 +2,16 @@
 
 If you are picking this project up with no other context, read this file and `SANITY-PORT-STATUS.md` first, then `USER-NEEDS.md` (who it is for and how little is verified), `DECISIONS.md` (why), `SPEC.md` (what the site does) and `ARCHITECTURE.md` (how the code is organised). `CLAUDE.md` has the rules for a Claude session working in the repo. The root-level [EDITING-GUIDE.md](../EDITING-GUIDE.md) is for the old Pages CMS PoC; [docs/EDITING-GUIDE.md](EDITING-GUIDE.md) is the admin guide for Sanity; check it against the deployed Studio before sending it.
 
-## Current handoff (2026-11-23)
+## Current handoff (2026-11-24)
+
+- **Working mode:** Dávid sends what bothers him on the test site, often as screenshots (Wix for reference, the test site, the Studio), sometimes in Hungarian; the agent fixes it, runs `npm run check`, looks at it at phone and desktop width, and pushes straight to `main`. He changes his mind sometimes: reverting is fine (`git revert`). Before a design change he is unsure about, show a mock-up (screenshots of a local build via SendUserFile) instead of pushing. Commit messages are neutral (`CLAUDE.md`).
+- **What changed 2026-11-23/24:** see `BACKLOG.md`, "Look polish done", and `DECISIONS.md` S13-S19. In short: Wix sizes, red, fonts and buttons on the festival; a community level with its own palette, logo, headline banner and menu; galleries with Mosaic and a photo viewer; the event calendar; colours as a palette in Site settings; the Studio menu in Festival and Community folders.
+- **The Studio deploys itself** when its code changes on `main` (S19). Dávid no longer runs `npm run studio:deploy`. After a Studio change, tell him to reload the Studio tab about two minutes later. The run can be checked at github.com/davidpalfi/forro-bp-website/actions (public API: `curl https://api.github.com/repos/davidpalfi/forro-bp-website/actions/runs`).
+- **Content lives in Sanity; the agent cannot reach it** (sanity.io and the workers.dev sites are blocked from cloud sessions). For content, give Dávid click-by-click Studio steps (menu paths as in `docs/EDITING-GUIDE.md`, e.g. "Community → Pages"). To check a change visually, build locally with test content: `CONTENT_SOURCE=file:<some.ndjson> npm run build`, made from `scripts/lib/sanity-fixture.mjs` plus the documents you need, then serve `dist/` and screenshot with Playwright.
+- **Screenshots from Dávid's phone or Mac carry a colour profile** (Display P3): convert to sRGB before measuring colours (PIL `ImageCms`), or the values come out wrong (this happened with the first mustard).
+- **Open for Dávid in the Studio** and **parked ideas:** `BACKLOG.md`, top. The admin has not seen anything yet (13a on hold).
+
+## Earlier handoff (2026-11-23)
 
 - **`main` is the Sanity version** (S12, 2026-11-23). The Pages CMS proof of concept is retired and kept as the tag `pages-cms-poc`; its GitHub Pages workflow and `.pages.yml` are removed. Code changes: pushed straight to `main` after `npm run check` passes (Dávid, 2026-11-23; revert if something breaks); every push to `main` rebuilds both Cloudflare sites. Both Workers' production branch and the test site's deploy hook were switched to `main` the same day; a test Publish rebuilt the test site from `main`. All branches other than `main` are deleted.
 

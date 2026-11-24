@@ -1,13 +1,13 @@
 # Sanity Port Status
 
-Status as of 2026-11-23. The progress record for the Sanity version. Update it as work is completed; do not treat plans as implementation.
+Status as of 2026-11-24. The progress record for the Sanity version. Update it as work is completed; do not treat plans as implementation.
 
 ## Where it stands
 
 | Part | State |
 |---|---|
 | Decisions S1-S4 (languages side by side, page builder, hosted Studio, Sanity photos) | Confirmed by Dávid 2026-11-16 |
-| Studio and schemas (`studio/`) | Built, refined in S5, validated. **Deployed** by Dávid, last on 2026-11-23 with "Edit on the page" pointing at the online preview |
+| Studio and schemas (`studio/`) | Built, refined in S5, validated. **Deploys itself** from GitHub since 2026-11-24 when Studio code changes on `main` (S19, `.github/workflows/studio-deploy.yml`; first run succeeded), with "Edit on the page" pointing at the online preview. Many fields added 2026-11-23/24 (logos, calendar, colours, community headline): see `BACKLOG.md`, "Look polish done" |
 | Site reads Sanity documents (`src/lib/source.ts`, `content.ts`, `Blocks.astro`) | Built and tested. Default source is still the JSON files |
 | Migration (`npm run sanity:import-file`, `npm run sanity:import`) | **Run** by Dávid 2026-11-18: 20 documents, 6 photos. Photos were stored the wrong way; import file fixed and photos repaired with `npm run sanity:import-replace` the same day |
 | Admin guide (`docs/EDITING-GUIDE.md`) | Written; real addresses in since 2026-11-23. Send a copy without the maintainer note; check once more against the deployed Studio |
@@ -35,12 +35,13 @@ Built and verified on 2026-11-18 (late evening, cloud session, no access to Sani
 
 ## Next steps, in order
 
+0. **Look polish** (in progress, top of `BACKLOG.md`): Dávid sends what bothers him; the agent fixes it on `main`. Then his content steps in the Studio ("Open for Dávid in the Studio" there).
 1. **Send it to the admin when Dávid is ready** (`BACKLOG.md` 13a): his phone check of the forms, invite test, a clean copy of the guide, invite her, send.
 2. **Her trial** (`BACKLOG.md` 13), then polish B-H, her design corrections, real content.
 3. ✅ `main` is the Sanity version (2026-11-23, S12).
 4. **Launch** per `GO-LIVE-CHECKLIST.md`: hosting of the real site, domain, redirects, noindex off.
 
-Do not deploy the Studio from a computer whose `studio/.env.production` lacks the preview address (`npm run studio:deploy` refuses anyway).
+The Studio deploys itself from GitHub. By hand: GitHub > Actions > Deploy Studio > Run workflow, or `npm run studio:deploy` on a computer whose `studio/.env.production` has the preview address (it refuses otherwise).
 
 ## Rules for whoever continues
 

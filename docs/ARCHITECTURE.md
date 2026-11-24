@@ -67,35 +67,40 @@ npm run build
 dist/   plain static files
 ```
 
-Nothing runs on a server. Browser JavaScript is two small inline scripts: the menu button (`Base.astro`) and the language redirect on `/` (`pages/index.astro`). The site works without either.
+Nothing runs on a server. Browser JavaScript is small inline scripts, no libraries: in `Base.astro` the phone menu button and Escape/click-outside for the language drop-down, the event calendar's month switcher, and the photo viewer for galleries and Image blocks; and the language redirect on `/` (`pages/index.astro`). The site works without any of them (all months listed, photos open as plain images, the drop-down is a `<details>`).
 
 ## File map
 
 | Path | Responsibility |
 |---|---|
-| `studio/sanity.config.ts` | The Studio: menu (structure), "Edit on the page" (preview address, which address opens which document), fixed settings documents, new-document templates |
+| `studio/sanity.config.ts` | The Studio: menu (Festival and Community folders), "Edit on the page" (preview address, which address opens which document), fixed settings documents, new-document templates, and the colour pickers (`form.components`, by `options.colourPicker` / `options.paletteList`) |
+| `studio/components/ColourInput.tsx`, `ColoursArrayInput.tsx` | The palette as swatches in every colour choice (reads Site settings → Colours live, so new colours need no redeploy); the "add the built-in colours" button in Site settings |
 | `studio/sanity.cli.ts` | Project `8hc671sk`, dataset `production`, Studio address `forro-budapest` |
 | `studio/schemaTypes/documents.ts` | Settings, page and person documents |
 | `studio/schemaTypes/blocks.ts` | The page blocks and `BLOCK_TYPES` |
 | `studio/schemaTypes/shared.ts` | Two-language field pairs, block style fields, rich text, image with alt text, link rule |
+| `studio/schemaTypes/colours.ts`, `palette.ts` | One palette colour (Site settings → Colours); the built-in colours (same as `src/lib/palette.ts`, compared by `npm run check`). Schema files stay free of React components because `npm run check` loads them in plain Node |
 | `src/lib/source.ts` | Loads the documents: JSON, Sanity HTTP API, or an `.ndjson` file; in preview, the drafts with stega markers (`loadPreviewDocuments`, the marker filter) |
 | `src/middleware.ts` | Preview only: loads the latest drafts before every page; does nothing in a build |
 | `src/lib/preview-client.ts` | Preview only: the click-to-edit script in the page (reload after edits, address sync with the Studio) |
 | `src/lib/from-json.ts` | JSON files -> Sanity documents. Used by the site and the import file; runs in plain Node too |
-| `src/lib/content.ts` | The only place pages get content from: `getSite`, `getFestival`, `getCommunity`, `getPages`, `getPeople`, `peopleForBlock`, `blockLink`, `groupBlocks`, `renderRich`, `getImage`, `href`, `withBase`, `safeUrl`, `trFirst`, `warnOnce` |
+| `src/lib/content.ts` | The only place pages get content from: `getSite`, `getFestival`, `getCommunity`, `getPages`, `getFestivalMenuLink`, `getPeople`, `peopleForBlock`, `calendarMonths`, `monthName`, `getPalette`, `knownColour`, `blockLink`, `groupBlocks`, `renderRich`, `paragraphs`, `getImage`, `href`, `withBase`, `safeUrl`, `trFirst`, `warnOnce` |
+| `src/lib/palette.ts` | The built-in colours and colour maths (contrast, readable text colour) |
 | `src/lib/schema.ts` | Forgiving field types: `text`, `flag`, `num`, `textList` |
 | `src/lib/i18n.ts` | `LANGS`, the fixed wording (`UI`), `tr(obj, 'field', lang)` |
 | `src/components/Blocks.astro` | Renders a list of blocks in bands |
 | `src/components/PageView.astro` | One editor-made page: top photo, heading, blocks |
-| `src/components/Hero.astro`, `PageTitle.astro`, `PersonList.astro`, `Picture.astro` | Banner, title band, people cards, responsive photo (Sanity or local) |
-| `src/layouts/Base.astro` | Head tags, header with menu built from pages, footer. Takes `lang`, `section`, `pagePath`, `tone` |
+| `src/components/Hero.astro`, `PageTitle.astro`, `PersonList.astro`, `Picture.astro` | Festival banner, title band, people cards, responsive photo (Sanity or local) |
+| `src/components/CommunityHero.astro` | The community home's headline banner (photo, or mustard with the big logo) |
+| `src/layouts/Base.astro` | Head tags, the palette as CSS variables, header with logo, date, menu built from pages, language drop-down and Tickets, footer with the community logo; the inline scripts. Takes `lang`, `section`, `pagePath`, `tone` (a palette colour id) |
 | `src/pages/index.astro` | `/`: redirect to a language |
 | `src/pages/[lang]/index.astro`, `[lang]/[slug].astro` | Community home and community pages |
 | `src/pages/[lang]/festival/index.astro`, `festival/[slug].astro` | Festival home and every festival page |
 | `src/pages/404.astro` | Not found, both languages |
 | `src/content/` | The proof-of-concept content (JSON); the migration source |
-| `public/uploads/` | Photos of the JSON content. `public/_img/` is generated; never edit it |
-| `src/styles/global.css` | All styling; colours and fonts at the top; page blocks at the end |
+| `public/uploads/` | Photos of the JSON content, and the round Forró Budapest logo (`forro-budapest-logo.png`, the community default). `public/_img/` is generated; never edit it |
+| `public/icons/` | Flags, Instagram icons (grey footer, gold people cards) |
+| `src/styles/global.css` | All styling; default colours and fonts at the top (the palette overrides them from `Base.astro`); page blocks, event calendar, community level and headline banner at the end. Next to it: `ticket-red.png`, `ticket-cream.png` (the Wix ticket shapes without words) and `paper-cream.webp` (the paper texture) |
 | `scripts/make-sanity-import.mjs` | `npm run sanity:import-file`: writes `sanity-import/` (ignored by Git) |
 | `scripts/check.mjs` | `npm run check`: schema check, six test builds, and that the preview stays out of public builds [7] |
 | `scripts/check-schema.mjs`, `scripts/lib/` | Documents vs Studio schema; Node loader for Studio files; Sanity-shaped test content |

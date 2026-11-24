@@ -80,7 +80,7 @@ npm run studio            # Sanity Studio on this computer, http://localhost:333
 
 Click-to-edit on your computer: run `preview:edit` and `studio` in two terminals, open http://localhost:3333, choose **Edit on the page**. The preview needs a Viewer token in a `.env` file in this folder (see `.env.example`; the file is ignored by git, never commit it).
 
-Sanity commands (need `npm run sanity:login` once): `npm run studio:deploy`, `npm run sanity:import` (creates missing documents only), `npm run sanity:import-replace` (overwrites the imported documents; only before the admin starts editing). Details: `docs/HANDOFF.md`, "Commands".
+Sanity commands (need `npm run sanity:login` once): `npm run studio:deploy` (normally not needed: GitHub deploys the Studio when `studio/` changes on `main`), `npm run sanity:import` (creates missing documents only), `npm run sanity:import-replace` (overwrites the imported documents; only before the admin starts editing). Details: `docs/HANDOFF.md`, "Commands".
 
 ## Documentation
 

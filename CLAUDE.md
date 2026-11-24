@@ -10,7 +10,7 @@ For content edits you can skip this. For anything structural (new fields, new pa
 
 - The live content is in Sanity (project `8hc671sk`, dataset `production`), edited in the Studio. The JSON files in `src/content/` (`settings/`, `people/`, `pages/`) are the original content: the source of the Sanity import and of the tests (`CONTENT_SOURCE` defaults to them). Editing them does not change the test site, which is built from Sanity.
 - Photos are in `public/uploads/`. Never edit or delete `public/_img/`; it is generated at build time.
-- The editor is `studio/` (Sanity Studio). The site renders Sanity documents; `src/lib/from-json.ts` converts the JSON files into the same documents, and `npm run check` fails if they stop matching the Studio schema. Hosting is on Cloudflare (`docs/HOSTING.md`). See `docs/SANITY-PORT-STATUS.md`.
+- The editor is `studio/` (Sanity Studio). The site renders Sanity documents; `src/lib/from-json.ts` converts the JSON files into the same documents, and `npm run check` fails if they stop matching the Studio schema. Hosting is on Cloudflare (`docs/HOSTING.md`); the Studio deploys itself from GitHub when `studio/` changes on `main` (`.github/workflows/studio-deploy.yml`). See `docs/SANITY-PORT-STATUS.md`.
 - Fixed wording in both languages is in `src/lib/i18n.ts`.
 - Page code is in `src/pages/[lang]/`, `src/components/`, `src/layouts/`; styles are in `src/styles/global.css`.
 
