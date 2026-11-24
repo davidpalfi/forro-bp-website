@@ -113,7 +113,7 @@ Open the person, click the **⋯** menu next to **Publish** and choose **Unpubli
 
 ### The event calendar
 The calendar page shows one month's calendar picture at a time, with arrows to the other months. It opens on the current month, and a month disappears by itself once it is over, so there is nothing to clean up. Visitors can tap the picture to see it large.
-1. Open the calendar page (e.g. **Community pages → Event calendar**) and click its **Event calendar** block. If the page has none yet, **Add item → Event calendar**.
+1. Open the calendar page (e.g. **Community → Pages → Event calendar**) and click its **Event calendar** block. If the page has none yet, **Add item → Event calendar**.
 2. Under **Months**, click **Add item**: choose the **Year** and **Month** and upload the **Calendar picture**.
 3. **Publish**. A new month appears with an arrow from the month before it.
 
