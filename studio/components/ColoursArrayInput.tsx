@@ -8,10 +8,10 @@ export function ColoursArrayInput(props: ArrayOfObjectsInputProps) {
   const items = (props.value ?? []) as { builtin?: string }[]
   const missing = BUILTIN_COLOURS.filter((b) => !items.some((i) => i.builtin === b.id))
   return (
-    <Stack space={4}>
+    <Stack gap={3}>
       <Box>{props.renderDefault(props)}</Box>
       {missing.length > 0 && (
-        <Stack space={3} paddingTop={2}>
+        <Stack gap={3}>
           <Text size={1} muted>
             Built-in colours not listed here use their usual codes: {missing.map((m) => `${m.name} ${m.code}`).join(', ')}.
           </Text>
