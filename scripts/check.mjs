@@ -352,6 +352,7 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
   const festivalDoc = docs.find((d) => d._type === 'festivalSettings');
   festivalDoc.logo = { _type: 'image', asset: { _type: 'reference', _ref: 'image-' + 'a'.repeat(40) + '-800x400-png' } };
   festivalDoc.headerLogo = { _type: 'image', asset: { _type: 'reference', _ref: 'image-' + 'b'.repeat(40) + '-200x100-png' } };
+  festivalDoc.tabIcon = { _type: 'image', asset: { _type: 'reference', _ref: 'image-' + 'd'.repeat(40) + '-64x64-png' } };
   // A banner video (an uploaded MP4 file).
   festivalDoc.heroVideo = { _type: 'file', asset: { _type: 'reference', _ref: 'file-' + 'c'.repeat(40) + '-mp4' } };
   fs.writeFileSync(path.join(dir, 'fixture.ndjson'), docs.map((d) => JSON.stringify(d)).join('\n'));
@@ -408,6 +409,7 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
       const home = read(dir, 'en/festival/index.html');
       const brand = /<img[^>]*class="brand-logo"[^>]*>/.exec(home)?.[0] ?? '';
       check(brand.includes('b'.repeat(40)) && home.includes('a'.repeat(40)) && !brand.includes('a'.repeat(40)), 'the top bar shows the small logo and the banner the big one');
+      check(/<link rel="icon" href="[^"]*d{40}/.test(home) && /<link rel="icon" href="[^"]*forro-budapest-logo/.test(read(dir, 'en/index.html')), 'the festival tab icon is its own upload; the community one falls back to the community logo');
       const video = /<video[^>]*class="hero-video"[^>]*>/.exec(home)?.[0] ?? '';
       check(video.includes(`data-hero-video="https://cdn.sanity.io/files/8hc671sk/production/${'c'.repeat(40)}.mp4"`) && video.includes('data-type="video/mp4"') && video.includes('preload="none"') && video.includes('muted') && !/\s(?:src|autoplay)=?/.test(video) && home.includes('class="hero-photo"') && home.includes('video[data-hero-video]'), 'the banner video is in the banner over the photo, loaded only by the script (so phones never download it)');
       check(!read(dir, 'en/festival/program/index.html').includes('<video'), 'the banner video is only on the festival home');

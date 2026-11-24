@@ -97,6 +97,12 @@ const communitySettings = defineType({
       description: 'The logo in the top-left corner of the community pages. Without it, the round Forró Budapest logo is used.',
       type: 'image',
     }),
+    defineField({
+      name: 'tabIcon',
+      title: 'Browser tab icon (optional)',
+      description: 'The small picture in the browser tab on community pages. A square PNG works best. Without it, the logo above is used.',
+      type: 'image',
+    }),
     homeBlocks('Home page blocks'),
   ],
   preview: { prepare: () => ({ title: 'Community home page' }) },
@@ -121,6 +127,7 @@ const festivalSettings = defineType({
     defineField({ name: 'name', title: 'Festival name', type: 'string', group: 'banner' }),
     defineField({ name: 'logo', title: 'Big logo (banner)', description: 'The large logo in the middle of the banner, shown instead of the name. A PNG with a transparent background works best.', type: 'image', group: 'banner' }),
     defineField({ name: 'headerLogo', title: 'Small logo (top bar)', description: 'The small logo in the top-left corner of every festival page. Without it, the big logo is used there.', type: 'image', group: 'banner' }),
+    defineField({ name: 'tabIcon', title: 'Browser tab icon (optional)', description: 'The small picture in the browser tab on festival pages. A square PNG works best. Without it, the big logo is used (or the small logo, if there is no big one).', type: 'image', group: 'banner' }),
     defineField({ name: 'heroImage', title: 'Banner photo', type: 'imageWithAlt', group: 'banner' }),
     defineField({
       name: 'heroImagePhone',

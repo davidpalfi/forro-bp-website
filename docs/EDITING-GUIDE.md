@@ -20,10 +20,10 @@ On the left is the **Content** menu:
 
 | In the menu | What it is |
 |---|---|
-| **Festival → Home page** | The big banner (photo, big logo, dates, ticket button), the small logo in the top-left corner and everything below it on the festival's front page |
+| **Festival → Home page** | The big banner (photo, big logo, dates, ticket button), the small logo in the top-left corner, the browser tab icon and everything below it on the festival's front page |
 | **Festival → Pages** | Program, Teachers, Artists, Location, Code of Conduct, and any page you add |
 | **Festival → Teachers** / **Artists** | One entry per person |
-| **Community → Home page** | The front page of the community site: the headline, a short line and up to two buttons at the top, an optional banner photo behind them, the logo in the top bar, and the blocks below |
+| **Community → Home page** | The front page of the community site: the headline, a short line and up to two buttons at the top, an optional banner photo behind them, the logo in the top bar, the browser tab icon, and the blocks below |
 | **Community → Pages** | Pages of the community site |
 | **Everyone (teachers and artists)** | All people in one list |
 | **Site settings** | Community name, contact email, social links, "Hide the site from Google" |

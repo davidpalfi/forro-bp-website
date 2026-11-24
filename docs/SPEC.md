@@ -48,7 +48,7 @@ Out of scope: content for the community level (not designed), a structured (text
   - Brand: in the festival, the small festival logo (`headerLogo`; without it the big banner logo; the festival name as text when neither is uploaded), linking to the festival home. On the community level, the community logo (`communitySettings.logo`, else the round Forró Budapest logo `public/uploads/forro-budapest-logo.png`, cropped from the community's Instagram), linking to the community home.
   - Language switch: a drop-down showing the current language's flag, `EN`/`HU` and an arrow; it opens a list (flag and "English"/"Magyar") linking to the same page in each language, the current one marked. It works without JavaScript (`<details>`); with it, Escape or a click elsewhere closes it. On computers it sits between the menu and the Tickets button; on phones beside the menu button.
   - Festival menu, in order: Home (the festival home), Program, Teachers, Artists, text pages with `showInMenu` (by `order`, then title; shown with their `menuLabel` when set), and a cream "Tickets" button (new tab) when `ticketUrl` is a safe link. Community menu: Home (the community home) first, then the community pages with `showInMenu` and the button to the festival, by menu order. The festival button is a community page with `goesTo: "festival"` (no address or page of its own; its `menuLabel`/`title`, `order` and `showInMenu` apply; only the first such page counts, with a warning); without one, a festival button with the festival name comes first.
-  - Browser-tab icon: the same logo as the brand, in its smallest size (festival logo on festival pages, community logo on community pages). No icon when the festival has no logo.
+  - Browser-tab icon, in its smallest size: on festival pages `festivalSettings.tabIcon`, else the big banner logo, else the small logo (none when no logo is uploaded); on community pages `communitySettings.tabIcon`, else the community logo (as in the top bar).
   - From 1180 px (the one-row header) the festival's date line (the same `dateLine` as on the banner) is also shown next to the brand.
   - The current page has `aria-current="page"`.
   - Below 1180 px the menu is behind a button and opens as a full-screen panel; Escape closes it. From 1180 px everything sits in one row, in capitals. Without JavaScript the menu is always visible instead.
@@ -107,6 +107,7 @@ All content is plain JSON files under `src/content/`. **Form** = what the editin
 | `name` | required | Brand text, titles. Default "Festival" |
 | `logo` | image | Big logo on the banner (and in the header when `headerLogo` is empty); text is used when empty |
 | `headerLogo` | image | Small logo in the header of every festival page (2026-11-23) |
+| `tabIcon` | image | Browser-tab icon on festival pages; the big logo when empty (Sanity only, 2026-11-24). `communitySettings.tabIcon` does the same on community pages, with the community logo as default |
 | `heroImage` | image | Festival banner; default sharing image |
 | `heroImagePhone` | image | Optional taller banner used below 720 px |
 | `heroVideo` | file (MP4, WebM; Sanity only) | Optional silent looping banner video over the photo, from 720 px, not with "reduce motion" or data saver (S21) |

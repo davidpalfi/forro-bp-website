@@ -88,8 +88,12 @@ const headerLogoField = inFestival
     : festival.logo
   : communityLogoField;
 const logo = getImage(headerLogoField);
-// The browser-tab icon is the same top-bar logo, in its smallest size.
-const tabIcon = logo && (logo.srcset ? logo.srcset.split(', ')[0].split(' ')[0] : logo.src);
+// The browser-tab icon, in its smallest size: the section's own tab icon, else on festival pages
+// the big banner logo (then the small one), on community pages the community logo.
+const tabIconImg = inFestival
+  ? getImage(festival.tabIcon) || getImage(festival.logo) || getImage(festival.headerLogo)
+  : getImage(community.tabIcon) || footerLogo;
+const tabIcon = tabIconImg && (tabIconImg.srcset ? tabIconImg.srcset.split(', ')[0].split(' ')[0] : tabIconImg.src);
 const ticketUrl = inFestival ? safeUrl(festival.ticketUrl) : '';
 const headerDate = inFestival ? tr(festival, 'dateLine', lang) : '';
 const instagram = safeUrl((inFestival && festival.instagram) || site.instagram || festival.instagram);
