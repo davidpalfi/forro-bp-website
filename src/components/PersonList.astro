@@ -1,6 +1,7 @@
 ---
 // The people cards: photo, role, name, bio, Instagram link. Used by the "People" block.
 import Picture from './Picture.astro';
+import Grip from './Grip.astro';
 import { paragraphs, safeUrl, withBase, type Person } from '../lib/content';
 import { UI, tr, type Lang } from '../lib/i18n';
 
@@ -35,6 +36,7 @@ const { people, lang, edits = [] } = Astro.props;
               </a>
             )}
           </div>
+          {edits[i] && <Grip />}
         </li>
       );
     })

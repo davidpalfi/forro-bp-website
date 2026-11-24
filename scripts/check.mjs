@@ -79,7 +79,7 @@ function previewTraces(dir) {
       if (e.isDirectory()) walk(p);
       else if (/\.(html|js|css)$/.test(e.name)) {
         const t = fs.readFileSync(p, 'utf8');
-        if (/enableVisualEditing|@sanity\/visual-editing|preview-client|data-sanity=/.test(t)) found.push(`${e.name} (editing script or click target)`);
+        if (/enableVisualEditing|@sanity\/visual-editing|preview-client|data-sanity=|class="edit-grip"/.test(t)) found.push(`${e.name} (editing script, click target or drag grip)`);
         else if (/[\u200b-\u200d\ufeff]{4,}/.test(t)) found.push(`${e.name} (invisible markers)`);
       }
     }

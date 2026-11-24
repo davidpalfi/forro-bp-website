@@ -4,6 +4,7 @@
 // A block of an unknown kind is skipped with a [content-warning], never an error.
 import Picture from './Picture.astro';
 import PersonList from './PersonList.astro';
+import Grip from './Grip.astro';
 import {
   groupBlocks,
   renderRich,
@@ -57,9 +58,10 @@ const widthOf = (b: Block | undefined) => {
 const images = (b: Block) => (Array.isArray(b.images) ? (b.images as unknown[]).filter((i) => getImage(i)) : []);
 // Click-to-edit (preview only, nothing in public builds): each block's outer element carries the
 // block's place in the page's list, so a click on its edge opens the whole block (with its Style
-// tab) and blocks can be dragged into a new order on the page. Where a photo fills the block, the
-// photo carries it instead. Texts directly in such an element get their own <span>, so the block
-// and the text stay two separate targets.
+// tab). Texts and photos inside are targets of their own, and Sanity only drags the innermost
+// target under the mouse, so each block gets a grip (<Grip>, shown on hover): pressing on it is
+// pressing on the block, which can then be dragged into a new order. Texts directly in a block's
+// element get their own <span>, so the block and the text stay two separate targets.
 const edit = (b: Block) => editAttr(b);
 const link = (b: Block) => {
   const l = blockLink(b, lang);
@@ -84,13 +86,20 @@ const link = (b: Block) => {
             case 'textBlock': {
               const value = trRich(b, 'body', lang);
               if (!value) return null;
-              if (look(b) === 'statement') return <p class="b-text b-statement stats" data-sanity={edit(b)}>{edit(b) ? <span>{richPlain(value)}</span> : richPlain(value)}</p>;
-              return <div class:list={['b-text', 'prose', look(b) === 'large' && 'b-large intro']} data-sanity={edit(b)} set:html={renderRich(value, lang)} />;
+              if (look(b) === 'statement') return <p class="b-text b-statement stats" data-sanity={edit(b)}>{edit(b) ? <><span>{richPlain(value)}</span><Grip /></> : richPlain(value)}</p>;
+              if (edit(b))
+                return (
+                  <div class:list={['b-text', 'prose', look(b) === 'large' && 'b-large intro']} data-sanity={edit(b)}>
+                    <Fragment set:html={renderRich(value, lang)} />
+                    <Grip />
+                  </div>
+                );
+              return <div class:list={['b-text', 'prose', look(b) === 'large' && 'b-large intro']} set:html={renderRich(value, lang)} />;
             }
             case 'headingBlock': {
               const t = tr(b, 'heading', lang);
               const Tag = headingTag(b);
-              return t ? <Tag class:list={[widthOf(g.blocks[bi + 1]), 'b-heading', `b-heading--${Tag}`]} data-sanity={edit(b)}>{edit(b) ? <span>{t}</span> : t}</Tag> : null;
+              return t ? <Tag class:list={[widthOf(g.blocks[bi + 1]), 'b-heading', `b-heading--${Tag}`]} data-sanity={edit(b)}>{edit(b) ? <><span>{t}</span><Grip /></> : t}</Tag> : null;
             }
             case 'imageBlock': {
               const img = getImage(b.image);
@@ -98,11 +107,12 @@ const link = (b: Block) => {
               const caption = tr(b, 'caption', lang);
               const phone = getImage(b.imagePhone);
               return (
-                <figure class:list={['b-image', imageWidth(b)]}>
+                <figure class:list={['b-image', imageWidth(b)]} data-sanity={edit(b)}>
                   <a class="gallery-open image-open" href={img.src} data-srcset={img.srcset} data-phone-src={phone?.src} data-phone-srcset={phone?.srcset}>
-                    <Picture image={b.image} phone={b.imagePhone} lang={lang} edit={edit(b)} class="b-image-photo" sizes={b.width === 'text' ? '(min-width: 760px) 704px, 100vw' : '(min-width: 1200px) 1150px, 100vw'} />
+                    <Picture image={b.image} phone={b.imagePhone} lang={lang} class="b-image-photo" sizes={b.width === 'text' ? '(min-width: 760px) 704px, 100vw' : '(min-width: 1200px) 1150px, 100vw'} />
                   </a>
                   {caption && <figcaption>{caption}</figcaption>}
+                  {edit(b) && <Grip />}
                 </figure>
               );
             }
@@ -126,6 +136,7 @@ const link = (b: Block) => {
                     })}
                   </ul>
                   {caption && <figcaption>{caption}</figcaption>}
+                  {edit(b) && <Grip />}
                 </figure>
               );
             }
@@ -137,6 +148,7 @@ const link = (b: Block) => {
                   <a class="button" href={l.url} target={l.external ? '_blank' : undefined} rel={l.external ? 'noopener' : undefined}>
                     {l.label}
                   </a>
+                  {edit(b) && <Grip />}
                 </p>
               );
             }
@@ -146,8 +158,8 @@ const link = (b: Block) => {
               const body = renderRich(trRich(b, 'body', lang), lang);
               const l = link(b);
               return (
-                <div class:list={['b-wide', 'b-banner', !photo && 'b-banner--plain']} data-sanity={photo ? undefined : edit(b)}>
-                  {photo && <Picture image={b.image} lang={lang} edit={edit(b)} class="b-banner-photo" sizes="(min-width: 1100px) 1088px, 100vw" />}
+                <div class:list={['b-wide', 'b-banner', !photo && 'b-banner--plain']} data-sanity={edit(b)}>
+                  {photo && <Picture image={b.image} lang={lang} class="b-banner-photo" sizes="(min-width: 1100px) 1088px, 100vw" />}
                   <div class="b-banner-inner">
                     {title && <h2 class="b-banner-title">{title}</h2>}
                     {body && <div class="prose" set:html={body} />}
@@ -157,6 +169,7 @@ const link = (b: Block) => {
                       </a>
                     )}
                   </div>
+                  {edit(b) && <Grip />}
                 </div>
               );
             }
@@ -173,9 +186,11 @@ const link = (b: Block) => {
                         {c.image ? <Picture image={c.image} lang={lang} class="b-column-photo" sizes="(min-width: 900px) 30vw, 100vw" /> : null}
                         {h && <h3 class="b-heading b-heading--h3">{h}</h3>}
                         {body && <div class="prose" set:html={body} />}
+                        {editAttr(c) && <Grip />}
                       </div>
                     );
                   })}
+                  {edit(b) && <Grip />}
                 </div>
               );
             }
@@ -192,16 +207,26 @@ const link = (b: Block) => {
                     <iframe src={embed} title={caption || 'Video'} loading="lazy" allow="fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" />
                   </div>
                   {caption && <figcaption>{caption}</figcaption>}
+                  {edit(b) && <Grip />}
                 </figure>
               );
             }
             case 'dividerBlock':
-              return b.style === 'space' ? <div class="b-space" aria-hidden="true" data-sanity={edit(b)} /> : <hr class="b-text b-divider" data-sanity={edit(b)} />;
+              // An <hr> cannot hold a grip: in the preview the line sits in a box that can.
+              if (edit(b))
+                return (
+                  <div class:list={[b.style === 'space' ? 'b-space' : 'b-text b-divider-box']} data-sanity={edit(b)}>
+                    {b.style !== 'space' && <hr class="b-divider" />}
+                    <Grip />
+                  </div>
+                );
+              return b.style === 'space' ? <div class="b-space" aria-hidden="true" /> : <hr class="b-text b-divider" />;
             case 'peopleGridBlock': {
               const people = peopleForBlock(b);
               return people.length ? (
                 <div class="b-people" data-sanity={edit(b)}>
                   <PersonList people={people} lang={lang} edits={peopleEditAttrs(b, people)} />
+                  {edit(b) && <Grip />}
                 </div>
               ) : null;
             }
@@ -230,6 +255,7 @@ const link = (b: Block) => {
                       </section>
                     );
                   })}
+                  {edit(b) && <Grip />}
                 </div>
               );
             }

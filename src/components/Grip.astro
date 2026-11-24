@@ -1,0 +1,9 @@
+---
+// Click-to-edit preview only: the handle for dragging a block (or a column, or a chosen person)
+// into a new order. It is not a click target itself, so pressing on it is pressing on the element
+// around it, which carries the item's data-sanity attribute. Shown while the mouse is over that
+// element (global.css, .edit-grip). Never rendered in public builds: callers only add it when
+// the element has a click target.
+---
+
+<span class="edit-grip" aria-hidden="true" title="Drag to move"></span>

@@ -107,7 +107,8 @@ try {
   // can be dragged into a new order). Each item is marked once, or dragging would get confused.
   const paths = (html) =>
     [...html.matchAll(/data-sanity="([^"]*)"/g)].map((m) => (/path=([^;]*)/.exec(m[1]) || [])[1] || '');
-  const every = paths((await page('/en/festival/everything/')).html);
+  const everyHtml = (await page('/en/festival/everything/')).html;
+  const every = paths(everyHtml);
   const item = (p) => `:${p}`;
   const shown = ['b01', 'b02', 'b03', 'b03h', 'b04', 'b05', 'b07', 'b08', 'b09', 'b11', 'b12', 'b13', 'b14'];
   const blockPaths = every.filter((p) => /^blocks:[^.]+$/.test(p));
@@ -120,6 +121,7 @@ try {
   check(inBlock('b04', 'images', ['g1', 'g2']), 'gallery photos can be dragged within their gallery');
   check(inBlock('b08', 'columns', ['c1', 'c2', 'c3']), 'columns can be dragged within their block');
   check(inBlock('b13', 'people', ['p1', 'p2']), 'chosen people can be dragged within their People block');
+  const needGrip = [...shown.map((k) => `blocks${item(k)}`), ...['c1', 'c2', 'c3'].map((k) => `blocks${item('b08')}.columns${item(k)}`), ...['p1', 'p2'].map((k) => `blocks${item('b13')}.people${item(k)}`)];
   const home = paths(locked.html);
   check(home.some((p) => /^homeBlocks:[^.]+$/.test(p)), 'the blocks of the festival home page have click targets too');
 
@@ -172,6 +174,15 @@ try {
       await tab.evaluate((sel) => document.querySelector(sel)?.addEventListener('click', (e) => e.preventDefault(), { capture: true }), link);
       await Promise.all([tab.waitForURL('**/en/festival/program/', { timeout: 10000 }).catch(() => {}), tab.click(link)]);
       check(new URL(tab.url()).pathname === '/en/festival/program/', 'a click on a menu link goes to that page even where click-to-edit would catch it');
+      // Texts and photos inside a block are targets of their own, and Sanity only drags the
+      // innermost target under the mouse, so each block, column and chosen person needs a grip
+      // (an element inside it without a target) to be dragged by.
+      await tab.goto(`${BASE}/en/festival/everything/`);
+      const grips = await tab.evaluate(() =>
+        [...document.querySelectorAll('.edit-grip')].map((g) => (/path=([^;]*)/.exec(g.parentElement?.getAttribute('data-sanity') || '') || [])[1] || '(none)'),
+      );
+      const noGrip = needGrip.filter((p) => !grips.includes(p));
+      check(noGrip.length === 0 && grips.length === needGrip.length, `every block, column and chosen person has one grip to drag it by${noGrip.length || grips.length !== needGrip.length ? `: missing ${noGrip.join(' ')}; found ${grips.join(' ')}` : ''}`);
       check(errors.length === 0, `no script errors in the preview${errors.length ? ': ' + errors.join('; ') : ''}`);
     } finally {
       await browser.close();
