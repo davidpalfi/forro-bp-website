@@ -452,3 +452,6 @@ figcaption { font-size: 0.9375rem; margin-top: 0.6rem; opacity: 0.85; }
 .cal-js .cal-month { margin-bottom: 0; }
 .cal-empty { text-align: center; }
 .cal-picture { width: 100%; }
+/* The round Forró Budapest logo needs more height than the festival's wide logo to be readable. */
+.in-community .brand-logo { height: 4rem; margin-block: -0.4rem; }
+@media (min-width: 1180px) { .in-community .brand-logo { height: 5rem; margin-block: -0.5rem; } }

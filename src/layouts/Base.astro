@@ -53,7 +53,14 @@ const nav = inFestival
 
 const brandPath = inFestival ? '/festival/' : '/';
 // The top bar uses the small logo; without one, the big banner logo.
-const headerLogoField = inFestival ? (getImage(festival.headerLogo) ? festival.headerLogo : festival.logo) : undefined;
+// Community pages: the logo from "Community home page", else the round Forró Budapest logo.
+const headerLogoField = inFestival
+  ? getImage(festival.headerLogo)
+    ? festival.headerLogo
+    : festival.logo
+  : getImage(community.logo)
+    ? community.logo
+    : '/uploads/forro-budapest-logo.png';
 const logo = getImage(headerLogoField);
 const ticketUrl = inFestival ? safeUrl(festival.ticketUrl) : '';
 const headerDate = inFestival ? tr(festival, 'dateLine', lang) : '';

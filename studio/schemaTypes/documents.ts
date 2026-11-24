@@ -61,6 +61,12 @@ const communitySettings = defineType({
   fields: [
     ...communityTitle.fields,
     defineField({ name: 'heroImage', title: 'Banner photo', type: 'imageWithAlt' }),
+    defineField({
+      name: 'logo',
+      title: 'Logo (top bar)',
+      description: 'The logo in the top-left corner of the community pages. Without it, the round Forró Budapest logo is used.',
+      type: 'image',
+    }),
     homeBlocks('Home page blocks'),
   ],
   preview: { prepare: () => ({ title: 'Community home page' }) },
