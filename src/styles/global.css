@@ -41,7 +41,8 @@ body {
 
 main { flex: 1; background: var(--red); }
 @media (min-width: 900px) { body { font-size: 0.9375rem; } }
-main.tone-dark { background: var(--dark); }
+/* Text colour follows the background: cream on dark, dark grey on light colours. */
+main.tone-dark { background: var(--dark); color: var(--cream); }
 main.tone-gold { background: var(--gold); color: var(--footer); }
 /* Cream pages (Location) sit on the Wix site's paper texture, stretched over the whole page. */
 main.tone-cream { background: var(--cream) url('./paper-cream.webp') center top / cover no-repeat; color: var(--ink); }
@@ -426,6 +427,9 @@ figcaption { font-size: 0.9375rem; margin-top: 0.6rem; opacity: 0.85; }
 .in-community .button { background: var(--dark); color: var(--cream); }
 .in-community .button:hover, .in-community .button:focus-visible { background: #1a1a1a; }
 .in-community .bg-red { color: var(--dark); }
+/* On a dark page or band the community's dark buttons would vanish: cream there. */
+.in-community .tone-dark .button, .in-community .bg-dark .button { background: var(--cream); color: var(--dark); }
+.in-community .tone-dark .button:hover, .in-community .bg-dark .button:hover { background: var(--white); }
 .in-community .hero, .in-community .b-banner { color: var(--cream); }
 .in-community main.tone-cream, .in-community .bg-cream { background: var(--cream); color: var(--dark); }
 .in-community .tone-cream .bg-cream { background: transparent; }
