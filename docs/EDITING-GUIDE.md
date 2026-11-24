@@ -94,8 +94,9 @@ Open the person, click the **⋯** menu next to **Publish** and choose **Unpubli
 ### Replace the program images
 1. Open **Festival → Pages** → **Program**.
 2. Each program graphic is an **Image** block. Click one and upload a new photo over it, or add a new **Image** block with **Add item** at the bottom.
-3. Drag the blocks by their handle (⋮⋮) to change the order.
-4. **Publish**.
+3. If phones should show a different version of a graphic (for example a tall one), upload it under **Phone version** in the same block. Leave it empty to show the same picture everywhere.
+4. Drag the blocks by their handle (⋮⋮) to change the order.
+5. **Publish**.
 
 ### Edit a text page (Location, Code of Conduct)
 1. Open **Festival → Pages** and choose the page.
@@ -128,7 +129,7 @@ Every page is a list of **blocks**, one under the other. You can add, remove and
 |---|---|
 | **Text** | Paragraphs with headings, lists and links. **Style** tab → *Text style*: Normal, **Large** (big serif text, like the festival introduction) or **Statement** (one bold line, like "14 Workshops \| 4 Bands …") |
 | **Heading** | A heading on its own, in three sizes |
-| **Image** | One photo, wide, at text width, or across the whole screen, with an optional caption. Visitors can tap it to see it large (useful for the program pictures on phones) |
+| **Image** | One photo, wide, at text width, or across the whole screen, with an optional caption. Visitors can tap it to see it large (useful for the program pictures on phones). **Phone version (optional):** a second picture that phones and narrow windows show instead, for example a tall version of a wide graphic |
 | **Gallery** | Several photos, as a **Grid** (three across, two on phones) or a **Mosaic** of big and small photos (best with 5 or 10). Visitors can click a photo to see it large and page through the rest |
 | **Button** | A button to one of your pages (choose it from the list) or to an address |
 | **People** | Teacher or artist cards. Leave the list empty to show everyone in the group automatically, or pick people to show only them |

@@ -304,10 +304,13 @@ const year = new Date().getFullYear();
         function show(n) {
           at = (n + list.length) % list.length;
           var a = list[at], small = a.querySelector('img');
+          // An Image block with a phone version opens that version on narrow screens.
+          var phone = a.dataset.phoneSrc && window.matchMedia('(max-width: 719px)').matches;
           img.removeAttribute('srcset');
-          if (a.dataset.srcset) img.srcset = a.dataset.srcset;
+          var srcset = phone ? a.dataset.phoneSrcset : a.dataset.srcset;
+          if (srcset) img.srcset = srcset;
           img.sizes = '100vw';
-          img.src = a.href;
+          img.src = phone ? a.dataset.phoneSrc : a.href;
           img.alt = small ? small.alt : '';
           count.textContent = list.length > 1 ? at + 1 + ' / ' + list.length : '';
           box.querySelector('.lightbox-prev').hidden = box.querySelector('.lightbox-next').hidden = list.length < 2;

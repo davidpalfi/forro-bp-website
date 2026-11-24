@@ -115,6 +115,9 @@ Colours are global: Site settings → Colours lists them (name, code, text colou
 ### S19. The Studio deploys itself from GitHub (Dávid, 2026-11-24)
 A GitHub workflow runs `npm run studio:deploy` when Studio code or the dependencies change on `main`, with a Sanity token limited to "Deploy Studio" stored as the repository secret `SANITY_AUTH_TOKEN` (never in the repository). Why: deploying needed a computer with the project and a Sanity sign-in, and was easy to forget after a Studio change. The site itself is still built by Cloudflare.
 
+### S20. A phone version on the Image block (Dávid, 2026-11-24)
+The Wix program page shows a different picture on narrow screens than on wide ones. The Image block got an optional "Phone version": below 720 px wide (the same breakpoint as the festival banner's phone photo) the page and the photo viewer show it instead. A field on the existing block rather than a separate "adaptive image" block: it works on every page without code changes, and the editor does not have to choose between two nearly identical blocks or rebuild a block to add a phone version later. Other photo fields (galleries, banner and columns blocks) have none yet; add the same field there if it is asked for.
+
 ### Still open for the port
 - Whether Cloudflare also hosts the real public site at launch (the test site is there, S11).
 - The invited-editor sign-in. The publish webhook after the trial ends: webhooks are not among the Growth features the trial lists, so they are expected to work on Free; publish one test change after the trial ends (around 2026-12-18) to confirm.

@@ -2,11 +2,14 @@
 // A photo: from Sanity's image service, or from public/uploads with web-sized versions.
 // `image` is whatever the content holds (a Sanity image or an /uploads/ path).
 // The editor's focus point keeps the important part visible when the photo is cropped.
+// With `phone`, narrow screens (under 720 px) get that photo instead.
 import { getImage, altOf, editAttr } from '../lib/content';
 import type { Lang } from '../lib/i18n';
 
 interface Props {
   image?: unknown;
+  /** Another photo for screens under 720 px wide (the Image block's phone version). */
+  phone?: unknown;
   lang?: Lang;
   /** Overrides the description stored with the photo. */
   alt?: string;
@@ -15,13 +18,34 @@ interface Props {
   eager?: boolean;
 }
 
-const { image, lang, alt, sizes = '100vw', class: className, eager = false } = Astro.props;
+const { image, phone, lang, alt, sizes = '100vw', class: className, eager = false } = Astro.props;
 const img = getImage(image);
+const small = img ? getImage(phone) : undefined;
 const description = alt ?? (lang ? altOf(image, lang) : '');
 ---
 
 {
-  img && (
+  img && small && (
+    <picture>
+      <source media="(max-width: 719px)" srcset={small.srcset ?? small.src} sizes="100vw" width={small.width} height={small.height} />
+      <img
+        src={img.src}
+        srcset={img.srcset}
+        sizes={img.srcset ? sizes : undefined}
+        width={img.width}
+        height={img.height}
+        alt={description}
+        class={className}
+        style={img.position ? `object-position: ${img.position}` : undefined}
+        loading={eager ? 'eager' : 'lazy'}
+        decoding="async"
+        data-sanity={editAttr(image)}
+      />
+    </picture>
+  )
+}
+{
+  img && !small && (
     <img
       src={img.src}
       srcset={img.srcset}

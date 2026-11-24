@@ -10,6 +10,7 @@
 // What this cannot check (needs a browser): the menu button, the language redirect on "/",
 // layout on phones, and anything about the live Studio or hosting. See docs/HANDOFF.md.
 
+import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -380,6 +381,7 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
       check(months.length === 2 && months[0] < months[1] && !page.includes('1'.repeat(40)) && page.includes('2'.repeat(40)) && page.includes('3'.repeat(40)) && !page.includes('4'.repeat(40)) && page.includes('data-cal-nav') && (page.match(/<p class="cal-empty"/g) || []).length === 1, 'the event calendar shows this month and later in order, each month once with its picture, with the month switcher');
     }
     check(/<a class="gallery-open image-open" href="https:\/\/cdn\.sanity\.io\//.test(page), 'an Image block opens large in the photo viewer');
+    check(/<picture><source media="\(max-width: 719px\)" srcset="https:\/\/cdn\.sanity\.io\/[^"]*/.test(page.replace(/>\s+</g, '><')) && page.includes(createHash('sha1').update('full-phone').digest('hex')) && /data-phone-src="https:\/\/cdn\.sanity\.io\//.test(page), 'an Image block with a phone version shows it on narrow screens and in the photo viewer there');
     check(['A small heading', 'Banner title', 'Banner button', 'Column three', 'A caption', 'b-divider', 'b-space', 'A statement line'].every((t) => page.includes(t)), 'every kind of block is shown');
     check(page.indexOf('>Gisa<') > -1 && page.indexOf('>Gisa<') < page.indexOf('>Dóri Czakó<'), 'a People block with chosen people shows them in the chosen order');
     check(/<main id="main" class="tone-dark"/.test(page), 'the page colour is used');

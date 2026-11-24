@@ -121,6 +121,13 @@ const imageBlock = defineType({
   fieldsets: [caption.fieldset],
   fields: [
     defineField({ name: 'image', title: 'Image', type: 'imageWithAlt', validation: (rule) => rule.required(), group: 'content' }),
+    defineField({
+      name: 'imagePhone',
+      title: 'Phone version (optional)',
+      description: 'A different picture for narrow screens (under 720 px wide, most phones), for example a taller version of the same graphic. Without it, phones show the image above.',
+      type: 'imageWithAlt',
+      group: 'content',
+    }),
     ...caption.fields.map((f) => ({ ...f, group: 'content' })),
     defineField({
       name: 'width',
