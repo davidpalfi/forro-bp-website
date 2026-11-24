@@ -41,7 +41,7 @@ const siteSettings = defineType({
     defineField({
       name: 'colours',
       title: 'Colours',
-      description: 'The colours every colour choice offers (page colour, block background, header, language list). Change a code here and it changes everywhere it is used. Add a colour with "Add item".',
+      description: 'The colours every colour choice offers (page colour, block background, header, language list, scroll bar). Change a code here and it changes everywhere it is used. Add a colour with "Add item".',
       type: 'array',
       of: [{ type: 'paletteColour' }],
       options: { paletteList: true } as never,
@@ -51,6 +51,7 @@ const siteSettings = defineType({
     defineField({ name: 'festivalLanguageListColour', title: 'Festival: language list', type: 'string', options: { colourPicker: 'optional' } as never, description: 'The list that opens under EN/HU. Default: as the top bar.', fieldset: 'colours' }),
     defineField({ name: 'communityHeaderColour', title: 'Community: top bar', type: 'string', options: { colourPicker: 'optional' } as never, description: 'Default: Mustard.', fieldset: 'colours' }),
     defineField({ name: 'communityLanguageListColour', title: 'Community: language list', type: 'string', options: { colourPicker: 'optional' } as never, description: 'The list that opens under EN/HU. Default: as the top bar.', fieldset: 'colours' }),
+    defineField({ name: 'scrollbarColour', title: 'Scroll bar', type: 'string', options: { colourPicker: 'optional' } as never, description: 'The bar at the right edge of the browser window, on every page. Default: Cream.', fieldset: 'colours' }),
     ...fontFields,
     ...footerNote.fields,
     defineField({

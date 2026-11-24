@@ -118,10 +118,11 @@ The calendar page shows one month's calendar picture at a time, with arrows to t
 3. **Publish**. A new month appears with an arrow from the month before it.
 
 ### Colours
-Every colour choice (a page's colour, a block's background, the top bar, the language list) offers the colours listed in **Site settings → Colours**.
+Every colour choice (a page's colour, a block's background, the top bar, the language list, the scroll bar) offers the colours listed in **Site settings → Colours**.
 - **Change a colour everywhere:** click **Add the built-in colours to change their codes** once (if the button is there), then open a colour and type its new **Colour code** (e.g. `#c28f32`). Everything that uses it changes.
 - **Add a colour:** **Add item**, give it a **Name** and a **Colour code**. It then appears in every colour choice. The text colour on it is picked automatically (dark grey or cream); set **Text colour on it** to choose yourself.
 - **Top bar and language list:** under the list, choose a colour for each part of the site, or leave **Default**.
+- **Scroll bar:** the bar at the right edge of the browser window, for the whole site. **Default** is Cream.
 - If text would be hard to read on a colour, the maintainer sees a warning; nothing breaks. Deleting a colour that pages still use makes them fall back to the page or festival colour.
 
 ### Fonts

@@ -338,6 +338,7 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
       { _key: 'grey1', _type: 'paletteColour', name: 'Grey on grey', code: '#777777', text: '#888888' },
     ],
     communityLanguageListColour: 'light',
+    scrollbarColour: 'cpink1',
     // Fonts: Inter for the menu and buttons, the usual font chosen by name, and an unknown one.
     boldFont: 'inter',
     headingFont: 'fraunces',
@@ -403,6 +404,7 @@ console.log('\n[6] Sanity-shaped content: uploaded photos, every block, editor m
       check(coc.includes("html:root{--sans:'Inter Variable', 'Helvetica Neue', Arial, sans-serif}") && !coc.includes('--serif:') && !coc.includes('--title:'), 'a font chosen in Site settings replaces the usual one; the usual one or an unknown one changes nothing');
       check(output.includes('[content-warning] the font "comic-sans" chosen for page titles'), 'an unknown font is a warning');
       check(/<details class="lang" style="--langlist-bg:var\(--c-light\)/.test(home) && !/<details class="lang" style/.test(coc), 'the language list colour can be set per part of the site');
+      check(/scrollbar-color:color-mix\(in srgb,var\(--c-cpink1-text\) 40%,var\(--c-cpink1\)\) var\(--c-cpink1\)/.test(home), 'the scroll bar colour comes from Site settings');
     }
     check(everything.includes('<p class="person-bio">First paragraph.</p>') && /<p class="person-bio">Second paragraph,\s+same paragraph\.<\/p>/.test(everything), 'in a bio an empty line (even one with an invisible character) starts a paragraph, a single line break does not');
     {

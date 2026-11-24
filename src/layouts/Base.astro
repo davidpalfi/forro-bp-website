@@ -71,7 +71,13 @@ const paletteCss =
   '--red:var(--c-red);--gold:var(--c-gold);--cream:var(--c-cream);--dark:var(--c-dark)}' +
   'body.in-community{--c-red:var(--c-gold);--c-red-text:var(--c-gold-text);--c-cream:var(--c-light);--c-cream-text:var(--c-light-text);--red:var(--c-gold);--cream:var(--c-light)}' +
   palette.map((c) => `body .bg-${c.id},body main.tone-${c.id}{background-color:var(--c-${c.id});color:var(--c-${c.id}-text)}`).join('') +
+  scrollbarCss(knownColour(site.scrollbarColour) ?? 'cream') +
   getFontCss();
+// The browser's scroll bar, from Site settings → Colours (default Cream): the colour as the track,
+// a mix of it and its text colour as the part you drag.
+function scrollbarCss(id: string) {
+  return `html:root{scrollbar-color:color-mix(in srgb,var(--c-${id}-text) 40%,var(--c-${id})) var(--c-${id})}`;
+}
 // The top bar and the language list, from Site settings → Colours (else the usual colours).
 const colourVars = (id: string | undefined, prefix: string) => (id ? `--${prefix}-bg:var(--c-${id});--${prefix}-text:var(--c-${id}-text)` : undefined);
 const headerStyle = colourVars(knownColour(inFestival ? site.festivalHeaderColour : site.communityHeaderColour), 'header');

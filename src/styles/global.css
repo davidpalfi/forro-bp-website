@@ -27,8 +27,6 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 html { -webkit-text-size-adjust: 100%; }
-/* The scroll bar is cream, the site's own off-white, instead of the browser's white. */
-html { scrollbar-color: #9a8f7a var(--cream); }
 
 body {
   margin: 0;
