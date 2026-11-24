@@ -54,6 +54,7 @@ Dávid prefers to give the admin a more mature version first (first impressions 
 3. Agent: a clean copy of `docs/EDITING-GUIDE.md` without the maintainer note at the top (as a file or shareable page, Dávid's choice); check it against the deployed Studio once more.
 4. Dávid invites her (role Administrator) and sends the guide, https://forro-budapest.sanity.studio and https://forro-bp-website.pdavid92.workers.dev, asking her to note what is unclear.
 5. Then backlog item 13 (her trial) and the polish below.
+6. **Ask her for all the original logos as PNG files** (transparent background, full size): the Forró Budapest community logo, the festival's big banner logo and small top-bar logo, and the browser-tab icon (favicon) of the Wix site, plus any version made just for the tab. Today the community logo is a crop from Instagram (`public/uploads/forro-budapest-logo.png`), and the Wix tab icon could not be fetched from a cloud session. They go into Festival → Home page and Community → Home page in the Studio (logo fields and "Browser tab icon", `DECISIONS.md` S24).
 
 **✅ Done 2026-11-23: `main` is the Sanity version** (S12). Old version: tag `pages-cms-poc`. Both Workers and the deploy hook build `main`; a test Publish rebuilt the test site from `main`; all other branches deleted.
 
