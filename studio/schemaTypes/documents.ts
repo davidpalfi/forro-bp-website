@@ -183,9 +183,9 @@ const page = defineType({
     defineField({
       name: 'goesTo',
       title: 'Menu button goes to',
-      description: 'Leave empty for a normal page. "The festival" makes this a menu button to the festival: give it a title or menu label and a menu order like any page; it has no page of its own.',
+      description: 'Leave empty for a normal page. "The festival home page" makes this the menu button that opens the festival home page: its title (or menu label) is the button\'s name and its menu order is its place in the menu. It has no page of its own.',
       type: 'string',
-      options: { list: [{ title: 'The festival', value: 'festival' }], layout: 'radio' },
+      options: { list: [{ title: 'The festival home page', value: 'festival' }], layout: 'radio' },
       hidden: ({ document }) => (document as { section?: string } | undefined)?.section !== 'community',
       group: 'settings',
     }),
@@ -199,7 +199,7 @@ const page = defineType({
     select: { en: 'title_en', hu: 'title_hu', slug: 'slug.current', section: 'section', media: 'coverImage', goesTo: 'goesTo' },
     prepare: ({ en, hu, slug, section, media, goesTo }) => ({
       title: en || hu || 'Untitled page',
-      subtitle: goesTo === 'festival' ? 'Menu button to the festival' : slug ? `/${section === 'community' ? '' : 'festival/'}${slug}/` : 'no address yet',
+      subtitle: goesTo === 'festival' ? 'Menu button to the festival home page' : slug ? `/${section === 'community' ? '' : 'festival/'}${slug}/` : 'no address yet',
       media,
     }),
   },
