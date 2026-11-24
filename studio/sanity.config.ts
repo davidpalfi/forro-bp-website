@@ -20,6 +20,26 @@ const both = (path: string) => [
 ]
 const pageAddress = (section?: string, slug?: string) => (section === 'community' ? `/${slug}/` : `/festival/${slug}/`)
 
+// "Edit on the page" opens on the page of the document last open in the editor (a person: the
+// Teachers or Artists page; Site settings keeps the page before), in the language the preview
+// last showed. The form (form.components below) remembers it; the tool reads it when it opens.
+let lastPage = '/festival/'
+let lastLang = 'en'
+function rememberDocument(value: unknown) {
+  const doc = (value ?? {}) as { _type?: string; slug?: { current?: string }; section?: string; goesTo?: string; group?: string }
+  const page =
+    doc._type === 'festivalSettings' ? '/festival/'
+    : doc._type === 'communitySettings' ? '/'
+    : doc._type === 'page' && doc.section === 'community' && doc.goesTo === 'festival' ? '/festival/'
+    : doc._type === 'page' && doc.slug?.current ? pageAddress(doc.section, doc.slug.current)
+    : doc._type === 'person' ? (doc.group === 'Artist' ? '/festival/artists/' : '/festival/teachers/')
+    : undefined
+  if (page) lastPage = page
+  const shown = new URLSearchParams(window.location.search).get('preview')
+  const lang = shown ? /^(?:https?:\/\/[^/]+)?\/(en|hu)(?:\/|$)/.exec(shown)?.[1] : undefined
+  if (lang) lastLang = lang
+}
+
 const singleton = (S: StructureBuilder, id: string, title: string) =>
   S.listItem()
     .id(id)
@@ -88,7 +108,7 @@ export default defineConfig({
     presentationTool({
       title: 'Edit on the page',
       previewUrl: {
-        initial: `${PREVIEW_URL}/en/festival/`,
+        initial: () => `${PREVIEW_URL}/${lastLang}${lastPage}`,
         // The preview lock: the Studio first opens this address with a one-hour secret, and
         // only then does the preview show drafts (src/lib/preview-lock.ts).
         previewMode: { enable: '/preview/enable/' },
@@ -141,6 +161,8 @@ export default defineConfig({
     // rather than in the schema files, which plain Node also loads for npm run check.
     components: {
       input: (props) => {
+        // The whole document's form: remember it for "Edit on the page" (rememberDocument).
+        if (props.path.length === 0) rememberDocument(props.value)
         const options = (props.schemaType.options ?? {}) as { colourPicker?: string; paletteList?: boolean; hexPicker?: boolean }
         if (options.colourPicker === 'page') return createElement(ColourInput, props as never)
         if (options.colourPicker === 'block') return createElement(BlockColourInput, props as never)

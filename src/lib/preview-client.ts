@@ -44,6 +44,27 @@ async function swapInNewVersion() {
 // For trying it by hand (and for npm run check): run __previewRefresh() in the browser console.
 (window as unknown as { __previewRefresh: () => Promise<void> }).__previewRefresh = swapInNewVersion;
 
+// A plain click on a link to another page of the site goes there, as on the real site. Without
+// this, Sanity's click-to-edit catches clicks on link texts (menu items, buttons: they carry the
+// editing markers), opens the text in the Studio and stays on the page. Registered on window
+// in the capture phase, so it runs before the overlays' own handlers on the elements. Link texts
+// are edited in the form instead. Same-page links (#...), other sites (the photo viewer's
+// photos) and modified clicks are left alone.
+window.addEventListener(
+  'click',
+  (event) => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+    if (!(link instanceof HTMLAnchorElement) || (link.target && link.target !== '_self') || link.hasAttribute('download')) return;
+    const url = new URL(link.href, location.href);
+    if (url.origin !== location.origin || (url.pathname === location.pathname && url.search === location.search)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    window.location.assign(url.href);
+  },
+  { capture: true },
+);
+
 enableVisualEditing({
   // After an edit in the Studio (or its Refresh button), show the new version of the page.
   refresh: (payload) => {

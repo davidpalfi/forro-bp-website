@@ -49,10 +49,10 @@ Most texts have two boxes next to each other: **English** and **Magyar**.
 
 Instead of looking for the right form, you can edit the website where you see it.
 
-1. At the top of the editor, click **Edit on the page**. The website appears, with your unpublished changes already in it.
-2. Move the mouse over the page: texts and photos get a thin outline. **Click** one, and its field opens beside the page.
+1. At the top of the editor, click **Edit on the page**. The website appears on the page you were last editing (a teacher or artist: the Teachers or Artists page), with your unpublished changes already in it.
+2. Move the mouse over the page: texts and photos get a thin outline. **Click** one, and its field opens beside the page. Menu items and buttons are the exception: a click on them goes to that page, as on the real website; change their text in the form beside the page.
 3. Type, or choose another photo. About a second after you stop typing, the page shows the change. Visitors do not see it yet.
-4. Use the website's menu inside the view to go to another page, or the language switch for the Hungarian version.
+4. Use the website's menu and buttons inside the view to go to another page, or the language switch for the Hungarian version.
 5. When you are happy, click **Publish**, as in section 4.
 
 The outlines only appear inside the editor; they are not on the real website. On a phone, use the lists in section 2 instead.

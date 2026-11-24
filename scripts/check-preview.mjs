@@ -146,6 +146,12 @@ try {
       await tab.click('.menu-btn');
       const open = await tab.evaluate(() => document.documentElement.classList.contains('menu-open'));
       check(open, 'the menu button still works after an update');
+      // Sanity's overlays stop a click on a link text inside the Studio; a stand-in for them
+      // (a capture handler on the link that cancels the click) must not stop going to the page.
+      const link = '#menu a[href="/en/festival/program/"]';
+      await tab.evaluate((sel) => document.querySelector(sel)?.addEventListener('click', (e) => e.preventDefault(), { capture: true }), link);
+      await Promise.all([tab.waitForURL('**/en/festival/program/', { timeout: 10000 }).catch(() => {}), tab.click(link)]);
+      check(new URL(tab.url()).pathname === '/en/festival/program/', 'a click on a menu link goes to that page even where click-to-edit would catch it');
       check(errors.length === 0, `no script errors in the preview${errors.length ? ': ' + errors.join('; ') : ''}`);
     } finally {
       await browser.close();
