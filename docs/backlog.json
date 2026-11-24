@@ -41,7 +41,7 @@
       "id": "FB-1",
       "title": "Review every page against the Wix site and list the rough spots",
       "type": "research",
-      "status": "proposed",
+      "status": "todo",
       "priority": "P2",
       "milestone": "M1",
       "owner": "agent",
@@ -49,13 +49,14 @@
       "estimate": "M",
       "goal": "Find what still looks unfinished before the admin sees it, instead of waiting for Dávid to spot everything.",
       "acceptance": [
-        "Screenshots at 390 and 1280 px of every page in docs/HANDOFF.md \"How to check things\", in both languages, built from test content",
-        "Each festival page compared with its Wix counterpart",
-        "Dávid receives a numbered list of rough spots (what, where, screenshot)",
-        "Each spot he accepts becomes a ticket here; matters of taste (fonts, alignment) go to FB-17 instead"
+        "Every page of the test site (both languages) captured at 390, 1180 and 1280 px, festival pages next to their Wix counterparts",
+        "Automated sweep of every page done: horizontal overflow, text overflowing its box, console errors, broken or oversized images, poor text contrast, English fallback showing on /hu/ pages, tap targets under 44 px on phones",
+        "Findings sorted into broken / looks unfinished / taste, each with page, width, screenshot and a fix size (S/M/L)",
+        "Dávid receives them as one page with side-by-side screenshots and a numbered list; nothing is changed in the code during the review",
+        "Each finding he accepts becomes a ticket (next ids from meta.next_id); taste findings go into FB-17's notes; FB-1 is deleted"
       ],
       "refs": ["docs/HANDOFF.md#how-to-check-things"],
-      "notes": "Only what looks broken or unfinished. Placeholder photos, logos and bios are content (FB-18, FB-19)."
+      "notes": "Needs network access to forrobudapest.com, www.forrobudapest.com, static.wixstatic.com, forro-bp-website.pdavid92.workers.dev, 8hc671sk.apicdn.sanity.io and cdn.sanity.io (the cloud environment \"forro-bp-website\" allows them). Check reachability with curl first; if a host is blocked, stop and say which. Use the pre-installed Playwright/Chromium (deviceScaleFactor 2 for screenshots Dávid sees). Wix pages: /, /program, /teachers, /music, /location, /code-of-conduct, and the Hungarian ones under /hu (find their exact addresses from the Wix language switch). Wix loads content late: wait for network idle and scroll the page before a full-page screenshot. Only what looks broken or unfinished; placeholder photos, logos and bios are content (FB-18, FB-19)."
     },
     {
       "id": "FB-2",
