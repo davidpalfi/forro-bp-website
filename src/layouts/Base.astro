@@ -88,6 +88,8 @@ const headerLogoField = inFestival
     : festival.logo
   : communityLogoField;
 const logo = getImage(headerLogoField);
+// The browser-tab icon is the same top-bar logo, in its smallest size.
+const tabIcon = logo && (logo.srcset ? logo.srcset.split(', ')[0].split(' ')[0] : logo.src);
 const ticketUrl = inFestival ? safeUrl(festival.ticketUrl) : '';
 const headerDate = inFestival ? tr(festival, 'dateLine', lang) : '';
 const instagram = safeUrl((inFestival && festival.instagram) || site.instagram || festival.instagram);
@@ -104,6 +106,7 @@ const year = new Date().getFullYear();
     <title>{fullTitle}</title>
     {desc && <meta name="description" content={desc} />}
     <link rel="canonical" href={canonical} />
+    {tabIcon && <link rel="icon" href={tabIcon} />}
     {LANGS.map((l) => <link rel="alternate" hreflang={l} href={new URL(href(l, pagePath), Astro.site).href} />)}
     <link rel="alternate" hreflang="x-default" href={new URL(href(site.defaultLang, pagePath), Astro.site).href} />
     <meta property="og:title" content={fullTitle} />
