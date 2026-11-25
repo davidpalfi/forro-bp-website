@@ -1,6 +1,6 @@
 {
   "meta": {
-    "updated": "2026-11-24",
+    "updated": "2026-11-25",
     "rules": [
       "One ticket = one outcome someone can finish and check. Title is an imperative sentence.",
       "IDs (FB-n) are permanent. New tickets take the next free number (meta.next_id, then increase it). Never reuse or renumber.",
@@ -200,24 +200,6 @@
       "depends_on": ["FB-44"],
       "refs": ["docs/DECISIONS.md#s27-drag-to-reorder-on-the-page-tried-and-parked-2026-11-24"],
       "notes": "Needs whole blocks as click targets (FB-44, parked), so only worth trying if FB-44 is revived."
-    },
-    {
-      "id": "FB-9",
-      "title": "Delete the leftover branches on GitHub",
-      "type": "chore",
-      "status": "proposed",
-      "priority": "P3",
-      "milestone": "M1",
-      "owner": "agent",
-      "labels": ["tooling"],
-      "estimate": "S",
-      "goal": "Only main and branches with work in progress remain, so nobody builds on an old one.",
-      "acceptance": [
-        "Dávid gets a list of every branch other than main, each with what it holds and whether it is merged",
-        "The ones he approves are deleted",
-        "feature/drag-blocks-on-page stays (S27 refers to it)"
-      ],
-      "notes": "On 2026-11-24: five claude/* session branches and feature/drag-blocks-on-page."
     },
     {
       "id": "FB-11",
