@@ -16,3 +16,4 @@ public/_img/
 # Cloudflare (wrangler) local files and secrets
 .wrangler/
 .dev.vars*
+img/
